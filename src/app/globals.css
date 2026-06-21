@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+:root {
+  --armenian-red: #D4001A;
+  --armenian-blue: #0033A0;
+  --armenian-orange: #F2A900;
+  --warm-cream: #FDF6EC;
+  --dark-wood: #3D2B1F;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+  background-color: #FAFAFA;
+  color: #1a1a1a;
+}
+
+/* ── Card hover effect ── */
+.card-hover {
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.13);
+}
+
+/* ── Badge pill ── */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, rgba(212,0,26,0.10), rgba(242,169,0,0.13));
+  color: #A0000F;
+  border: 1px solid rgba(212,0,26,0.15);
+  white-space: nowrap;
+}
+
+/* ── Badge grid for host card ── */
+.badge-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.badge-scroll::-webkit-scrollbar { display: none; }
+
+/* ── Armenian ornament divider ── */
+.ornament-divider {
+  text-align: center;
+  color: var(--armenian-orange);
+  letter-spacing: 0.5em;
+  font-size: 1.1rem;
+  opacity: 0.5;
+}
+
+/* ── Section label chip ── */
+.section-label {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: #FDF6EC;
+  color: #D4001A;
+  margin-bottom: 1rem;
+}
+
+/* ── Gradient text ── */
+.gradient-text {
+  background: linear-gradient(135deg, #D4001A, #F2A900);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Star colors ── */
+.star-active { color: #F2A900; }
+.star-inactive { color: #D1D5DB; }
+
+/* ── Animate fade-up (use with Intersection Observer if desired) ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fadeUp 0.5s ease forwards;
+}
+
+/* ── Pulse dot (for live stats) ── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.4); }
+}
+.pulse-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22C55E;
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+/* ── Quote mark ── */
+.quote-mark {
+  font-family: Georgia, serif;
+  font-size: 4rem;
+  line-height: 1;
+  color: #E5E7EB;
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  user-select: none;
+}

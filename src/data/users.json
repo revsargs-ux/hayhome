@@ -1,0 +1,10 @@
+[
+  {
+    "id": "admin1",
+    "name": "Admin",
+    "email": "admin@hayhome.am",
+    "password": "admin123",
+    "role": "admin",
+    "createdAt": "2024-01-01"
+  }
+]
