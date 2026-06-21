@@ -15,12 +15,20 @@ async function readJSON<T>(filename: string): Promise<T[]> {
   }
 }
 
+// Table names with hayhome_ prefix to avoid conflicts with Dispatcher.PRO
+const T = {
+  hosts: "hayhome_hosts",
+  reviews: "hayhome_reviews",
+  bookings: "hayhome_bookings",
+  users: "hayhome_users",
+};
+
 // ============================================
 // HOSTS
 // ============================================
 export async function getHosts(): Promise<Host[]> {
   const { data, error } = await supabase
-    .from("hosts")
+    .from(T.hosts)
     .select("*")
     .eq("status", "active")
     .order("rating", { ascending: false });
@@ -34,7 +42,7 @@ export async function getHosts(): Promise<Host[]> {
 
 export async function getHost(id: string): Promise<Host | null> {
   const { data, error } = await supabase
-    .from("hosts")
+    .from(T.hosts)
     .select("*")
     .eq("id", id)
     .single();
@@ -61,7 +69,7 @@ export async function createHost(
   };
 
   const { data, error } = await supabase
-    .from("hosts")
+    .from(T.hosts)
     .insert(newHost)
     .select()
     .single();
@@ -75,7 +83,7 @@ export async function createHost(
 
 export async function updateHost(id: string, updates: Partial<Host>): Promise<Host | null> {
   const { data, error } = await supabase
-    .from("hosts")
+    .from(T.hosts)
     .update(updates)
     .eq("id", id)
     .select()
@@ -92,7 +100,7 @@ export async function updateHost(id: string, updates: Partial<Host>): Promise<Ho
 // REVIEWS
 // ============================================
 export async function getReviews(hostId?: string): Promise<Review[]> {
-  let query = supabase.from("reviews").select("*").order("date", { ascending: false });
+  let query = supabase.from(T.reviews).select("*").order("date", { ascending: false });
   if (hostId) query = query.eq("hostId", hostId);
 
   const { data, error } = await query;
@@ -109,7 +117,7 @@ export async function createReview(review: Omit<Review, "id">): Promise<Review> 
   const newReview: Review = { ...review, id: `r${Date.now()}` };
 
   const { data, error } = await supabase
-    .from("reviews")
+    .from(T.reviews)
     .insert(newReview)
     .select()
     .single();
@@ -121,14 +129,14 @@ export async function createReview(review: Omit<Review, "id">): Promise<Review> 
 
   // Пересчёт рейтинга хозяина
   const { data: hostReviews } = await supabase
-    .from("reviews")
+    .from(T.reviews)
     .select("rating")
     .eq("hostId", review.hostId);
 
   if (hostReviews && hostReviews.length > 0) {
     const avg = hostReviews.reduce((s: number, r: any) => s + r.rating, 0) / hostReviews.length;
     await supabase
-      .from("hosts")
+      .from(T.hosts)
       .update({
         rating: Math.round(avg * 10) / 10,
         reviewCount: hostReviews.length,
@@ -143,7 +151,7 @@ export async function createReview(review: Omit<Review, "id">): Promise<Review> 
 // BOOKINGS
 // ============================================
 export async function getBookings(hostId?: string): Promise<Booking[]> {
-  let query = supabase.from("bookings").select("*").order("createdAt", { ascending: false });
+  let query = supabase.from(T.bookings).select("*").order("createdAt", { ascending: false });
   if (hostId) query = query.eq("hostId", hostId);
 
   const { data, error } = await query;
@@ -167,7 +175,7 @@ export async function createBooking(
   };
 
   const { data, error } = await supabase
-    .from("bookings")
+    .from(T.bookings)
     .insert(newBooking)
     .select()
     .single();
@@ -181,7 +189,7 @@ export async function createBooking(
 
 export async function updateBooking(id: string, updates: Partial<Booking>): Promise<Booking | null> {
   const { data, error } = await supabase
-    .from("bookings")
+    .from(T.bookings)
     .update(updates)
     .eq("id", id)
     .select()
@@ -198,7 +206,7 @@ export async function updateBooking(id: string, updates: Partial<Booking>): Prom
 // USERS
 // ============================================
 export async function getUsers(): Promise<User[]> {
-  const { data, error } = await supabase.from("users").select("*");
+  const { data, error } = await supabase.from(T.users).select("*");
 
   if (error || !data) {
     console.warn("[Supabase] getUsers fallback to JSON:", error?.message);
@@ -209,7 +217,7 @@ export async function getUsers(): Promise<User[]> {
 
 export async function getUserByEmail(email: string): Promise<User | null> {
   const { data, error } = await supabase
-    .from("users")
+    .from(T.users)
     .select("*")
     .eq("email", email)
     .single();
@@ -230,7 +238,7 @@ export async function createUser(user: Omit<User, "id" | "createdAt">): Promise<
   };
 
   const { data, error } = await supabase
-    .from("users")
+    .from(T.users)
     .insert(newUser)
     .select()
     .single();

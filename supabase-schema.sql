@@ -1,10 +1,10 @@
--- HayHome: Схема таблиц для Supabase
+-- HayHome: Схема таблиц для Supabase (префикс hayhome_ чтобы не конфликтовать)
 -- Выполнить в Supabase Dashboard → SQL Editor
 
 -- ============================================
--- 1. TABLE: hosts
+-- 1. TABLE: hayhome_hosts
 -- ============================================
-CREATE TABLE IF NOT EXISTS hosts (
+CREATE TABLE IF NOT EXISTS hayhome_hosts (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   "familyName" TEXT NOT NULL,
@@ -34,11 +34,11 @@ CREATE TABLE IF NOT EXISTS hosts (
 );
 
 -- ============================================
--- 2. TABLE: reviews
+-- 2. TABLE: hayhome_reviews
 -- ============================================
-CREATE TABLE IF NOT EXISTS reviews (
+CREATE TABLE IF NOT EXISTS hayhome_reviews (
   id TEXT PRIMARY KEY,
-  "hostId" TEXT NOT NULL REFERENCES hosts(id) ON DELETE CASCADE,
+  "hostId" TEXT NOT NULL REFERENCES hayhome_hosts(id) ON DELETE CASCADE,
   "guestName" TEXT NOT NULL,
   "guestCountry" TEXT NOT NULL,
   rating SMALLINT NOT NULL DEFAULT 5 CHECK (rating BETWEEN 1 AND 5),
@@ -47,11 +47,11 @@ CREATE TABLE IF NOT EXISTS reviews (
 );
 
 -- ============================================
--- 3. TABLE: bookings
+-- 3. TABLE: hayhome_bookings
 -- ============================================
-CREATE TABLE IF NOT EXISTS bookings (
+CREATE TABLE IF NOT EXISTS hayhome_bookings (
   id TEXT PRIMARY KEY,
-  "hostId" TEXT NOT NULL REFERENCES hosts(id) ON DELETE CASCADE,
+  "hostId" TEXT NOT NULL REFERENCES hayhome_hosts(id) ON DELETE CASCADE,
   "hostName" TEXT NOT NULL,
   "guestName" TEXT NOT NULL,
   "guestEmail" TEXT NOT NULL,
@@ -67,9 +67,9 @@ CREATE TABLE IF NOT EXISTS bookings (
 );
 
 -- ============================================
--- 4. TABLE: users
+-- 4. TABLE: hayhome_users
 -- ============================================
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS hayhome_users (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
@@ -81,32 +81,23 @@ CREATE TABLE IF NOT EXISTS users (
 -- ============================================
 -- 5. INDEXES
 -- ============================================
-CREATE INDEX IF NOT EXISTS idx_hosts_region ON hosts(region);
-CREATE INDEX IF NOT EXISTS idx_hosts_city ON hosts(city);
-CREATE INDEX IF NOT EXISTS idx_hosts_status ON hosts(status);
-CREATE INDEX IF NOT EXISTS idx_reviews_hostId ON reviews("hostId");
-CREATE INDEX IF NOT EXISTS idx_bookings_hostId ON bookings("hostId");
-CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_hayhome_hosts_region ON hayhome_hosts(region);
+CREATE INDEX IF NOT EXISTS idx_hayhome_hosts_city ON hayhome_hosts(city);
+CREATE INDEX IF NOT EXISTS idx_hayhome_hosts_status ON hayhome_hosts(status);
+CREATE INDEX IF NOT EXISTS idx_hayhome_reviews_hostId ON hayhome_reviews("hostId");
+CREATE INDEX IF NOT EXISTS idx_hayhome_bookings_hostId ON hayhome_bookings("hostId");
+CREATE INDEX IF NOT EXISTS idx_hayhome_bookings_status ON hayhome_bookings(status);
+CREATE INDEX IF NOT EXISTS idx_hayhome_users_email ON hayhome_users(email);
 
 -- ============================================
 -- 6. RLS (Row Level Security)
 -- ============================================
-ALTER TABLE hosts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
-ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hayhome_hosts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hayhome_reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hayhome_bookings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hayhome_users ENABLE ROW LEVEL SECURITY;
 
--- Hosts: публичное чтение active, запись только через service_role
-CREATE POLICY "hosts_public_read" ON hosts FOR SELECT USING (status = 'active');
-CREATE POLICY "hosts_service_all" ON hosts FOR ALL USING (auth.role() = 'service_role');
-
--- Reviews: публичное чтение, запись через service_role
-CREATE POLICY "reviews_public_read" ON reviews FOR SELECT USING (true);
-CREATE POLICY "reviews_service_all" ON reviews FOR ALL USING (auth.role() = 'service_role');
-
--- Bookings: нет публичного чтения (приватные), только service_role
-CREATE POLICY "bookings_service_all" ON bookings FOR ALL USING (auth.role() = 'service_role');
-
--- Users: нет публичного чтения, только service_role
-CREATE POLICY "users_service_all" ON users FOR ALL USING (auth.role() = 'service_role');
+-- host data is public (active only)
+CREATE POLICY "hayhome_hosts_public_read" ON hayhome_hosts FOR SELECT USING (status = 'active');
+-- reviews are public
+CREATE POLICY "hayhome_reviews_public_read" ON hayhome_reviews FOR SELECT USING (true);
