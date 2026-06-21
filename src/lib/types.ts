@@ -1,0 +1,78 @@
+export type Stars = 1 | 2 | 3 | 4 | 5;
+
+export interface HostI18nEntry {
+  familyName?: string;
+  description?: string;
+  longDescription?: string;
+}
+
+export interface Host {
+  i18n?: Record<string, HostI18nEntry>;
+  id: string;
+  name: string;
+  familyName: string;
+  location: string;
+  city: string;
+  region: string;
+  stars: Stars;
+  pricePerNight: number;
+  description: string;
+  longDescription: string;
+  photos: string[];
+  coverPhoto: string;
+  languages: string[];
+  amenities: string[];
+  experiences: string[];
+  badges: string[];
+  maxGuests: number;
+  availableRooms: number;
+  rating: number;
+  reviewCount: number;
+  verified: boolean;
+  phone: string;
+  email: string;
+  createdAt: string;
+  status: "active" | "pending" | "suspended";
+}
+
+export interface Badge {
+  emoji: string;
+  label: string;
+  color: string;
+}
+
+export interface Review {
+  id: string;
+  hostId: string;
+  guestName: string;
+  guestCountry: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
+
+export interface Booking {
+  id: string;
+  hostId: string;
+  hostName: string;
+  guestName: string;
+  guestEmail: string;
+  guestPhone: string;
+  guestCountry: string;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  totalPrice: number;
+  status: "pending" | "confirmed" | "cancelled" | "completed";
+  message: string;
+  createdAt: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  role: "guest" | "host" | "admin";
+  createdAt: string;
+}
