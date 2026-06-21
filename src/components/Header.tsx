@@ -1,13 +1,16 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, Home, Search, Heart } from "lucide-react";
+import { Menu, X, Home, Search, Heart, User, LogOut, Shield } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { tr } = useLang();
+  const { user, logout } = useAuth();
   const n = tr.nav;
 
   return (
@@ -17,9 +20,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
             <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm"
-              style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-              H
-            </div>
+              style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>H</div>
             <span className="text-xl font-bold text-gray-900">
               Hay<span style={{ color: "#D4001A" }}>Home</span>
             </span>
@@ -41,17 +42,61 @@ export default function Header() {
           {/* Right: lang + auth */}
           <div className="hidden md:flex items-center gap-2">
             <LanguageSwitcher />
-            <Link href="/login" className="text-gray-600 hover:text-gray-900 font-medium transition-colors text-sm px-3 py-2">
-              {n.login}
-            </Link>
-            <Link href="/register"
-              className="px-4 py-2 rounded-full text-white font-medium text-sm transition-all hover:opacity-90 active:scale-95"
-              style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-              {n.register}
-            </Link>
+
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition text-sm font-medium text-gray-700"
+                >
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                    style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
+                    {user.name[0]}
+                  </div>
+                  <span className="max-w-[100px] truncate">{user.name}</span>
+                </button>
+
+                {userMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-1 z-50">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-xs text-gray-400">{user.email}</p>
+                      <p className="text-xs font-semibold text-gray-600 capitalize">{user.role}</p>
+                    </div>
+                    <Link href="/dashboard"
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => setUserMenuOpen(false)}>
+                      <User size={14} /> Dashboard
+                    </Link>
+                    {user.role === "admin" && (
+                      <Link href="/admin"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => setUserMenuOpen(false)}>
+                        <Shield size={14} /> Admin Panel
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => { setUserMenuOpen(false); logout(); }}
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50">
+                      <LogOut size={14} /> {n.logout ?? "Выйти"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link href="/login" className="text-gray-600 hover:text-gray-900 font-medium transition-colors text-sm px-3 py-2">
+                  {n.login}
+                </Link>
+                <Link href="/register"
+                  className="px-4 py-2 rounded-full text-white font-medium text-sm transition-all hover:opacity-90 active:scale-95"
+                  style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
+                  {n.register}
+                </Link>
+              </>
+            )}
           </div>
 
-          {/* Mobile burger */}
+          {/* Mobile */}
           <div className="md:hidden flex items-center gap-2">
             <LanguageSwitcher />
             <button className="p-2 rounded-lg text-gray-600 hover:bg-gray-100" onClick={() => setOpen(!open)}>
@@ -74,13 +119,26 @@ export default function Header() {
             <Heart size={18} /> {n.about}
           </Link>
           <div className="pt-2 flex flex-col gap-2">
-            <Link href="/login" className="text-center py-2 border border-gray-300 rounded-full text-gray-700 font-medium" onClick={() => setOpen(false)}>
-              {n.login}
-            </Link>
-            <Link href="/register" className="text-center py-2 rounded-full text-white font-medium"
-              style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }} onClick={() => setOpen(false)}>
-              {n.register}
-            </Link>
+            {user ? (
+              <>
+                <Link href="/dashboard" className="text-center py-2 border border-gray-300 rounded-full text-gray-700 font-medium" onClick={() => setOpen(false)}>
+                  Dashboard
+                </Link>
+                <button onClick={() => { setOpen(false); logout(); }} className="py-2 rounded-full text-red-600 border border-red-200 font-medium">
+                  {n.logout ?? "Выйти"}
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="text-center py-2 border border-gray-300 rounded-full text-gray-700 font-medium" onClick={() => setOpen(false)}>
+                  {n.login}
+                </Link>
+                <Link href="/register" className="text-center py-2 rounded-full text-white font-medium"
+                  style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }} onClick={() => setOpen(false)}>
+                  {n.register}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
