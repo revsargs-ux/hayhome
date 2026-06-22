@@ -62,6 +62,7 @@ export interface Translations {
     login: string;
     register: string;
     logout: string;
+    partner?: string;
   };
   hero: {
     greeting: string;
@@ -157,6 +158,7 @@ const t: Record<LangCode, Translations> = {
       login: "Войти",
       register: "Регистрация",
       logout: "Выйти",
+      partner: "Партнёры",
     },
     hero: {
       greeting: "Bari Ekeq!",
@@ -243,7 +245,7 @@ const t: Record<LangCode, Translations> = {
   },
 
   en: {
-    nav: { findFamily: "Find a Family", hostGuests: "Host Guests", about: "About", login: "Log In", register: "Sign Up", logout: "Sign Out" },
+    nav: { findFamily: "Find a Family", hostGuests: "Host Guests", about: "About", partner: "Partners", login: "Log In", register: "Sign Up", logout: "Sign Out" },
     hero: {
       greeting: "Bari Ekeq!",
       title1: "Come in — become",
@@ -306,7 +308,7 @@ const t: Record<LangCode, Translations> = {
   },
 
   hy: {
-    nav: { findFamily: "Գտնել ընտանիք", hostGuests: "Ընդունել հյուրեր", about: "Մեր մասին", login: "Մուտք", register: "Գրանցում" , logout: "Ելք" },
+    nav: { findFamily: "Գտնել ընտանիք", hostGuests: "Ընդունել հյուրեր", about: "Մեր մասին", partner: "Գործընկերներ", login: "Մուտք", register: "Գրանցում" , logout: "Ելք" },
     hero: {
       greeting: "Բարի եկաք!",
       title1: "Արի — դարձիր",

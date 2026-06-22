@@ -37,6 +37,9 @@ export default function Header() {
             <Link href="/about" className="text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
               {n.about}
             </Link>
+            <Link href="/partner" className="text-gray-600 hover:text-red-600 transition-colors font-medium text-sm flex items-center gap-1">
+              🤝 <span className="hidden sm:inline">{n.partner || ("Партнёры")}</span>
+            </Link>
           </nav>
 
           {/* Right: lang + auth */}
@@ -117,6 +120,9 @@ export default function Header() {
           </Link>
           <Link href="/about" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
             <Heart size={18} /> {n.about}
+          </Link>
+          <Link href="/partner" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
+            🤝 {n.partner || ("Партнёры")}
           </Link>
           <div className="pt-2 flex flex-col gap-2">
             {user ? (
