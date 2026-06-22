@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Booking, Host } from "@/lib/types";
-import { Calendar, DollarSign, Users, Star, Edit2, Save, X, RefreshCw, LogOut, Shield } from "lucide-react";
+import { Calendar, DollarSign, Users, Star, Edit2, Save, X, RefreshCw, LogOut, Shield, Share2 } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
@@ -173,11 +174,17 @@ export default function DashboardPage() {
         {partnerCode && (
           <div className="mt-4 rounded-xl p-4 bg-white shadow-sm">
             <p className="text-xs text-gray-500 mb-2">{lang === "ru" ? "🤝 Ваша партнёрская ссылка — делитесь с друзьями" : "🤝 Your referral link — share with friends"}</p>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-3">
               <code className="flex-1 text-sm bg-gray-50 rounded-lg px-3 py-2 truncate">https://hay-home.com/register?ref={partnerCode}</code>
               <button onClick={() => { navigator.clipboard.writeText("https://hay-home.com/register?ref=" + partnerCode); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="px-3 py-2 rounded-lg text-sm font-medium transition" style={{ background: copied ? "#16a34a" : "#D4001A", color: "white" }}>
                 {copied ? (lang === "ru" ? "✓" : "✓") : (lang === "ru" ? "Копировать" : "Copy")}
               </button>
+              <button onClick={() => { if (navigator.share) navigator.share({ title: "HayHome", url: "https://hay-home.com/register?ref=" + partnerCode }); else { navigator.clipboard.writeText("https://hay-home.com/register?ref=" + partnerCode); setCopied(true); setTimeout(() => setCopied(false), 2000); } }} className="px-3 py-2 rounded-lg text-sm font-medium border transition hover:bg-gray-50" style={{ borderColor: "#D4001A", color: "#D4001A" }}>
+                <Share2 size={16} /> {lang === "ru" ? "Поделиться" : "Share"}
+              </button>
+            </div>
+            <div className="flex justify-center">
+              <QRCodeSVG value={"https://hay-home.com/register?ref=" + partnerCode} size={120} level="M" fgColor="#D4001A" bgColor="white" />
             </div>
           </div>
         )}
