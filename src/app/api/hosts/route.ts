@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getHosts, createHost } from "@/lib/data";
 import { rateLimit } from "@/lib/rateLimit";
 import { sendHostApplicationNotification } from "@/lib/email";
+import { createClient } from "@supabase/supabase-js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_TEXT = 2000;
@@ -81,6 +82,18 @@ export async function POST(req: NextRequest) {
     pricePerNight: hostData.pricePerNight,
     description: hostData.description,
   }).catch((err) => console.error("[Email] Host application notification failed:", err));
+
+  // Log to application history
+  try {
+    const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+    await sb.from("hayhome_host_history").insert({
+      host_id: host.id,
+      action: "submitted",
+      note: `Заявка: ${hostData.familyName} — ${hostData.city}, ${hostData.region}`,
+    });
+  } catch (e) {
+    console.error("[History] Failed to log submission:", e);
+  }
 
   return NextResponse.json(host, { status: 201 });
 }

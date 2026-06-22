@@ -27,6 +27,7 @@ export interface Host {
   maxGuests: number;
   availableRooms: number;
   rating: number;
+  admin_notes?: string;
   reviewCount: number;
   verified: boolean;
   phone: string;

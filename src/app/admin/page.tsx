@@ -42,6 +42,19 @@ export default function AdminPage() {
     setUpdating(null);
   };
 
+  const logAction = async (hostId: string, action: string, note?: string) => {
+    try {
+      await fetch(`/api/hosts/${hostId}/notes`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, note }),
+      });
+    } catch (e) {
+      console.error("[Admin] Failed to log action:", e);
+    }
+  };
+
   const updateBooking = async (id: string, status: Booking["status"]) => {
     setUpdating(id);
     await fetch(`/api/bookings/${id}`, {
@@ -128,7 +141,7 @@ export default function AdminPage() {
                     </h2>
                     <div className="space-y-3">
                       {pendingHosts.map((host) => (
-                        <HostRow key={host.id} host={host} updating={updating} onUpdate={updateHost} />
+                        <HostRow key={host.id} host={host} updating={updating} onUpdate={updateHost} onLogAction={logAction} />
                       ))}
                     </div>
                   </div>
@@ -139,12 +152,12 @@ export default function AdminPage() {
                   </h2>
                   <div className="space-y-3">
                     {activeHosts.map((host) => (
-                      <HostRow key={host.id} host={host} updating={updating} onUpdate={updateHost} />
+                      <HostRow key={host.id} host={host} updating={updating} onUpdate={updateHost} onLogAction={logAction} />
                     ))}
                   </div>
                 </div>
                 {hosts.filter(h => h.status === "suspended").map((host) => (
-                  <HostRow key={host.id} host={host} updating={updating} onUpdate={updateHost} />
+                  <HostRow key={host.id} host={host} updating={updating} onUpdate={updateHost} onLogAction={logAction} />
                 ))}
               </div>
             )}
@@ -230,13 +243,43 @@ export default function AdminPage() {
   );
 }
 
-function HostRow({ host, updating, onUpdate }: {
+function HostRow({ host, updating, onUpdate, onLogAction }: {
   host: Host;
   updating: string | null;
   onUpdate: (id: string, updates: Partial<Host>) => void;
+  onLogAction: (id: string, action: string, note?: string) => void;
 }) {
   const { lang } = useLang();
   const a = (ru: string, en: string) => lang === "ru" ? ru : en;
+  const [note, setNote] = useState("");
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState<any[]>([]);
+  const [savingNote, setSavingNote] = useState(false);
+
+  const loadHistory = async () => {
+    const res = await fetch(`/api/hosts/${host.id}/notes`);
+    setHistory(await res.json());
+    setShowHistory(true);
+  };
+
+  const saveNote = async () => {
+    if (!note.trim()) return;
+    setSavingNote(true);
+    await onLogAction(host.id, "note_added", note);
+    setNote("");
+    if (showHistory) loadHistory();
+    setSavingNote(false);
+  };
+
+  const actionLabels: Record<string, Record<string, string>> = {
+    submitted: { ru: "Заявка подана", en: "Application submitted" },
+    approved: { ru: "Одобрена", en: "Approved" },
+    rejected: { ru: "Отклонена", en: "Rejected" },
+    suspended: { ru: "Приостановлена", en: "Suspended" },
+    restored: { ru: "Восстановлена", en: "Restored" },
+    note_added: { ru: "Заметка", en: "Note" },
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -249,17 +292,20 @@ function HostRow({ host, updating, onUpdate }: {
           </div>
           <p className="text-sm text-gray-600">{host.description}</p>
           <p className="text-xs text-gray-400 mt-1">
-            {host.phone} · {host.email} · {"★".repeat(host.stars)} · ${host.pricePerNight}/ночь
+            {host.phone} · {host.email} · {"★".repeat(host.stars)} · ${host.pricePerNight}{a("/ночь", "/night")}
           </p>
+          {host.admin_notes && (
+            <p className="text-xs text-amber-600 mt-1 bg-amber-50 rounded px-2 py-1">📝 {host.admin_notes}</p>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
           {host.status === "pending" && (
             <>
-              <button onClick={() => onUpdate(host.id, { status: "active", verified: true })} disabled={updating === host.id}
+              <button onClick={() => { onUpdate(host.id, { status: "active", verified: true }); onLogAction(host.id, "approved"); }} disabled={updating === host.id}
                 className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg font-medium hover:bg-green-600 disabled:opacity-50">
                 <Check size={12} /> {a("Одобрить", "Approve")}
               </button>
-              <button onClick={() => onUpdate(host.id, { status: "suspended" })} disabled={updating === host.id}
+              <button onClick={() => { onUpdate(host.id, { status: "suspended" }); onLogAction(host.id, "rejected"); }} disabled={updating === host.id}
                 className="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg font-medium hover:bg-red-600 disabled:opacity-50">
                 <X size={12} /> {a("Отклонить", "Reject")}
               </button>
@@ -268,27 +314,56 @@ function HostRow({ host, updating, onUpdate }: {
           {host.status === "active" && (
             <>
               <div className="flex items-center gap-1">
-                <select
-                  defaultValue={host.stars}
+                <select defaultValue={host.stars}
                   onChange={(e) => onUpdate(host.id, { stars: Number(e.target.value) as Host["stars"] })}
-                  className="px-2 py-1.5 border border-gray-200 rounded-lg text-xs text-gray-700 outline-none"
-                >
+                  className="px-2 py-1.5 border border-gray-200 rounded-lg text-xs text-gray-700 outline-none">
                   {[1, 2, 3, 4, 5].map((s) => <option key={s} value={s}>{"★".repeat(s)}</option>)}
                 </select>
               </div>
-              <button onClick={() => onUpdate(host.id, { status: "suspended" })} disabled={updating === host.id}
+              <button onClick={() => { onUpdate(host.id, { status: "suspended" }); onLogAction(host.id, "suspended"); }} disabled={updating === host.id}
                 className="px-3 py-1.5 bg-gray-200 text-gray-700 text-xs rounded-lg font-medium hover:bg-gray-300 disabled:opacity-50">
                 {a("Приостановить", "Suspend")}
               </button>
             </>
           )}
           {host.status === "suspended" && (
-            <button onClick={() => onUpdate(host.id, { status: "active" })} disabled={updating === host.id}
+            <button onClick={() => { onUpdate(host.id, { status: "active" }); onLogAction(host.id, "restored"); }} disabled={updating === host.id}
               className="px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg font-medium hover:bg-blue-600 disabled:opacity-50">
               {a("Восстановить", "Restore")}
             </button>
           )}
         </div>
+      </div>
+      {/* Note + History */}
+      <div className="mt-3 pt-3 border-t border-gray-100">
+        <div className="flex gap-2">
+          <input value={note} onChange={(e) => setNote(e.target.value)} onKeyDown={(e) => e.key === "Enter" && saveNote()}
+            placeholder={a("Добавить заметку...", "Add note...")}
+            className="flex-1 px-3 py-1.5 text-xs border border-gray-200 rounded-lg outline-none focus:border-red-400" />
+          <button onClick={saveNote} disabled={savingNote || !note.trim()}
+            className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs rounded-lg hover:bg-gray-200 disabled:opacity-50">
+            {savingNote ? "..." : a("Сохранить", "Save")}
+          </button>
+          <button onClick={loadHistory}
+            className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs rounded-lg hover:bg-gray-200">
+            {a("История", "History")}
+          </button>
+        </div>
+        {showHistory && (
+          <div className="mt-2 max-h-40 overflow-y-auto">
+            {history.length === 0 ? (
+              <p className="text-xs text-gray-400">{a("Нет записей", "No records")}</p>
+            ) : (
+              history.map((h: any) => (
+                <div key={h.id} className="text-xs text-gray-500 py-1 border-b border-gray-50">
+                  <span className="text-gray-400">{h.created_at?.slice(0, 16)}</span>{" "}
+                  <span className="font-medium text-gray-700">{actionLabels[h.action]?.[lang] || actionLabels[h.action]?.en || h.action}</span>
+                  {h.note && <span className="text-gray-500"> — {h.note}</span>}
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
