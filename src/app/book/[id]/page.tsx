@@ -102,10 +102,15 @@ export default function BookPage() {
           <p>👥 {form.guests} {tr.hosts.guests}</p>
           <p>💵 {t("total")}: ${total}</p>
         </div>
-        <Link href="/hosts" className="block w-full py-3 rounded-full text-white font-semibold text-center"
-          style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-          {t("moreFamilies")}
-        </Link>
+        <div className="flex flex-col gap-3">
+          <Link href="/dashboard" className="block w-full py-3 rounded-full text-white font-semibold text-center"
+            style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
+            {lang === "ru" ? "Мои бронирования" : lang === "hy" ? "Իմ ամրագրումները" : lang === "fr" ? "Mes réservations" : lang === "de" ? "Meine Buchungen" : lang === "es" ? "Mis reservas" : lang === "ar" ? "حجوزاتي" : lang === "zh" ? "我的预订" : "My bookings"}
+          </Link>
+          <Link href="/hosts" className="block w-full py-3 rounded-full text-center font-semibold border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition">
+            {t("moreFamilies")}
+          </Link>
+        </div>
       </div>
     </div>
   );
