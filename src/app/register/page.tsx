@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function RegisterPage() {
   const router = useRouter();
   const { tr } = useLang();
+  const { refresh } = useAuth();
   const a = tr.auth;
   const n = tr.nav;
 
@@ -29,6 +31,7 @@ export default function RegisterPage() {
       body: JSON.stringify({ name: form.name, email: form.email, password: form.password, role: "guest" }),
     });
     if (res.ok) {
+      await refresh(); // обновить AuthContext до навигации
       router.push("/hosts");
     } else {
       const d = await res.json();

@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
   const { tr } = useLang();
+  const { refresh } = useAuth();
   const a = tr.auth;
   const n = tr.nav;
 
@@ -27,6 +29,7 @@ export default function LoginPage() {
     });
     if (res.ok) {
       const data = await res.json();
+      await refresh(); // обновить AuthContext до навигации
       router.push(data.role === "admin" ? "/admin" : "/dashboard");
     } else {
       setError(a.wrongCreds);
