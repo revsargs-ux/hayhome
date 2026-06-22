@@ -4,14 +4,16 @@ import { Host, Booking } from "@/lib/types";
 import { Check, X, Star, Users, DollarSign, Home, RefreshCw } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 
-type Tab = "hosts" | "bookings" | "stats";
+type Tab = "hosts" | "bookings" | "stats" | "payouts";
 
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>("hosts");
   const [hosts, setHosts] = useState<Host[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [payouts, setPayouts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [payoutLoading, setPayoutLoading] = useState(false);
 
   const { lang } = useLang();
 
@@ -19,12 +21,14 @@ export default function AdminPage() {
 
   const load = async () => {
     setLoading(true);
-    const [h, b] = await Promise.all([
+    const [h, b, p] = await Promise.all([
       fetch("/api/hosts?all=1", { credentials: "include" }).then((r) => r.json()),
       fetch("/api/bookings", { credentials: "include" }).then((r) => r.json()),
+      fetch("/api/partners/payout/", { credentials: "include" }).then((r) => r.json()).catch(() => []),
     ]);
     setHosts(h);
     setBookings(b);
+    setPayouts(Array.isArray(p) ? p : []);
     setLoading(false);
   };
 
@@ -75,6 +79,7 @@ export default function AdminPage() {
   const tabs: { key: Tab; label: string; badge?: number }[] = [
     { key: "hosts", label: a("Хозяева", "Hosts"), badge: pendingHosts.length },
     { key: "bookings", label: a("Бронирования", "Bookings"), badge: pendingBookings.length },
+    { key: "payouts", label: a("Выплаты", "Payouts"), badge: payouts.filter(p => p.status === "pending").length || undefined },
     { key: "stats", label: a("Статистика", "Statistics") },
   ];
 
@@ -209,6 +214,63 @@ export default function AdminPage() {
             )}
 
             {/* Stats tab */}
+            {tab === "payouts" && (
+              <div className="space-y-4">
+                {payouts.length === 0 ? (
+                  <div className="text-center py-20 text-gray-400">{a("Нет запросов на вывод", "No payout requests")}</div>
+                ) : (
+                  payouts.map((p: any) => {
+                    const partner = p.hayhome_partners;
+                    const methodLabels: Record<string, string> = { idram: "Idram", bank_transfer: a("Банк", "Bank"), crypto: "Крипта" };
+                    const statusLabels: Record<string, Record<string, string>> = {
+                      pending: { ru: "Ожидает", en: "Pending" },
+                      confirmed: { ru: "Выплачен", en: "Paid" },
+                      rejected: { ru: "Отклонён", en: "Rejected" },
+                    };
+                    return (
+                      <div key={p.id} className="bg-white rounded-xl shadow-sm p-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <span className="font-semibold text-gray-900">${p.amount}</span>
+                              <span className="text-gray-400 text-sm">· {partner?.name || "?"} ({partner?.code || "?"})</span>
+                              <PayoutBadge status={p.status} lang={lang} />
+                            </div>
+                            <p className="text-xs text-gray-500">
+                              {methodLabels[p.method] || p.method} · {p.details}
+                              {partner?.email && <> · {partner.email}</>}
+                            </p>
+                            {p.created_at && <p className="text-xs text-gray-400 mt-1">{p.created_at.slice(0, 16)}</p>}
+                          </div>
+                          {p.status === "pending" && (
+                            <div className="flex gap-2">
+                              <button onClick={async () => {
+                                setPayoutLoading(true);
+                                await fetch("/api/partners/payout/", { method: "PATCH", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payoutId: p.id, decision: "confirmed" }) });
+                                await load(); setPayoutLoading(false);
+                              }} disabled={payoutLoading}
+                                className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg font-medium hover:bg-green-600 disabled:opacity-50">
+                                <Check size={12} /> {a("Выплатить", "Pay")}
+                              </button>
+                              <button onClick={async () => {
+                                const reason = prompt(a("Причина отклонения (опционально):", "Rejection reason (optional):"));
+                                if (reason === null) return;
+                                setPayoutLoading(true);
+                                await fetch("/api/partners/payout/", { method: "PATCH", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payoutId: p.id, decision: "rejected", reason }) });
+                                await load(); setPayoutLoading(false);
+                              }} disabled={payoutLoading}
+                                className="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg font-medium hover:bg-red-600 disabled:opacity-50">
+                                <X size={12} /> {a("Отклонить", "Reject")}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            )}
             {tab === "stats" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-white rounded-2xl shadow-sm p-6">
@@ -386,4 +448,10 @@ function StatusBadgeHost({ status }: { status: Host["status"] }) {
   const map = { active: "bg-green-100 text-green-700", pending: "bg-yellow-100 text-yellow-700", suspended: "bg-red-100 text-red-700" };
   const labels: Record<string, Record<string, string>> = { active: { ru: "Активен", en: "Active" }, pending: { ru: "На проверке", en: "Pending" }, suspended: { ru: "Приостановлен", en: "Suspended" } };
   return <span className={`text-xs rounded-full px-2 py-0.5 font-medium ${map[status]}`}>{labels[status]?.[lang] || labels[status]?.en || status}</span>;
+}
+
+function PayoutBadge({ status, lang }: { status: string; lang: string }) {
+  const map: Record<string, string> = { pending: "bg-yellow-100 text-yellow-700", confirmed: "bg-green-100 text-green-700", rejected: "bg-red-100 text-red-700" };
+  const labels: Record<string, Record<string, string>> = { pending: { ru: "Ожидает", en: "Pending" }, confirmed: { ru: "Выплачен", en: "Paid" }, rejected: { ru: "Отклонён", en: "Rejected" } };
+  return <span className={"text-xs rounded-full px-2 py-0.5 font-medium " + (map[status] || "")}>{labels[status]?.[lang] || labels[status]?.en || status}</span>;
 }

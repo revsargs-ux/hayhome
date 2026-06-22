@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { rateLimit } from "@/lib/rateLimit";
+import { sendPayoutRequestNotification } from "@/lib/email";
 
 const MIN_PAYOUT = 30;
 
@@ -53,10 +54,19 @@ export async function POST(req: NextRequest) {
 
   const { error: pErr } = await supabase.from("hayhome_payouts").insert(payout);
   if (pErr) {
-    // Откат баланса
     await supabase.from("hayhome_partners").update({ balance: partner.balance }).eq("id", partner.id);
     return NextResponse.json({ error: "Failed to create payout" }, { status: 500 });
   }
+
+  // Email notifications (async, non-blocking)
+  sendPayoutRequestNotification({
+    partnerName: partner.name || partner.user_id,
+    partnerEmail: partner.email || "",
+    amount,
+    method,
+    details,
+    partnerCode: partner.code,
+  }).catch((err) => console.error("[Email] Payout notification failed:", err));
 
   return NextResponse.json({ payout, newBalance: partner.balance - amount });
 }
