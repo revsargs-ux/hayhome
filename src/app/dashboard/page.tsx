@@ -43,8 +43,8 @@ export default function DashboardPage() {
   const loadData = async () => {
     setLoading(true);
     const [bRes, hRes] = await Promise.all([
-      fetch("/api/bookings"),
-      fetch("/api/hosts?all=1"),
+      fetch("/api/bookings", { credentials: "include" }),
+      fetch("/api/hosts?all=1", { credentials: "include" }),
     ]);
     const bData = await bRes.json();
     const hData = await hRes.json();
@@ -74,7 +74,14 @@ export default function DashboardPage() {
     setSaving(false);
   };
 
-  const myBookings = user?.role === "admin" ? bookings : bookings.filter(b => myProfile ? b.hostId === myProfile.id : false);
+  const myBookings = user?.role === "admin"
+    ? bookings
+    : bookings.filter(b =>
+        // Хозяин видит заявки на свою семью
+        (myProfile && b.hostId === myProfile.id) ||
+        // Гость видит свои бронирования
+        (user && b.guestEmail === user.email)
+      );
   const pending = myBookings.filter(b => b.status === "pending").length;
   const confirmed = myBookings.filter(b => b.status === "confirmed").length;
   const revenue = myBookings.filter(b => b.status === "completed").reduce((s, b) => s + b.totalPrice, 0);

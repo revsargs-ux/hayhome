@@ -41,6 +41,7 @@ export default function BookPage() {
     try {
       const res = await fetch("/api/bookings", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, hostId: id, hostName: host.familyName, totalPrice: total }),
       });
