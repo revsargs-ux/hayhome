@@ -22,8 +22,8 @@ function PartnerContent() {
     step3Desc: { ru: "5% от каждого бронирования — 2 года. Минимальный вывод $30", en: "5% from every booking — 2 years. Min payout $30", hy: "5% ամեն ամրագրումից — 2 տարի. Նվազագույն տրամադրություն $30", fr: "5% par réservation — 2 ans. Min $30", de: "5% pro Buchung — 2 Jahre. Min $30", es: "5% por reserva — 2 años. Mín $30" },
     ambassadorTitle: { ru: "Амбассадор", en: "Ambassador", hy: "Ամբասադոր", fr: "Ambassadeur", de: "Botschafter", es: "Embajador" },
     ambassadorDesc: { ru: "Привлекайте туристов и гостей. Они регистрируются по вашей ссылке — вы получаете 5% от каждого их бронирования в течение 2 лет.", en: "Invite tourists and guests. They register via your link — you get 5% from each booking for 2 years.", hy: "Հրավիրեք զբոսաշրջիկների. Նրանք գրանցվում են ձեր հղումով — դուք ստանում եք 5% ամեն ամրագրումից 2 տարի:", fr: "Invitez des touristes. Ils s'inscrivent via votre lien — 5% par réservation pendant 2 ans.", de: "Laden Sie Touristen ein. Sie registrieren sich über Ihren Link — 5% pro Buchung für 2 Jahre.", es: "Invite turistas. Se registran por su enlace — 5% de cada reserva por 2 años." },
-    hunterTitle: { ru: "Охотник за семьями", en: "Family Hunter", hy: "Ընտանիքների որոշիչ", fr: "Chasseur de familles", de: "Familien-Jäger", es: "Cazador de familias" },
-    hunterDesc: { ru: "Находите семьи и мастеров, помогаете им зарегистрироваться на платформе. $5 бонус + 5% от бронирований — 2 года.", en: "Find families and artisans, help them register. $5 bonus + 5% from bookings — 2 years.", hy: "Գտեք ընտանիքներ և վարպետներ, օգնեք նրանց գրանցվել։ $5 բոնուս + 5% ամրագրումներից — 2 տարի.", fr: "Trouvez des familles et artisans. $5 bonus + 5% des réservations — 2 ans.", de: "Finden Sie Familien und Handwerker. $5 Bonus + 5% von Buchungen — 2 Jahre.", es: "Encuentre familias y artesanos. $5 bonus + 5% de reservas — 2 años." },
+    scoutTitle: { ru: "Скаут", en: "Scout", hy: "Սկաուտ", fr: "Scout", de: "Scout", es: "Scout" },
+    scoutDesc: { ru: "Находите семьи и мастеров, помогаете им зарегистрироваться на платформе. 5% от бронирований — 2 года.", en: "Find families and artisans, help them register. 5% from bookings — 2 years.", hy: "Գտեք ընտանիքներ և վարպետներ, օգնեք նրանց գրանցվել։ 5% ամրագրումներից — 2 տարի.", fr: "Trouvez des familles et artisans. 5% des réservations — 2 ans.", de: "Finden Sie Familien und Handwerker. 5% von Buchungen — 2 Jahre.", es: "Encuentre familias y artesanos. 5% de reservas — 2 años." },
     cta: { ru: "Стать партнёром", en: "Become a Partner", hy: "Դարձել գործընկեր", fr: "Devenir partenaire", de: "Partner werden", es: "Hacerse socio" },
     faq1q: { ru: "Когда я получу первую выплату?", en: "When do I get my first payout?" },
     faq1a: { ru: "После первого бронирования от вашего реферала. Выплаты раз в месяц при накоплении от $30.", en: "After the first booking by your referral. Payouts monthly from $30." },
@@ -95,11 +95,11 @@ function PartnerContent() {
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
                   <MapPin size={24} className="text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">{t("hunterTitle")}</h3>
+                <h3 className="text-xl font-bold text-gray-900">{t("scoutTitle")}</h3>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed">{t("hunterDesc")}</p>
+              <p className="text-gray-600 text-sm leading-relaxed">{t("scoutDesc")}</p>
               <div className="mt-4 flex items-center gap-2 text-sm font-semibold" style={{ color: "#D4001A" }}>
-                <Shield size={16} /> $5 + 5% × 2 {lang === "ru" ? "года" : "years"}
+                <Shield size={16} /> 5% × 2 {lang === "ru" ? "года" : "years"}
               </div>
             </div>
           </div>
