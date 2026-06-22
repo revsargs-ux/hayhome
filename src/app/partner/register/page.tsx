@@ -88,7 +88,7 @@ function PartnerRegisterContent() {
                   <MapPin size={28} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-lg">{lang === "ru" ? "Скаут" : "Scout"}</h3>
+                  <h3 className="font-bold text-gray-900 text-lg">{lang === "ru" ? "Агент" : "Agent"}</h3>
                   <p className="text-gray-500 text-sm mt-1">{lang === "ru" ? "Находите семьи и мастеров для платформы" : "Find families and artisans for the platform"}</p>
                   <div className="mt-2 text-sm font-bold" style={{ color: "#D4001A" }}>5% × 2 {lang === "ru" ? "года" : "years"}</div>
                 </div>
