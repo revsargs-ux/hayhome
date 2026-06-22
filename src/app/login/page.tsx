@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 
 export default function LoginPage() {
@@ -11,6 +12,7 @@ export default function LoginPage() {
   const n = tr.nav;
 
   const [form, setForm] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -32,6 +34,8 @@ export default function LoginPage() {
     setLoading(false);
   };
 
+  const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900";
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-sm p-8 w-full max-w-md">
@@ -48,16 +52,22 @@ export default function LoginPage() {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
             <input required type="email" value={form.email}
-              onChange={(e) => setForm(f => ({ ...f, email: e.target.value }))}
+              onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
               placeholder="your@email.com"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
+              className={inputCls} />
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">{a.password}</label>
-            <input required type="password" value={form.password}
-              onChange={(e) => setForm(f => ({ ...f, password: e.target.value }))}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
+            <div className="relative">
+              <input required type={showPassword ? "text" : "password"} value={form.password}
+                onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                placeholder="••••••••"
+                className={`${inputCls} pr-12`} />
+              <button type="button" onClick={() => setShowPassword(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition p-1">
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
           <button type="submit" disabled={loading}
@@ -79,7 +89,6 @@ export default function LoginPage() {
             {n.hostGuests}
           </Link>
         </p>
-        <p className="text-center text-xs text-gray-400 mt-4">Admin: admin@hayhome.am / admin123</p>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 
 export default function RegisterPage() {
@@ -11,12 +12,15 @@ export default function RegisterPage() {
   const n = tr.nav;
 
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.password !== form.confirm) { setError(a.passMismatch); return; }
+    if (form.password.length < 6) { setError(a.minPass); return; }
     setLoading(true);
     setError("");
     const res = await fetch("/api/auth/register", {
@@ -32,6 +36,8 @@ export default function RegisterPage() {
     }
     setLoading(false);
   };
+
+  const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900";
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -49,27 +55,43 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">{a.name}</label>
-            <input required value={form.name} onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
+            <input required value={form.name}
+              onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
               placeholder="John Smith"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
+              className={inputCls} />
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
-            <input required type="email" value={form.email} onChange={(e) => setForm(f => ({ ...f, email: e.target.value }))}
+            <input required type="email" value={form.email}
+              onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
               placeholder="your@email.com"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
+              className={inputCls} />
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">{a.password}</label>
-            <input required type="password" value={form.password} onChange={(e) => setForm(f => ({ ...f, password: e.target.value }))}
-              placeholder={a.minPass}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
+            <div className="relative">
+              <input required type={showPass ? "text" : "password"} value={form.password}
+                onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                placeholder={a.minPass}
+                className={`${inputCls} pr-12`} />
+              <button type="button" onClick={() => setShowPass(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition p-1">
+                {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">{a.confirmPassword}</label>
-            <input required type="password" value={form.confirm} onChange={(e) => setForm(f => ({ ...f, confirm: e.target.value }))}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
+            <div className="relative">
+              <input required type={showConfirm ? "text" : "password"} value={form.confirm}
+                onChange={e => setForm(f => ({ ...f, confirm: e.target.value }))}
+                placeholder="••••••••"
+                className={`${inputCls} pr-12`} />
+              <button type="button" onClick={() => setShowConfirm(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition p-1">
+                {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
           <button type="submit" disabled={loading}
