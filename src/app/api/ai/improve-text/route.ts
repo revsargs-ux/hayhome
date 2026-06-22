@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   try {
     const response = await client.chat.completions.create({
       model,
-      max_tokens: 4000, // GLM-5.2 нужно много токенов на размышление
+      max_tokens: 800,
       temperature: 0.85,
       stream: false,
       messages: [{ role: "user", content: userPrompt }],
