@@ -41,9 +41,20 @@ export default function BecomeHostPage() {
     languages: ["Армянский"] as string[],
   });
 
+  const [customExp, setCustomExp] = useState("");
+  const [customAmenity, setCustomAmenity] = useState("");
+
   const set = (field: string, value: unknown) => setForm(f => ({ ...f, [field]: value }));
   const toggle = (field: "amenities" | "experiences" | "languages", val: string) =>
     setForm(f => ({ ...f, [field]: f[field].includes(val) ? f[field].filter(x => x !== val) : [...f[field], val] }));
+
+  const addCustom = (field: "experiences" | "amenities") => {
+    const val = field === "experiences" ? customExp.trim() : customAmenity.trim();
+    if (!val || form[field].includes(val)) return;
+    setForm(f => ({ ...f, [field]: [...f[field], val] }));
+    if (field === "experiences") setCustomExp("");
+    else setCustomAmenity("");
+  };
 
   const improveAI = async (field: "description" | "longDescription") => {
     const text = form[field];
@@ -257,6 +268,15 @@ export default function BecomeHostPage() {
                     </button>
                   ))}
                 </div>
+                <div className="flex gap-2 mt-3">
+                  <input type="text" value={customAmenity}
+                    onChange={e => setCustomAmenity(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter" && customAmenity.trim()) { e.preventDefault(); addCustom("amenities"); } }}
+                    placeholder="Add your own..."
+                    className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-red-400" />
+                  <button type="button" onClick={() => addCustom("amenities")}
+                    className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">+</button>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">{b.experiencesLabel}</label>
@@ -267,6 +287,15 @@ export default function BecomeHostPage() {
                       {form.experiences.includes(e) && "✓ "}{e}
                     </button>
                   ))}
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <input type="text" value={customExp}
+                    onChange={e => setCustomExp(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter" && customExp.trim()) { e.preventDefault(); addCustom("experiences"); } }}
+                    placeholder="Add your own..."
+                    className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-red-400" />
+                  <button type="button" onClick={() => addCustom("experiences")}
+                    className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">+</button>
                 </div>
               </div>
               <div>
