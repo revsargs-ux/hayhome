@@ -38,15 +38,13 @@ function PartnerContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #D4001A, #F2A900, #D4001A)" }}>
-        <div className="max-w-4xl mx-auto px-4 py-16 sm:py-24 text-center relative z-10">
-          <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-2 text-white text-sm font-medium mb-6">
-            <Star size={16} /> {t("title")}
-          </div>
+      <div className="relative overflow-hidden bg-gray-900">
+        <div className="max-w-4xl mx-auto px-4 py-16 sm:py-20 text-center relative z-10">
           <h1 className="text-3xl sm:text-5xl font-bold text-white mb-4">{t("title")}</h1>
-          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-8">{t("subtitle")}</p>
+          <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8">{t("subtitle")}</p>
           <Link href="/partner/register"
-            className="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold text-gray-900 hover:bg-gray-100 transition shadow-lg text-lg">
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-bold text-white hover:opacity-90 transition shadow-lg text-lg"
+            style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
             {t("cta")} <ChevronRight size={20} />
           </Link>
         </div>
