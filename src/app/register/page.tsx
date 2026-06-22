@@ -1,13 +1,16 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { Suspense } from "react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function RegisterPage() {
+function RegisterContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || null;
   const { tr } = useLang();
   const { refresh } = useAuth();
   const a = tr.auth;
@@ -32,7 +35,7 @@ export default function RegisterPage() {
     });
     if (res.ok) {
       await refresh(); // обновить AuthContext до навигации
-      router.push("/hosts");
+      router.push(redirect || "/hosts");
     } else {
       const d = await res.json();
       setError(d.error || a.wrongCreds);
@@ -118,5 +121,13 @@ export default function RegisterPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterContent />
+    </Suspense>
   );
 }

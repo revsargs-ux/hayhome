@@ -11,6 +11,7 @@ export default function HomePage() {
   const [hosts, setHosts] = useState<Host[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     Promise.all([
@@ -44,14 +45,25 @@ export default function HomePage() {
           </h1>
           <p className="text-xl text-white/70 max-w-2xl mx-auto leading-relaxed mb-8">{tr.hero.subtitle}</p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <Link href="/hosts" className="px-8 py-4 rounded-full text-lg font-semibold text-white transition hover:scale-105" style={{ background: "#D4001A" }}>
+            <Link href={searchQuery ? `/hosts?q=${encodeURIComponent(searchQuery)}` : "/hosts"}
+              className="px-8 py-4 rounded-full text-lg font-semibold text-white transition hover:scale-105" style={{ background: "#D4001A" }}>
               {tr.hero.searchBtn}
             </Link>
             <Link href="/become-host" className="px-8 py-4 rounded-full text-lg font-semibold border-2 border-white/30 text-white hover:bg-white/10 transition">
               {h.becomeCta}
             </Link>
           </div>
-          <p className="text-white/50 mt-6">{hosts.length}+ {tr.hero.familiesWaiting}</p>
+          <div className="flex gap-3 mt-4 max-w-lg">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter" && searchQuery) window.location.href = `/hosts?q=${encodeURIComponent(searchQuery)}`; }}
+                placeholder={tr.hero.searchPlaceholder}
+                className="flex-1 px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/40 outline-none focus:bg-white/20 transition text-sm"
+              />
+            </div>
+          <p className="text-white/50 mt-4">{hosts.length}+ {tr.hero.familiesWaiting}</p>
         </div>
       </section>
 

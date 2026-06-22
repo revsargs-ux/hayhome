@@ -1,13 +1,16 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { Suspense } from "react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || null;
   const { tr } = useLang();
   const { refresh } = useAuth();
   const a = tr.auth;
@@ -30,7 +33,7 @@ export default function LoginPage() {
     if (res.ok) {
       const data = await res.json();
       await refresh(); // обновить AuthContext до навигации
-      router.push(data.role === "admin" ? "/admin" : "/dashboard");
+      router.push(redirect || (data.role === "admin" ? "/admin" : "/dashboard"));
     } else {
       setError(a.wrongCreds);
     }
@@ -94,5 +97,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
   );
 }

@@ -184,6 +184,19 @@ export default function DashboardPage() {
                       <p className="text-xs text-gray-400 mt-0.5">{b.guestEmail} · {b.guestPhone}</p>
                       {b.message && <p className="text-xs text-gray-500 italic mt-1">"{b.message}"</p>}
                     </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <Link href={`/hosts/${b.hostId}`}
+                        className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 transition">
+                        {lang === "ru" ? "Профиль" : "Profile"}
+                      </Link>
+                      {b.status === "completed" && (
+                        <Link href={`/hosts/${b.hostId}#reviews`}
+                          className="px-3 py-1.5 rounded-lg text-xs font-medium text-white transition"
+                          style={{ background: "#D4001A" }}>
+                          {lang === "ru" ? "Отзыв" : lang === "fr" ? "Avis" : lang === "de" ? "Bewertung" : lang === "ar" ? "تقييم" : lang === "zh" ? "评价" : "Review"}
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

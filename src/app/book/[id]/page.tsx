@@ -5,18 +5,21 @@ import Link from "next/link";
 import { Host } from "@/lib/types";
 import { ChevronLeft, Star, Check } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { getLocalizedField } from "@/lib/i18n-utils";
 
 export default function BookPage() {
   const params = useParams();
   const router = useRouter();
   const { tr, lang } = useLang();
+  const { user } = useAuth();
   const id = params.id as string;
 
   const [host, setHost] = useState<Host | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [authRequired, setAuthRequired] = useState(false);
 
   const [form, setForm] = useState({
     guestName: "", guestEmail: "", guestPhone: "",
@@ -24,6 +27,17 @@ export default function BookPage() {
   });
 
   useEffect(() => { fetch(`/api/hosts/${id}`).then(r => r.json()).then(setHost); }, [id]);
+
+  // Автозаполнение данных из профиля
+  useEffect(() => {
+    if (user) {
+      setForm(f => ({
+        ...f,
+        guestName: f.guestName || user.name,
+        guestEmail: f.guestEmail || user.email,
+      }));
+    }
+  }, [user]);
 
   const nights = (() => {
     if (!form.checkIn || !form.checkOut) return 0;
@@ -35,6 +49,7 @@ export default function BookPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!host) return;
+    if (!user) { setAuthRequired(true); return; }
     if (nights < 1) { setError(lang === "ru" ? "Выберите корректные даты" : "Please select valid dates"); return; }
     setLoading(true);
     setError("");
@@ -86,6 +101,31 @@ export default function BookPage() {
   if (!host) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-10 h-10 border-4 border-red-200 border-t-red-600 rounded-full animate-spin" />
+    </div>
+  );
+
+  if (authRequired) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-sm p-8 max-w-sm w-full text-center">
+        <div className="text-5xl mb-4">🔐</div>
+        <h2 className="text-xl font-bold text-gray-900 mb-3">
+          {lang === "ru" ? "Для бронирования нужно войти" : "Login required to book"}
+        </h2>
+        <p className="text-gray-500 mb-6 text-sm">
+          {lang === "ru" ? "Создайте аккаунт или войдите, чтобы забронировать визит" : "Create an account or log in to book a visit"}
+        </p>
+        <div className="flex flex-col gap-3">
+          <Link href={`/login?redirect=/book/${id}`}
+            className="block py-3 rounded-full text-white font-semibold text-center"
+            style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
+            {tr.auth.loginBtn}
+          </Link>
+          <Link href={`/register?redirect=/book/${id}`}
+            className="block py-3 rounded-full border-2 border-gray-200 text-gray-700 font-semibold text-center hover:bg-gray-50 transition">
+            {tr.auth.registerBtn}
+          </Link>
+        </div>
+      </div>
     </div>
   );
 

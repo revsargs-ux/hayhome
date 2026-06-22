@@ -15,8 +15,8 @@ export default function AdminPage() {
   const load = async () => {
     setLoading(true);
     const [h, b] = await Promise.all([
-      fetch("/api/hosts?all=1").then((r) => r.json()),
-      fetch("/api/bookings").then((r) => r.json()),
+      fetch("/api/hosts?all=1", { credentials: "include" }).then((r) => r.json()),
+      fetch("/api/bookings", { credentials: "include" }).then((r) => r.json()),
     ]);
     setHosts(h);
     setBookings(b);
@@ -29,6 +29,7 @@ export default function AdminPage() {
     setUpdating(id);
     await fetch(`/api/hosts/${id}`, {
       method: "PATCH",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updates),
     });
@@ -40,6 +41,7 @@ export default function AdminPage() {
     setUpdating(id);
     await fetch(`/api/bookings/${id}`, {
       method: "PATCH",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });

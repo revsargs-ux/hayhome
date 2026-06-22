@@ -1,20 +1,22 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import HostCard from "@/components/HostCard";
 import { Host } from "@/lib/types";
 import { Search, SlidersHorizontal, MapPin } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
+import { useSearchParams } from "next/navigation";
 
 const REGIONS_LIST = ["Ереван", "Тавуш", "Ширак", "Арарат", "Гегаркуник", "Лори", "Вайоц Дзор", "Арагацотн", "Котайк", "Сюник"];
 
-export default function HostsPage() {
+function HostsContent() {
   const { tr } = useLang();
   const h = tr.hosts;
+  const searchParams = useSearchParams();
 
   const [hosts, setHosts] = useState<Host[]>([]);
   const [filtered, setFiltered] = useState<Host[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("q") || "");
   const [region, setRegion] = useState("");
   const [minStars, setMinStars] = useState(0);
   const [maxPrice, setMaxPrice] = useState(200);
@@ -163,5 +165,13 @@ export default function HostsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function HostsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-red-200 border-t-red-600 rounded-full animate-spin" /></div>}>
+      <HostsContent />
+    </Suspense>
   );
 }
