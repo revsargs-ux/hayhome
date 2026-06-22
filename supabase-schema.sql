@@ -101,3 +101,74 @@ ALTER TABLE hayhome_users ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "hayhome_hosts_public_read" ON hayhome_hosts FOR SELECT USING (status = 'active');
 -- reviews are public
 CREATE POLICY "hayhome_reviews_public_read" ON hayhome_reviews FOR SELECT USING (true);
+
+-- ============================================
+-- 5. TABLE: hayhome_partners
+-- ============================================
+CREATE TABLE IF NOT EXISTS hayhome_partners (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES hayhome_users(id),
+  role TEXT NOT NULL CHECK (role IN ('ambassador', 'hunter', 'regional')),
+  region TEXT,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'frozen', 'suspended')),
+  balance NUMERIC DEFAULT 0,
+  total_earned NUMERIC DEFAULT 0,
+  total_withdrawn NUMERIC DEFAULT 0,
+  code TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_partners_user ON hayhome_partners(user_id);
+CREATE INDEX idx_partners_code ON hayhome_partners(code);
+
+-- ============================================
+-- 6. TABLE: hayhome_referrals
+-- ============================================
+CREATE TABLE IF NOT EXISTS hayhome_referrals (
+  id TEXT PRIMARY KEY,
+  partner_id TEXT NOT NULL REFERENCES hayhome_partners(id),
+  referred_user_id TEXT NOT NULL REFERENCES hayhome_users(id),
+  type TEXT NOT NULL CHECK (type IN ('guest', 'host', 'experience')),
+  referred_entity_id TEXT,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'expired', 'fraud')),
+  first_booking_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_referrals_partner ON hayhome_referrals(partner_id);
+CREATE INDEX idx_referrals_user ON hayhome_referrals(referred_user_id);
+
+-- ============================================
+-- 7. TABLE: hayhome_payouts
+-- ============================================
+CREATE TABLE IF NOT EXISTS hayhome_payouts (
+  id TEXT PRIMARY KEY,
+  partner_id TEXT NOT NULL REFERENCES hayhome_partners(id),
+  amount NUMERIC NOT NULL,
+  method TEXT NOT NULL CHECK (method IN ('idram', 'bank_transfer', 'crypto')),
+  details TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'rejected')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  processed_at TIMESTAMPTZ,
+  note TEXT
+);
+CREATE INDEX idx_payouts_partner ON hayhome_payouts(partner_id);
+
+-- ============================================
+-- ALTER: add referral fields to existing tables
+-- ============================================
+ALTER TABLE hayhome_users ADD COLUMN IF NOT EXISTS referred_by TEXT;
+ALTER TABLE hayhome_users ADD COLUMN IF NOT EXISTS referred_by_code TEXT;
+ALTER TABLE hayhome_bookings ADD COLUMN IF NOT EXISTS commission_partner NUMERIC DEFAULT 0;
+ALTER TABLE hayhome_bookings ADD COLUMN IF NOT EXISTS partner_id TEXT;
+
+-- RLS for partners
+ALTER TABLE hayhome_partners ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hayhome_referrals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hayhome_payouts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read partners by code" ON hayhome_partners FOR SELECT USING (true);
+CREATE POLICY "Partners can read own referrals" ON hayhome_referrals FOR SELECT USING (true);
+CREATE POLICY "Partners can read own payouts" ON hayhome_payouts FOR SELECT USING (true);
+CREATE POLICY "Service role full access partners" ON hayhome_partners FOR ALL USING (auth.role() = 'service_role');
+CREATE POLICY "Service role full access referrals" ON hayhome_referrals FOR ALL USING (auth.role() = 'service_role');
+CREATE POLICY "Service role full access payouts" ON hayhome_payouts FOR ALL USING (auth.role() = 'service_role');

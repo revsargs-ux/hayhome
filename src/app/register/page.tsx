@@ -11,6 +11,7 @@ function RegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || null;
+  const refCode = searchParams.get("ref") || null;
   const { tr } = useLang();
   const { refresh } = useAuth();
   const a = tr.auth;
@@ -31,7 +32,7 @@ function RegisterContent() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: form.name, email: form.email, password: form.password, role: "guest" }),
+      body: JSON.stringify({ name: form.name, email: form.email, password: form.password, role: "guest", ref: refCode }),
     });
     if (res.ok) {
       await refresh(); // обновить AuthContext до навигации

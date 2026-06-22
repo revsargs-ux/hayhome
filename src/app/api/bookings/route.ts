@@ -82,5 +82,38 @@ export async function POST(req: NextRequest) {
     message: booking.message,
   }).catch((err) => console.error("[Email] Booking notification failed:", err));
 
+  // Partner commission (async, non-blocking)
+  (async () => {
+    try {
+      const { createClient } = require("@supabase/supabase-js");
+      const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+      // Check if guest was referred
+      const { data: guestUser } = await sb.from("hayhome_users").select("referred_by_code, referred_by").eq("id", user.id).single();
+      if (guestUser?.referred_by_code) {
+        const { data: partner } = await sb.from("hayhome_partners").select("id, status").eq("code", guestUser.referred_by_code).eq("status", "active").single();
+        if (partner) {
+          const commission = Math.round(booking.totalPrice * 0.05 * 100) / 100;
+          // Update booking with commission
+          await sb.from("hayhome_bookings").update({ commission_partner: commission, partner_id: partner.id }).eq("id", booking.id);
+          // Check/create referral record
+          const { data: ref } = await sb.from("hayhome_referrals").select("id, first_booking_at").eq("partner_id", partner.id).eq("referred_user_id", user.id).single();
+          if (ref) {
+            if (!ref.first_booking_at) {
+              await sb.from("hayhome_referrals").update({ first_booking_at: new Date().toISOString(), expires_at: new Date(Date.now() + 2 * 365.25 * 24 * 60 * 60 * 1000).toISOString() }).eq("id", ref.id);
+            } else if (new Date(ref.expires_at) > new Date()) {
+              // Still within 2-year window — credit partner
+              await sb.from("hayhome_partners").update({ balance: 0, total_earned: 0 }).eq("id", partner.id);
+              const { data: p } = await sb.from("hayhome_partners").select("balance, total_earned").eq("id", partner.id).single();
+              if (p) {
+                await sb.from("hayhome_partners").update({ balance: p.balance + commission, total_earned: p.total_earned + commission }).eq("id", partner.id);
+              }
+            }
+          }
+          console.log(`[Partner] Commission $${commission} credited to ${partner.id}`);
+        }
+      }
+    } catch (e) { console.warn("[Partner] Commission error:", e); }
+  })();
+
   return NextResponse.json(booking, { status: 201 });
 }

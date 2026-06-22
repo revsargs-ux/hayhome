@@ -51,6 +51,43 @@ export interface Review {
   date: string;
 }
 
+export interface Partner {
+  id: string;
+  user_id: string;
+  role: "ambassador" | "hunter" | "regional";
+  region: string | null;
+  status: "active" | "frozen" | "suspended";
+  balance: number;
+  total_earned: number;
+  total_withdrawn: number;
+  code: string;
+  created_at: string;
+}
+
+export interface Referral {
+  id: string;
+  partner_id: string;
+  referred_user_id: string;
+  type: "guest" | "host" | "experience";
+  referred_entity_id: string | null;
+  status: "active" | "expired" | "fraud";
+  first_booking_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+}
+
+export interface Payout {
+  id: string;
+  partner_id: string;
+  amount: number;
+  method: "idram" | "bank_transfer" | "crypto";
+  details: string;
+  status: "pending" | "completed" | "rejected";
+  created_at: string;
+  processed_at: string | null;
+  note: string | null;
+}
+
 export interface Booking {
   id: string;
   hostId: string;

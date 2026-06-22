@@ -40,6 +40,19 @@ export async function POST(req: NextRequest) {
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = await createUser({ name, email, password: hashedPassword, role: safeRole });
 
+  // Реферальный код — если пришёл по ссылке партнёра
+  const refCode = body.ref || body.referred_by_code || null;
+  if (refCode) {
+    try {
+      const { createClient } = await import("@supabase/supabase-js");
+      const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+      const { data: partner } = await sb.from("hayhome_partners").select("id, user_id").eq("code", refCode).single();
+      if (partner && partner.user_id !== user.id) {
+        await sb.from("hayhome_users").update({ referred_by_code: refCode, referred_by: partner.user_id }).eq("id", user.id);
+      }
+    } catch (e) { console.warn("[Referral] Failed to record referral:", e); }
+  }
+
   const token = await signToken({
     id: user.id,
     email: user.email,

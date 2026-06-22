@@ -6,6 +6,8 @@ const requests = new Map<string, { count: number; resetAt: number }>();
 const LIMITS: Record<string, { max: number; windowMs: number }> = {
   "POST:/api/auth/forgot-password": { max: 3, windowMs: 300_000 }, // 3 per 5 min
   "POST:/api/auth/reset-password": { max: 5, windowMs: 300_000 },  // 5 per 5 min
+  "POST:/api/partners": { max: 3, windowMs: 300_000 },        // 3 per 5 min
+  "POST:/api/partners/payout": { max: 5, windowMs: 300_000 },   // 5 per 5 min
   "POST:/api/auth/login": { max: 5, windowMs: 60_000 },     // 5 per minute
   "POST:/api/auth/register": { max: 3, windowMs: 60_000 },   // 3 per minute
   "POST:/api/reviews": { max: 5, windowMs: 60_000 },         // 5 per minute
