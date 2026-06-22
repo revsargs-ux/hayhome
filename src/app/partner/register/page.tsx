@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Check, Loader2, Copy, Users, MapPin, DollarSign } from "lucide-react";
+import { Check, Loader2, Copy, Users, MapPin, DollarSign, Share2 } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 
 function PartnerRegisterContent() {
   const { lang } = useLang();
@@ -116,6 +117,16 @@ function PartnerRegisterContent() {
                 </button>
               </div>
               <p className="text-xs text-gray-400 mt-2">{lang === "ru" ? "Скопируйте ссылку и делитесь" : "Copy the link and share it"}</p>
+            </div>
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <QRCodeSVG value={refLink} size={180} level="M" bgColor="white" fgColor="#D4001A"
+                imageSettings={{ src: "", height: 0, width: 0, excavate: false }}
+                className="mx-auto" />
+              <p className="text-sm text-gray-500 mt-3">{lang === "ru" ? "Отсканируйте QR-код" : "Scan the QR code"}</p>
+              <button onClick={() => { if (navigator.share) { navigator.share({ title: "HayHome — Партнёр", url: refLink }); } else { navigator.clipboard.writeText(refLink); setCopied(true); setTimeout(() => setCopied(false), 2000); } }}
+                className="mt-4 w-full py-3 rounded-full font-semibold flex items-center justify-center gap-2 border-2 transition hover:bg-gray-50" style={{ borderColor: "#D4001A", color: "#D4001A" }}>
+                <Share2 size={18} /> {copied ? (lang === "ru" ? "Скопировано!" : "Copied!") : (lang === "ru" ? "Поделиться" : "Share")}
+              </button>
             </div>
             <Link href="/partner/dashboard" className="block w-full py-3 rounded-full text-white font-semibold text-center"
               style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
