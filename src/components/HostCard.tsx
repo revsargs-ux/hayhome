@@ -45,12 +45,15 @@ export default function HostCard({ host }: Props) {
           <p className="text-gray-600 text-sm line-clamp-2 mb-3 leading-relaxed">{description}</p>
 
           {host.badges && host.badges.length > 0 && (
-            <div className="badge-scroll mb-3">
-              {host.badges.map((badge) => (
-                <span key={badge} className="badge-pill flex-shrink-0">
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {host.badges.slice(0, 3).map((badge) => (
+                <span key={badge} className="badge-pill text-xs whitespace-nowrap">
                   {translateBadge(badge, lang)}
                 </span>
               ))}
+              {host.badges.length > 3 && (
+                <span className="text-xs text-gray-400 self-center">+{host.badges.length - 3}</span>
+              )}
             </div>
           )}
 

@@ -5,7 +5,7 @@ import { Host } from "@/lib/types";
 import { Search, SlidersHorizontal, MapPin } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 
-const REGIONS = ["Все регионы", "Ереван", "Тавуш", "Ширак", "Арарат", "Гегаркуник", "Лори", "Вайоц Дзор", "Арагацотн"];
+const REGIONS_LIST = ["Ереван", "Тавуш", "Ширак", "Арарат", "Гегаркуник", "Лори", "Вайоц Дзор", "Арагацотн", "Котайк", "Сюник"];
 
 export default function HostsPage() {
   const { tr } = useLang();
@@ -15,7 +15,7 @@ export default function HostsPage() {
   const [filtered, setFiltered] = useState<Host[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [region, setRegion] = useState("Все регионы");
+  const [region, setRegion] = useState("");
   const [minStars, setMinStars] = useState(0);
   const [maxPrice, setMaxPrice] = useState(200);
   const [showFilters, setShowFilters] = useState(false);
@@ -38,7 +38,7 @@ export default function HostsPage() {
         h.description.toLowerCase().includes(q)
       );
     }
-    if (region !== "Все регионы") result = result.filter((h) => h.region === region || h.city === region);
+    if (region) result = result.filter((h) => h.region === region || h.city === region);
     if (minStars > 0) result = result.filter((h) => h.stars >= minStars);
     result = result.filter((h) => h.pricePerNight <= maxPrice);
     if (sortBy === "rating") result.sort((a, b) => b.rating - a.rating);
@@ -86,7 +86,8 @@ export default function HostsPage() {
                 <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">{h.region}</label>
                 <select value={region} onChange={(e) => setRegion(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none bg-white">
-                  {REGIONS.map((r) => <option key={r}>{r}</option>)}
+                  <option value="">{h.allRegions}</option>
+                  {REGIONS_LIST.map((r) => <option key={r} value={r}>{r}</option>)}
                 </select>
               </div>
               <div>
@@ -124,7 +125,7 @@ export default function HostsPage() {
           </h1>
           {filtered.length > 0 && (
             <div className="flex items-center gap-1 text-gray-500 text-sm">
-              <MapPin size={14} /> <span>Armenia</span>
+              <MapPin size={14} /> <span>🇦🇲 Armenia</span>
             </div>
           )}
         </div>
@@ -148,7 +149,7 @@ export default function HostsPage() {
             <h3 className="text-xl font-bold text-gray-900 mb-2">{h.notFound}</h3>
             <p className="text-gray-500 mb-6">{h.notFoundSub}</p>
             <button
-              onClick={() => { setSearch(""); setRegion("Все регионы"); setMinStars(0); setMaxPrice(200); }}
+              onClick={() => { setSearch(""); setRegion(""); setMinStars(0); setMaxPrice(200); }}
               className="px-6 py-2.5 rounded-full text-white font-medium"
               style={{ background: "#D4001A" }}
             >
