@@ -27,7 +27,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative overflow-hidden min-h-[600px] flex items-center">
+      <section className="relative overflow-hidden flex items-center md:min-h-[600px]" style={{ minHeight: "520px" }}>
         <Image
           src="https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=1600&q=80&auto=format&fit=crop"
           alt={tr.hero.title1}
@@ -36,34 +36,32 @@ export default function HomePage() {
           priority
         />
         <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, rgba(20,5,0,0.92) 0%, rgba(10,3,0,0.80) 60%, rgba(0,5,30,0.88) 100%)" }} />
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center w-full">
-          <p className="text-2xl text-amber-300 font-semibold mb-4">{tr.hero.greeting}</p>
-          <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight">
-            {tr.hero.title1}<br />
-            <span style={{ color: "#F2A900" }}>{tr.hero.title2}</span><br />
-            {tr.hero.title3}
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 text-center w-full">
+          <p className="text-xl md:text-2xl text-amber-300 font-semibold mb-2 md:mb-4">🇦🇲 {tr.hero.greeting}</p>
+          <h1 className="text-3xl md:text-6xl font-extrabold text-white mb-4 md:mb-6 leading-tight">
+            {tr.hero.title1} <span style={{ color: "#F2A900" }}>{tr.hero.title2}</span>
           </h1>
-          <p className="text-xl text-white/70 max-w-2xl mx-auto leading-relaxed mb-8">{tr.hero.subtitle}</p>
-          <div className="flex gap-4 justify-center flex-wrap">
+          <p className="text-sm md:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed mb-6 md:mb-8">{tr.hero.subtitle}</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Link href={searchQuery ? `/hosts?q=${encodeURIComponent(searchQuery)}` : "/hosts"}
-              className="px-8 py-4 rounded-full text-lg font-semibold text-white transition hover:scale-105" style={{ background: "#D4001A" }}>
+              className="w-full sm:w-auto px-8 py-3.5 md:py-4 rounded-full text-base md:text-lg font-semibold text-white transition hover:scale-105" style={{ background: "#D4001A" }}>
               {tr.hero.searchBtn}
             </Link>
-            <Link href="/become-host" className="px-8 py-4 rounded-full text-lg font-semibold border-2 border-white/30 text-white hover:bg-white/10 transition">
+            <Link href="/become-host" className="w-full sm:w-auto px-8 py-3.5 md:py-4 rounded-full text-base md:text-lg font-semibold border-2 border-white/30 text-white hover:bg-white/10 transition">
               {h.becomeCta}
             </Link>
           </div>
-          <div className="flex gap-3 mt-4 max-w-lg">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter" && searchQuery) window.location.href = `/hosts?q=${encodeURIComponent(searchQuery)}`; }}
-                placeholder={tr.hero.searchPlaceholder}
-                className="flex-1 px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/40 outline-none focus:bg-white/20 transition text-sm"
-              />
-            </div>
-          <p className="text-white/50 mt-4">{hosts.length}+ {tr.hero.familiesWaiting}</p>
+          <div className="mt-4 max-w-md mx-auto">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter" && searchQuery) window.location.href = `/hosts?q=${encodeURIComponent(searchQuery)}`; }}
+              placeholder={tr.hero.searchPlaceholder}
+              className="w-full px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/40 outline-none focus:bg-white/20 transition text-sm"
+            />
+          </div>
+          <p className="text-white/50 mt-3 text-sm">{hosts.length}+ {tr.hero.familiesWaiting}</p>
         </div>
       </section>
 
