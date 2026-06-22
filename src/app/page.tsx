@@ -18,7 +18,7 @@ export default function HomePage() {
       fetch("/api/hosts").then(r => r.json()),
       fetch("/api/reviews").then(r => r.json()),
     ]).then(([h, r]) => {
-      setHosts(h.slice(0, 6));
+      setHosts(h.filter((x: Host) => x.status === "active").slice(0, 10));
       setReviews(r.slice(0, 3));
       setLoading(false);
     });
@@ -49,6 +49,9 @@ export default function HomePage() {
             </Link>
             <Link href="/become-host" className="w-full sm:w-auto px-8 py-3.5 md:py-4 rounded-full text-base md:text-lg font-semibold border-2 border-white/30 text-white hover:bg-white/10 transition">
               {h.becomeCta}
+            </Link>
+            <Link href="/partner" className="w-full sm:w-auto px-8 py-3.5 md:py-4 rounded-full text-base md:text-lg font-semibold border-2 border-amber-400/50 text-amber-300 hover:bg-amber-400/10 transition">
+              🤝 {tr.nav.partner}
             </Link>
           </div>
           <div className="mt-4 max-w-md mx-auto">
