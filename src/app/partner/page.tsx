@@ -73,35 +73,26 @@ function PartnerContent() {
         {/* Roles */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">
-            {lang === "ru" ? "Роли партнёров" : "Partner Roles"}
+            {lang === "ru" ? "Что делает партнёр" : "What partners do"}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl shadow-sm p-6 border-2 border-transparent hover:border-red-200 transition">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  <Gift size={24} className="text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900">{t("ambassadorTitle")}</h3>
-              </div>
-              <p className="text-gray-600 text-sm leading-relaxed">{t("ambassadorDesc")}</p>
-              <div className="mt-4 flex items-center gap-2 text-sm font-semibold" style={{ color: "#D4001A" }}>
-                <Shield size={16} /> 5% × 2 {lang === "ru" ? "года" : "years"}
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-white rounded-2xl shadow-sm p-5 text-center">
+              <Users size={28} className="text-red-600 mx-auto mb-3" />
+              <h3 className="font-bold text-gray-900 text-sm mb-1">{lang === "ru" ? "Привлекает туристов" : "Invites tourists"}</h3>
+              <p className="text-gray-500 text-xs">{lang === "ru" ? "Делится ссылкой с туристами и диаспорой" : "Shares link with tourists & diaspora"}</p>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm p-6 border-2 border-transparent hover:border-red-200 transition">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  <MapPin size={24} className="text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900">{t("scoutTitle")}</h3>
-              </div>
-              <p className="text-gray-600 text-sm leading-relaxed">{t("scoutDesc")}</p>
-              <div className="mt-4 flex items-center gap-2 text-sm font-semibold" style={{ color: "#D4001A" }}>
-                <Shield size={16} /> 5% × 2 {lang === "ru" ? "года" : "years"}
-              </div>
+            <div className="bg-white rounded-2xl shadow-sm p-5 text-center">
+              <MapPin size={28} className="text-red-600 mx-auto mb-3" />
+              <h3 className="font-bold text-gray-900 text-sm mb-1">{lang === "ru" ? "Находит семьи" : "Finds families"}</h3>
+              <p className="text-gray-500 text-xs">{lang === "ru" ? "Помогает семьям и мастерам зарегистрироваться" : "Helps families & artisans register"}</p>
+            </div>
+            <div className="bg-white rounded-2xl shadow-sm p-5 text-center">
+              <DollarSign size={28} className="text-red-600 mx-auto mb-3" />
+              <h3 className="font-bold text-gray-900 text-sm mb-1">5% × 2 {lang === "ru" ? "года" : "years"}</h3>
+              <p className="text-gray-500 text-xs">{lang === "ru" ? "С первой сделки, вывод от $30/мес" : "From first deal, min $30/mo"}</p>
             </div>
           </div>
-        </div>
+          </div>
 
         {/* FAQ */}
         <div>

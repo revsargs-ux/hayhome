@@ -4,14 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Check, Gift, MapPin, Loader2, Copy } from "lucide-react";
+import { Check, Loader2, Copy, Users, MapPin, DollarSign } from "lucide-react";
 
 function PartnerRegisterContent() {
   const { lang } = useLang();
   const { user } = useAuth();
   const router = useRouter();
 
-  const [role, setRole] = useState<"ambassador" | "hunter">("ambassador");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [partner, setPartner] = useState<any>(null);
@@ -36,9 +35,9 @@ function PartnerRegisterContent() {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ role }),
+      body: JSON.stringify({ role: "ambassador" }),
     });
-    const data = await res.json();
+    const data: any = await res.json();
     if (res.ok) {
       setPartner(data.partner);
       setDone(true);
@@ -61,45 +60,46 @@ function PartnerRegisterContent() {
         {!done ? (
           <div className="space-y-6">
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-900">{lang === "ru" ? "Станьте партнёром" : "Become a Partner"}</h1>
-              <p className="text-gray-500 mt-2">{lang === "ru" ? "Выберите вашу роль" : "Choose your role"}</p>
+              <h1 className="text-2xl font-bold text-gray-900">{lang === "ru" ? "Станьте партнёром HayHome" : "Become a HayHome Partner"}</h1>
+              <p className="text-gray-500 mt-2">{lang === "ru" ? "Один профиль — все возможности" : "One profile — all possibilities"}</p>
             </div>
 
-            {/* Ambassador */}
-            <button onClick={() => setRole("ambassador")}
-              className={`w-full text-left p-6 rounded-2xl border-2 transition ${role === "ambassador" ? "border-red-500 bg-red-50" : "border-gray-200 bg-white hover:border-gray-300"}`}>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  <Gift size={28} className="text-white" />
+            {/* What you do */}
+            <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-50">
+                  <Users size={20} className="text-red-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-lg">{lang === "ru" ? "Амбассадор" : "Ambassador"}</h3>
-                  <p className="text-gray-500 text-sm mt-1">{lang === "ru" ? "Привлекаете туристов по своей ссылке" : "Invite tourists via your link"}</p>
-                  <div className="mt-2 text-sm font-bold" style={{ color: "#D4001A" }}>5% × 2 {lang === "ru" ? "года" : "years"}</div>
+                  <h3 className="font-bold text-gray-900 text-sm">{lang === "ru" ? "Привлекаете туристов" : "Invite tourists"}</h3>
+                  <p className="text-gray-500 text-xs mt-1">{lang === "ru" ? "Делитесь ссылкой — туристы регистрируются по ней" : "Share your link — tourists register via it"}</p>
                 </div>
               </div>
-            </button>
-
-            {/* Hunter */}
-            <button onClick={() => setRole("hunter")}
-              className={`w-full text-left p-6 rounded-2xl border-2 transition ${role === "hunter" ? "border-red-500 bg-red-50" : "border-gray-200 bg-white hover:border-gray-300"}`}>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  <MapPin size={28} className="text-white" />
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-50">
+                  <MapPin size={20} className="text-red-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-lg">{lang === "ru" ? "Агент" : "Agent"}</h3>
-                  <p className="text-gray-500 text-sm mt-1">{lang === "ru" ? "Находите семьи и мастеров для платформы" : "Find families and artisans for the platform"}</p>
-                  <div className="mt-2 text-sm font-bold" style={{ color: "#D4001A" }}>5% × 2 {lang === "ru" ? "года" : "years"}</div>
+                  <h3 className="font-bold text-gray-900 text-sm">{lang === "ru" ? "Находите семьи и мастеров" : "Find families & artisans"}</h3>
+                  <p className="text-gray-500 text-xs mt-1">{lang === "ru" ? "Помогаете им зарегистрироваться на платформе" : "Help them register on the platform"}</p>
                 </div>
               </div>
-            </button>
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-50">
+                  <DollarSign size={20} className="text-red-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-sm">{lang === "ru" ? "Получаете 5% от бронирований" : "Earn 5% from bookings"}</h3>
+                  <p className="text-gray-500 text-xs mt-1">{lang === "ru" ? "2 года с первой сделки. Вывод от $30/мес" : "2 years from first deal. Min payout $30/mo"}</p>
+                </div>
+              </div>
+            </div>
 
             <button onClick={handleSubmit} disabled={loading}
               className="w-full py-4 rounded-full text-white font-bold text-lg hover:opacity-90 transition disabled:opacity-70 flex items-center justify-center gap-2"
               style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
               {loading ? <Loader2 size={20} className="animate-spin" /> : <Check size={20} />}
-              {lang === "ru" ? "Начать" : "Start"}
+              {lang === "ru" ? "Получить код партнёра" : "Get partner code"}
             </button>
           </div>
         ) : (
