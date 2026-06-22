@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 const REGIONS_LIST = ["Ереван", "Тавуш", "Ширак", "Арарат", "Гегаркуник", "Лори", "Вайоц Дзор", "Арагацотн", "Котайк", "Сюник"];
 
 function HostsContent() {
-  const { tr } = useLang();
+  const { tr, lang } = useLang();
   const h = tr.hosts;
   const searchParams = useSearchParams();
 
@@ -20,6 +20,7 @@ function HostsContent() {
   const [region, setRegion] = useState("");
   const [minStars, setMinStars] = useState(0);
   const [maxPrice, setMaxPrice] = useState(200);
+  const [experience, setExperience] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<"rating" | "price_asc" | "price_desc">("rating");
 
@@ -43,11 +44,12 @@ function HostsContent() {
     if (region) result = result.filter((h) => h.region === region || h.city === region);
     if (minStars > 0) result = result.filter((h) => h.stars >= minStars);
     result = result.filter((h) => h.pricePerNight <= maxPrice);
+    if (experience) result = result.filter((h) => h.experiences?.some(e => e.toLowerCase().includes(experience.toLowerCase())));
     if (sortBy === "rating") result.sort((a, b) => b.rating - a.rating);
     else if (sortBy === "price_asc") result.sort((a, b) => a.pricePerNight - b.pricePerNight);
     else result.sort((a, b) => b.pricePerNight - a.pricePerNight);
     setFiltered(result);
-  }, [hosts, search, region, minStars, maxPrice, sortBy]);
+  }, [hosts, search, region, minStars, maxPrice, sortBy, experience]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -113,6 +115,15 @@ function HostsContent() {
                 <div className="flex justify-between text-xs text-gray-400 mt-1">
                   <span>$10</span><span>$200</span>
                 </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
+                  {lang === "ru" ? "Опыт / Впечатление" : lang === "hy" ? "Փորձ / Տպավորություն" : lang === "fr" ? "Expérience" : lang === "de" ? "Erlebnis" : lang === "es" ? "Experiencia" : lang === "ar" ? "تجربة" : lang === "zh" ? "体验" : "Experience"}
+                </label>
+                <input type="text" value={experience}
+                  onChange={(e) => setExperience(e.target.value)}
+                  placeholder="Wine, excursion..."
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-red-400" />
               </div>
             </div>
           )}
