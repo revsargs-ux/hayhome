@@ -32,6 +32,8 @@ export default function DashboardPage() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editForm, setEditForm] = useState({ description: "", phone: "", pricePerNight: 30 });
+  const [partnerCode, setPartnerCode] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const statusLabels = STATUS_LABELS[lang] ?? STATUS_LABELS.en;
 
@@ -42,9 +44,10 @@ export default function DashboardPage() {
 
   const loadData = async () => {
     setLoading(true);
-    const [bRes, hRes] = await Promise.all([
+    const [bRes, hRes, pRes] = await Promise.all([
       fetch("/api/bookings", { credentials: "include" }),
       fetch("/api/hosts?all=1", { credentials: "include" }),
+      fetch("/api/partners", { credentials: "include" }).catch(() => null),
     ]);
     const bData = await bRes.json();
     const hData = await hRes.json();
@@ -57,6 +60,11 @@ export default function DashboardPage() {
         setMyProfile(profile);
         setEditForm({ description: profile.description, phone: profile.phone, pricePerNight: profile.pricePerNight });
       }
+    }
+    // Check partner status
+    if (pRes && pRes.ok) {
+      const pData = await pRes.json();
+      if (pData.partner?.code) setPartnerCode(pData.partner.code);
     }
     setLoading(false);
   };
@@ -149,6 +157,30 @@ export default function DashboardPage() {
             </button>
           ))}
         </div>
+
+        {/* Partner referral block */}
+        {!partnerCode && (
+          <div className="mt-4 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ background: "linear-gradient(135deg, #D4001A10, #F2A90010)" }}>
+            <div>
+              <p className="font-semibold text-gray-900 text-sm">{lang === "ru" ? "🤝 Зарабатывайте с HayHome" : "🤝 Earn with HayHome"}</p>
+              <p className="text-xs text-gray-500">{lang === "ru" ? "Приглашайте друзей и получайте 5% от их бронирований" : "Invite friends and earn 5% from their bookings"}</p>
+            </div>
+            <Link href="/partner/register" className="px-5 py-2 rounded-full text-white text-sm font-semibold flex-shrink-0 hover:opacity-90 transition" style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
+              {lang === "ru" ? "Стать партнёром" : "Become a Partner"}
+            </Link>
+          </div>
+        )}
+        {partnerCode && (
+          <div className="mt-4 rounded-xl p-4 bg-white shadow-sm">
+            <p className="text-xs text-gray-500 mb-2">{lang === "ru" ? "🤝 Ваша партнёрская ссылка — делитесь с друзьями" : "🤝 Your referral link — share with friends"}</p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 text-sm bg-gray-50 rounded-lg px-3 py-2 truncate">https://hay-home.com/register?ref={partnerCode}</code>
+              <button onClick={() => { navigator.clipboard.writeText("https://hay-home.com/register?ref=" + partnerCode); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="px-3 py-2 rounded-lg text-sm font-medium transition" style={{ background: copied ? "#16a34a" : "#D4001A", color: "white" }}>
+                {copied ? (lang === "ru" ? "✓" : "✓") : (lang === "ru" ? "Копировать" : "Copy")}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Bookings tab */}
         {tab === "bookings" && (

@@ -4,18 +4,27 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Users, Globe, Star, Phone, Mail, Check, ChevronLeft } from "lucide-react";
-import { Host, Review } from "@/lib/types";
+import { Host, Review, Booking } from "@/lib/types";
 import { useLang } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { translateLang, translateBadge, translateAmenity, translateExperience, getLocalizedField } from "@/lib/i18n-utils";
 
 export default function HostProfilePage() {
   const { id } = useParams<{ id: string }>();
   const { tr, lang } = useLang();
   const h = tr.hosts;
+  const { user } = useAuth();
 
   const [host, setHost] = useState<Host | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [canReview, setCanReview] = useState(false);
+
+  // Review form state
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -27,6 +36,52 @@ export default function HostProfilePage() {
       setLoading(false);
     });
   }, [id]);
+
+  // Check if user can leave a review (has completed booking with this host)
+  useEffect(() => {
+    if (!user) { setCanReview(false); return; }
+    fetch("/api/bookings")
+      .then((r) => r.ok ? r.json() : [])
+      .then((bookings: Booking[]) => {
+        const hasCompleted = bookings.some(
+          (b) => b.hostId === id && b.status === "completed"
+        );
+        setCanReview(hasCompleted);
+      })
+      .catch(() => setCanReview(false));
+  }, [user, id]);
+
+  const submitReview = async () => {
+    if (reviewComment.trim().length < 10 || submitting) return;
+    setSubmitting(true);
+    setReviewSuccess(false);
+    try {
+      const res = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          hostId: id,
+          guestName: user?.name || "",
+          guestEmail: user?.email || "",
+          rating: reviewRating,
+          comment: reviewComment.trim(),
+          guestCountry: "Unknown",
+        }),
+      });
+      if (res.ok) {
+        const newReview = await res.json();
+        setReviews((prev) => [newReview, ...prev]);
+        setReviewComment("");
+        setReviewRating(5);
+        setReviewSuccess(true);
+        setTimeout(() => setReviewSuccess(false), 4000);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -163,7 +218,7 @@ export default function HostProfilePage() {
                   </div>
                 )}
               </div>
-              {reviews.length === 0 ? (
+              {reviews.length === 0 && !canReview ? (
                 <p className="text-gray-400 text-center py-8">{h.newGuest}</p>
               ) : (
                 <div className="space-y-6">
@@ -190,6 +245,54 @@ export default function HostProfilePage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Review form */}
+              {user && canReview && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">{h.writeReview}</h3>
+                  {reviewSuccess && (
+                    <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl text-green-800 text-sm font-medium">
+                      ✓ {h.reviewSuccess}
+                    </div>
+                  )}
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex gap-1 mb-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button key={star} type="button" onClick={() => setReviewRating(star)}
+                            className="hover:scale-110 transition-transform">
+                            <Star size={28}
+                              fill={star <= reviewRating ? "#F2A900" : "none"}
+                              color={star <= reviewRating ? "#F2A900" : "#D1D5DB"} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <textarea
+                      value={reviewComment}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      placeholder={h.reviewPlaceholder}
+                      rows={4}
+                      className="w-full p-3 border border-gray-200 rounded-xl text-sm text-gray-800 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400 resize-none"
+                    />
+                    <button
+                      onClick={submitReview}
+                      disabled={reviewComment.trim().length < 10 || submitting}
+                      className="px-6 py-3 rounded-xl text-white font-bold text-sm hover:opacity-90 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                      style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
+                    >
+                      {submitting ? "..." : h.submitReview}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Must be guest message */}
+              {user && !canReview && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <p className="text-gray-400 text-sm text-center py-4">{h.mustBeGuest}</p>
                 </div>
               )}
             </div>

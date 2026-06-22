@@ -100,8 +100,9 @@ export default function Footer() {
         <div className="border-t border-white/5 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-gray-600">© 2025 HayHome. All rights reserved.</p>
           <div className="flex items-center gap-4 text-xs text-gray-600">
-            <Link href="#" className="hover:text-gray-400 transition-colors">Terms</Link>
-            <Link href="#" className="hover:text-gray-400 transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-gray-400 transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy</Link>
+            <Link href="/rules" className="hover:text-gray-400 transition-colors">Rules</Link>
             <span>Made with ❤️ in Armenia</span>
           </div>
         </div>

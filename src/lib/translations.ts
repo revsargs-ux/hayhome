@@ -104,6 +104,11 @@ export interface Translations {
     freeCancel: string;
     directContact: string;
     noHidden: string;
+    writeReview: string;
+    reviewPlaceholder: string;
+    submitReview: string;
+    reviewSuccess: string;
+    mustBeGuest: string;
   };
   home: {
     whyTitle: string;
@@ -146,6 +151,12 @@ export interface Translations {
     error: string;
     rating: string;
     newHost: string;
+  };
+  legal: {
+    privacy: string;
+    terms: string;
+    rules: string;
+    back: string;
   };
 }
 
@@ -200,6 +211,11 @@ const t: Record<LangCode, Translations> = {
       freeCancel: "Бесплатная отмена за 48 часов",
       directContact: "Прямой контакт с семьёй",
       noHidden: "Без скрытых платежей",
+      writeReview: "Написать отзыв",
+      reviewPlaceholder: "Расскажите о вашем опыте... (минимум 10 символов)",
+      submitReview: "Отправить отзыв",
+      reviewSuccess: "Спасибо за отзыв!",
+      mustBeGuest: "Только гости с завершённым бронированием могут оставить отзыв",
     },
     home: {
       whyTitle: "Почему HayHome?",
@@ -240,6 +256,7 @@ const t: Record<LangCode, Translations> = {
       aiImprovedLong: "ИИ улучшил текст — проверьте и отредактируйте при необходимости",
     },
     common: { loading: "Загрузка...", error: "Ошибка", rating: "рейтинг", newHost: "Новый" },
+    legal: { privacy: "Политика конфиденциальности", terms: "Условия использования", rules: "Правила платформы", back: "На главную" },
     auth: { loginTitle: "Войти в аккаунт", registerTitle: "Создать аккаунт", registerSub: "Регистрация гостя — бесплатно", password: "Пароль", confirmPassword: "Повторите пароль", name: "Ваше имя", loginBtn: "Войти", loggingIn: "Вход...", registerBtn: "Зарегистрироваться", registering: "Регистрация...", noAccount: "Нет аккаунта?", hasAccount: "Уже есть аккаунт?", wantToHost: "Хотите принимать гостей?", wrongCreds: "Неверный email или пароль", passMismatch: "Пароли не совпадают", minPass: "Минимум 6 символов" },
     about: { heroTitle: "О нас", heroSub: "Мы не строим платформу для аренды жилья. Мы строим живую культурную сеть.", missionLabel: "Наша миссия", missionTitle: "Армения открывается", missionTitle2: "через сердце семьи", missionSub: "HayHome — это не Airbnb. Это культурная экосистема национального масштаба. Мы сохраняем армянские семейные ценности и укрепляем образ Армении как самого гостеприимного народа мира.", card1title: "Сохранение традиций", card1desc: "Каждая семья — хранитель культурного кода. Мы помогаем этому коду жить и передаваться поколениям.", card2title: "Объединение народов", card2desc: "Гости из 40+ стран уже познакомились с Арменией через наших хозяев. Каждый визит — мост между культурами.", card3title: "Гордость за страну", card3desc: "Армянские семьи зарабатывают статус «Хранителя традиций» — признание всего сообщества.", storyLabel: "Как всё началось", storyTitle: "Идея, которая родилась за ужином", story1: "Всё началось с простого наблюдения: в Армении живут сотни семей, готовых принять гостей и показать настоящее гостеприимство. Но у них не было инструмента рассказать об этом миру.", story2: "А туристы со всего мира хотят именно этого — не отельный сервис, а живой опыт. Настоящие истории за большим столом.", story3: "HayHome создан, чтобы соединить этих людей. Это платформа доверия, культуры и тепла. Не просто бизнес — движение.", valuesLabel: "Наши ценности", valuesTitle: "Чем мы не Airbnb", v1t: "Хозяин — не арендодатель", v1d: "Каждый хозяин — «Хранитель традиций». Он презентует свой уклад жизни, культуру и историю.", v2t: "Опыт, а не кровать", v2d: "Гость ищет не место для ночлега, а уникальный опыт: мастер-классы, ужины, истории.", v3t: "Доверие через верификацию", v3d: "Каждая семья проходит проверку. Система звёзд гарантирует качество.", v4t: "Армяне знакомят армян", v4d: "Армянские семьи из разных регионов знакомятся между собой через платформу.", v5t: "Геймификация и статусы", v5d: "Бейджи «Лучшая кухня», «Мастер вина» — признание сообщества.", v6t: "Истории, не отзывы", v6d: "«Я приехал туристом, а уехал сыном этой семьи» — вот настоящий отзыв.", statsTitle: "HayHome сегодня", s1: "Семей в сети", s2: "Регионов Армении", s3: "Стран гостей", s4: "Средний рейтинг", toneLabel: "Наш голос", toneTitle: "Как мы говорим", toneSub: "Мы говорим как старший брат, гостеприимный хозяин, патриот без пафоса — не как корпорация.", secTitle: "Безопасность и доверие", secDesc: "Каждая семья проходит верификацию документов. Страхование и поддержка 24/7.", ctaTitle: "Войди — стань частью большой армянской семьи", ctaSub: "Не важно откуда вы. Важно что вы готовы открыться новому." },
   },
@@ -267,6 +284,11 @@ const t: Record<LangCode, Translations> = {
       aboutFamily: "About the Family", amenities: "Amenities", experiences: "What awaits you",
       languages: "Languages", reviews: "Reviews", newGuest: "Be the first guest!",
       freeCancel: "Free cancellation within 48 hours", directContact: "Direct contact with the family", noHidden: "No hidden fees",
+      writeReview: "Write a Review",
+      reviewPlaceholder: "Tell us about your experience... (min 10 characters)",
+      submitReview: "Submit Review",
+      reviewSuccess: "Thank you for your review!",
+      mustBeGuest: "Only guests with a completed booking can leave a review",
     },
     home: {
       whyTitle: "Why HayHome?",
@@ -303,6 +325,7 @@ const t: Record<LangCode, Translations> = {
       aiImprovedLong: "AI improved the text — review and edit if needed",
     },
     common: { loading: "Loading...", error: "Error", rating: "rating", newHost: "New" },
+    legal: { privacy: "Privacy Policy", terms: "Terms of Service", rules: "Platform Rules", back: "Back to Home" },
     auth: { loginTitle: "Sign In", registerTitle: "Create Account", registerSub: "Guest registration — free", password: "Password", confirmPassword: "Confirm Password", name: "Your Name", loginBtn: "Sign In", loggingIn: "Signing in...", registerBtn: "Create Account", registering: "Registering...", noAccount: "No account?", hasAccount: "Already have an account?", wantToHost: "Want to host guests?", wrongCreds: "Invalid email or password", passMismatch: "Passwords don't match", minPass: "Minimum 6 characters" },
     about: { heroTitle: "About Us", heroSub: "We are not building a rental platform. We are building a living cultural network.", missionLabel: "Our Mission", missionTitle: "Armenia opens up", missionTitle2: "through the heart of a family", missionSub: "HayHome is not Airbnb. It is a cultural ecosystem of national scale. We preserve Armenian family values and strengthen Armenia's image as the most hospitable people in the world.", card1title: "Preserving Traditions", card1desc: "Every family is a keeper of cultural heritage. We help this heritage live and pass on to future generations.", card2title: "Uniting People", card2desc: "Guests from 40+ countries have already discovered Armenia through our hosts. Every visit is a bridge between cultures.", card3title: "Pride in the Country", card3desc: "Armenian families earn the status of 'Tradition Keeper' — recognition from the whole community.", storyLabel: "How It Started", storyTitle: "An idea born over dinner", story1: "It all started with a simple observation: hundreds of Armenian families are ready to welcome guests and show real hospitality — but had no tool to tell the world.", story2: "And tourists from around the world want exactly this — not hotel service, but a living experience. Real stories around a big table.", story3: "HayHome was created to connect these people. It is a platform of trust, culture and warmth. Not just a business — a movement.", valuesLabel: "Our Values", valuesTitle: "Why We Are Not Airbnb", v1t: "Host, Not Landlord", v1d: "Every host is a 'Tradition Keeper'. They present their way of life, culture and history.", v2t: "Experience, Not a Bed", v2d: "The guest seeks not a place to sleep, but a unique experience: masterclasses, dinners, stories.", v3t: "Trust Through Verification", v3d: "Every family is verified. The star system guarantees quality.", v4t: "Armenians Meet Armenians", v4d: "Armenian families from different regions meet each other through the platform.", v5t: "Gamification & Status", v5d: "Badges like 'Best Kitchen', 'Wine Master' are community recognition.", v6t: "Stories, Not Reviews", v6d: "'I came as a tourist and left as their son' — that's a real review.", statsTitle: "HayHome Today", s1: "Families in the network", s2: "Regions of Armenia", s3: "Guest countries", s4: "Average rating", toneLabel: "Our Voice", toneTitle: "How We Speak", toneSub: "We speak like an older brother, a welcoming host, a patriot without pomposity — not like a corporation.", secTitle: "Safety & Trust", secDesc: "Every family goes through document verification. Insurance and 24/7 support.", ctaTitle: "Come in — become part of one big Armenian family", ctaSub: "It doesn't matter where you are from. What matters is that you are ready to open up to something new." },
   },
@@ -330,6 +353,11 @@ const t: Record<LangCode, Translations> = {
       aboutFamily: "Ընտանիքի մասին", amenities: "Հարմարություններ", experiences: "Ինչ է սպասվում",
       languages: "Լեզուներ", reviews: "Կարծիքներ", newGuest: "Եղեք առաջին հյուրը!",
       freeCancel: "Անվճար չեղարկում 48 ժամ", directContact: "Ուղղակի կապ ընտանիքի հետ", noHidden: "Թաքնված վճարներ չկան",
+      writeReview: "Գրել կարծիք",
+      reviewPlaceholder: "Պատմեք ձեր փորձի մասին... (նվազագույնը 10 նիշ)",
+      submitReview: "Ուղարկել կարծիքը",
+      reviewSuccess: "Շնորհակալություն ձեր կարծիքի համար!",
+      mustBeGuest: "Միայն ավարտված ամրագրմամբ հյուրերը կարող են կարծիք թողնել",
     },
     home: {
       whyTitle: "Ինչու՞ HayHome?",
@@ -366,6 +394,7 @@ const t: Record<LangCode, Translations> = {
       aiImprovedLong: "AI-ն բարելավել է — ստուգեք",
     },
     common: { loading: "Բեռնում...", error: "Սխալ", rating: "վարկանիշ", newHost: "Նոր" },
+    legal: { privacy: "Գաղտնիության քաղաքականություն", terms: "Օգտագործման պայմաններ", rules: "Հարթակի կանոններ", back: "Գլխավոր" },
     about: { heroTitle: "Մեր մասին", heroSub: "Մենք չենք կառուցում բնակարանների վարձակալության հարթակ: Մենք կառուցում ենք կենդանի մշակութային ցանց:", missionLabel: "Մեր առաքելությունը", missionTitle: "Հայաստանը բացվում է", missionTitle2: "ընտանիքի սրտի միջոցով", missionSub: "HayHome-ը Airbnb չէ: Սա ազգային մասշտաբի մշակութային էկոհամակարգ է: Մենք պահպանում ենք հայկական ընտանեկան արժեքները և ամրապնդում Հայաստանի կերպարը՝ որպես աշխարհի ամենահյուրընկալ ժողովուրդ:", card1title: "Ավանդույթների պահպանում", card1desc: "Յուրաքանչյուր ընտանիք մշակութային կոդի պահապան է: Մենք օգնում ենք այդ կոդին ապրել և փոխանցվել սերունդներին:", card2title: "Ժողովուրդների միավորում", card2desc: "40+ երկրների հյուրեր արդեն ծանաչել են Հայաստանը մեր տանտերերի միջոցով: Յուրաքանչյուր այց՝ կամուրջ մշակույթների միջև:", card3title: "Հպարտություն երկրի համար", card3desc: "Հայկական ընտանիքները վաստակում են «Ավանդույթների պահապան» կարգավիճակ՝ ամբողջ համայնքի ճանաչումը:", storyLabel: "Ինչպես սկսվեց", storyTitle: "Գաղափար, որը ծնվեց ընթրիքին", story1: "Ամեն ինչ սկսվեց պարզ դիտարկումից. Հայաստանում ապրում են հարյուրավոր ընտանիքներ, որոնք պատրաստ են ընդունել հյուրեր և ցույց տալ իրական հյուրընկալություն, բայց նրանք գործիք չունեին աշխարհին պատմելու դրա մասին:", story2: "Իսկ զբոսաշրջիկները ամբողջ աշխարհից հենց սա են ուզում՝ ոչ թե հյուրանոցային սպասարկում, այլ կենդանի փորձ: Իրական պատմություններ մեծ սեղանի շուրջ:", story3: "HayHome-ը ստեղծվել է այս մարդկանց միացնելու համար: Սա վստահության, մշակույթի և ջերմության հարթակ է: Ոչ միայն բիզնես՝ շարժում:", valuesLabel: "Մեր արժեքները", valuesTitle: "Ինչու մենք չենք Airbnb", v1t: "Տանտերը վարձատու չէ", v1d: "Յուրաքանչյուր տանտեր «Ավանդույթների պահապան» է: Նա ներկայացնում է իր ապրելակերպը, մշակույթը և պատմությունը:", v2t: "Փորձ, ոչ թե մահճակալ", v2d: "Հյուրը փնտրում է ոչ թե քնելու տեղ, այլ եզակի փորձ՝ վարպետության դասեր, ընթրիքներ, պատմություններ:", v3t: "Վստահություն ստուգման միջոցով", v3d: "Յուրաքանչյուր ընտանիք անցնում է ստուգում: Աստղերի համակարգը երաշխավորում է որակը:", v4t: "Հայերը ծանոթացնում են հայերի", v4d: "Տարբեր շրջանների հայկական ընտանիքներ ծանոթանում են միմյանց հարթակի միջոցով:", v5t: "Գեյմիֆիկացիա և կարգավիճակներ", v5d: "«Լավագույն խոհանոց», «Գինու վարպետ» նշանները՝ համայնքի ճանաչում:", v6t: "Պատմություններ, ոչ թե կարծիքներ", v6d: "«Ես եկա որպես զբոսաշրջիկ, իսկ հեռացա որպես այդ ընտանիքի որդի»՝ սա է իրական ակնարկը:", statsTitle: "HayHome այսօր", s1: "Ընտանիք ցանցում", s2: "Հայաստանի մարզեր", s3: "Հյուրերի երկրներ", s4: "Միջին վարկանիշ", toneLabel: "Մեր ձայնը", toneTitle: "Ինչպես ենք խոսում", toneSub: "Մենք խոսում ենք ավագ եղբոր պես՝ հյուրընկալ տանտեր, հայրենասեր՝ առանց փառասիրության՝ ոչ թե կորպորացիայի պես:", secTitle: "Անվտանգություն և վստահություն", secDesc: "Յուրաքանչյուր ընտանիք անցնում է փաստաթղթերի ստուգում: Ապահովագրություն և աջակցություն 24/7:", ctaTitle: "Արի — դարձիր մեծ հայկական ընտանիքի մաս", ctaSub: "Կարևոր չէ որտեղից եք: Կարևոր է, որ պատրաստ եք բացվել նորին:" },
     auth: { loginTitle: "Մուտք գործել", registerTitle: "Ստեղծել հաշիվ", registerSub: "Հյուրի գրանցում — անվճար", password: "Գաղտնաբառ", confirmPassword: "Կրկնել գաղտնաբառը", name: "Ձեր անունը", loginBtn: "Մուտք", loggingIn: "Մուտք...", registerBtn: "Գրանցվել", registering: "Գրանցում...", noAccount: "Հաշիվ չունե՞ք:", hasAccount: "Արդեն հաշիվ ունե՞ք:", wantToHost: "Ցանկանո՞ւմ եք ընդունել հյուրեր:", wrongCreds: "Սխալ email կամ գաղտնաբառ", passMismatch: "Գաղտնաբառերը չեն համընկնում", minPass: "Նվազ. 6 նիշ" },
   },
@@ -393,6 +422,11 @@ const t: Record<LangCode, Translations> = {
       aboutFamily: "À propos", amenities: "Équipements", experiences: "Ce qui vous attend",
       languages: "Langues", reviews: "Avis", newGuest: "Soyez le premier hôte!",
       freeCancel: "Annulation gratuite sous 48h", directContact: "Contact direct", noHidden: "Pas de frais cachés",
+      writeReview: "Écrire un avis",
+      reviewPlaceholder: "Racontez votre expérience... (min 10 caractères)",
+      submitReview: "Envoyer l'avis",
+      reviewSuccess: "Merci pour votre avis!",
+      mustBeGuest: "Seuls les hôtes avec une réservation terminée peuvent laisser un avis",
     },
     home: {
       whyTitle: "Pourquoi HayHome?",
@@ -429,6 +463,7 @@ const t: Record<LangCode, Translations> = {
       aiImprovedLong: "IA a amélioré — vérifiez si nécessaire",
     },
     common: { loading: "Chargement...", error: "Erreur", rating: "note", newHost: "Nouveau" },
+    legal: { privacy: "Politique de confidentialité", terms: "Conditions d'utilisation", rules: "Règles de la plateforme", back: "Accueil" },
     about: { heroTitle: "À propos", heroSub: "Nous ne construisons pas une plateforme de location. Nous construisons un réseau culturel vivant.", missionLabel: "Notre mission", missionTitle: "L'Arménie s'ouvre", missionTitle2: "par le cœur d'une famille", missionSub: "HayHome n'est pas Airbnb. C'est un écosystème culturel d'envergure nationale. Nous préservons les valeurs familiales arméniennes et renforçons l'image de l'Arménie comme le peuple le plus hospitalier du monde.", card1title: "Préserver les traditions", card1desc: "Chaque famille est gardienne d'un héritage culturel. Nous aidons cet héritage à vivre et à se transmettre aux générations futures.", card2title: "Unir les peuples", card2desc: "Des hôtes de 40+ pays ont déjà découvert l'Arménie grâce à nos familles. Chaque visite est un pont entre les cultures.", card3title: "Fierté du pays", card3desc: "Les familles arméniennes obtiennent le statut de « Gardien des traditions » — une reconnaissance de toute la communauté.", storyLabel: "Comment tout a commencé", storyTitle: "Une idée née autour d'un dîner", story1: "Tout a commencé par une observation simple : des centaines de familles arméniennes sont prêtes à accueillir des hôtes et à montrer la véritable hospitalité — mais n'avaient aucun outil pour en parler au monde.", story2: "Et les touristes du monde entier veulent exactement cela — pas un service hôtelier, mais une expérience vécue. De vraies histoires autour d'une grande table.", story3: "HayHome a été créé pour relier ces personnes. C'est une plateforme de confiance, de culture et de chaleur. Pas juste une entreprise — un mouvement.", valuesLabel: "Nos valeurs", valuesTitle: "Pourquoi nous ne sommes pas Airbnb", v1t: "Hôte, pas propriétaire", v1d: "Chaque hôte est un « Gardien des traditions ». Il présente son mode de vie, sa culture et son histoire.", v2t: "L'expérience, pas le lit", v2d: "Le client ne cherche pas une place pour dormir, mais une expérience unique : ateliers, dîners, histoires.", v3t: "Confiance par la vérification", v3d: "Chaque famille est vérifiée. Le système d'étoiles garantit la qualité.", v4t: "Les Arméniens se rencontrent", v4d: "Des familles arméniennes de différentes régions se découvrent grâce à la plateforme.", v5t: "Ludification et statuts", v5d: "Les badges « Meilleure cuisine », « Maître du vin » sont des reconnaissances de la communauté.", v6t: "Des histoires, pas des avis", v6d: "« Je suis arrivé touriste et reparti comme leur fils » — voilà un vrai témoignage.", statsTitle: "HayHome aujourd'hui", s1: "Familles dans le réseau", s2: "Régions d'Arménie", s3: "Pays d'origine des hôtes", s4: "Note moyenne", toneLabel: "Notre voix", toneTitle: "Comment nous parlons", toneSub: "Nous parlons comme un grand frère, un hôte accueillant, un patriote sans jingoïsme — pas comme une corporation.", secTitle: "Sécurité et confiance", secDesc: "Chaque famille passe par une vérification de documents. Assurance et support 24h/24 et 7j/7.", ctaTitle: "Entrez — devenez partie d'une grande famille arménienne", ctaSub: "Peu importe d'où vous venez. L'important est que vous êtes prêt à vous ouvrir à du nouveau." },
     auth: { loginTitle: "Se connecter", registerTitle: "Créer un compte", registerSub: "Inscription gratuite", password: "Mot de passe", confirmPassword: "Confirmer le mot de passe", name: "Votre nom", loginBtn: "Connexion", loggingIn: "Connexion...", registerBtn: "S'inscrire", registering: "Inscription...", noAccount: "Pas de compte?", hasAccount: "Déjà un compte?", wantToHost: "Vous voulez accueillir?", wrongCreds: "Email ou mot de passe incorrect", passMismatch: "Les mots de passe ne correspondent pas", minPass: "Minimum 6 caractères" },
   },
@@ -456,6 +491,11 @@ const t: Record<LangCode, Translations> = {
       aboutFamily: "Über die Familie", amenities: "Ausstattung", experiences: "Was Sie erwartet",
       languages: "Sprachen", reviews: "Bewertungen", newGuest: "Seien Sie der erste Gast!",
       freeCancel: "Kostenlose Stornierung 48h", directContact: "Direktkontakt", noHidden: "Keine versteckten Gebühren",
+      writeReview: "Bewertung schreiben",
+      reviewPlaceholder: "Erzählen Sie von Ihrer Erfahrung... (min 10 Zeichen)",
+      submitReview: "Bewertung senden",
+      reviewSuccess: "Danke für Ihre Bewertung!",
+      mustBeGuest: "Nur Gäste mit abgeschlossener Buchung können bewerten",
     },
     home: {
       whyTitle: "Warum HayHome?",
@@ -492,6 +532,7 @@ const t: Record<LangCode, Translations> = {
       aiImprovedLong: "KI hat verbessert — bei Bedarf bearbeiten",
     },
     common: { loading: "Laden...", error: "Fehler", rating: "Bewertung", newHost: "Neu" },
+    legal: { privacy: "Datenschutzerklärung", terms: "Nutzungsbedingungen", rules: "Plattformregeln", back: "Zur Startseite" },
     about: { heroTitle: "Über uns", heroSub: "Wir bauen keine Mietplattform. Wir bauen ein lebendiges kulturelles Netzwerk.", missionLabel: "Unsere Mission", missionTitle: "Armenien öffnet sich", missionTitle2: "durch das Herz einer Familie", missionSub: "HayHome ist kein Airbnb. Es ist ein kulturelles Ökosystem von nationaler Bedeutung. Wir bewahren armenische Familienwerte und stärken Armeniens Image als das gastfreundlichste Volk der Welt.", card1title: "Bewahrung von Traditionen", card1desc: "Jede Familie ist Hüter eines kulturellen Codes. Wir helfen diesem Code zu leben und an Generationen weitergegeben zu werden.", card2title: "Völker verbinden", card2desc: "Gäste aus 40+ Ländern haben Armenien bereits durch unsere Gastgeber entdeckt. Jeder Besuch ist eine Brücke zwischen Kulturen.", card3title: "Stolz auf das Land", card3desc: "Armenische Familien verdienen den Status 'Hüter der Traditionen' — Anerkennung der gesamten Gemeinschaft.", storyLabel: "Wie alles begann", storyTitle: "Eine Idee, die beim Abendessen entstand", story1: "Alles begann mit einer einfachen Beobachtung: In Armenien leben Hunderte von Familien, die bereit sind, Gäste aufzunehmen und echte Gastfreundschaft zu zeigen — aber sie hatten kein Werkzeug, um der Welt davon zu erzählen.", story2: "Und Touristen aus aller Welt wollen genau das — keinen Hotelservice, sondern ein lebendiges Erlebnis. Echte Geschichten an einem großen Tisch.", story3: "HayHome wurde geschaffen, um diese Menschen zu verbinden. Es ist eine Plattform des Vertrauens, der Kultur und der Wärme. Nicht nur ein Geschäft — eine Bewegung.", valuesLabel: "Unsere Werte", valuesTitle: "Warum wir nicht Airbnb sind", v1t: "Gastgeber, nicht Vermieter", v1d: "Jeder Gastgeber ist ein 'Hüter der Traditionen'. Er präsentiert seine Lebensweise, Kultur und Geschichte.", v2t: "Erlebnis, kein Bett", v2d: "Der Gast sucht keinen Schlafplatz, sondern ein einzigartiges Erlebnis: Workshops, Abendessen, Geschichten.", v3t: "Vertrauen durch Verifizierung", v3d: "Jede Familie wird geprüft. Das Sternesystem garantiert Qualität.", v4t: "Armenier lernen Armenier kennen", v4d: "Armenische Familien aus verschiedenen Regionen entdecken einander über die Plattform.", v5t: "Gamification und Status", v5d: "Abzeichen wie 'Beste Küche', 'Weinmeister' sind Anerkennung der Gemeinschaft.", v6t: "Geschichten, keine Bewertungen", v6d: "'Ich kam als Tourist und ging als ihr Sohn' — das ist eine echte Bewertung.", statsTitle: "HayHome heute", s1: "Familien im Netzwerk", s2: "Regionen Armeniens", s3: "Herkunftsländer der Gäste", s4: "Durchschnittliche Bewertung", toneLabel: "Unsere Stimme", toneTitle: "Wie wir sprechen", toneSub: "Wir sprechen wie ein älterer Bruder, ein gastfreundlicher Gastgeber, ein Patriot ohne Pomp — nicht wie eine Corporation.", secTitle: "Sicherheit und Vertrauen", secDesc: "Jede Familie durchläuft eine Dokumentenprüfung. Versicherung und 24/7-Support.", ctaTitle: "Komm rein — werde Teil einer großen armenischen Familie", ctaSub: "Es ist egal, woher du kommst. Wichtig ist, dass du bereit bist, dich Neuem zu öffnen." },
     auth: { loginTitle: "Anmelden", registerTitle: "Konto erstellen", registerSub: "Gast-Registrierung — kostenlos", password: "Passwort", confirmPassword: "Passwort bestätigen", name: "Ihr Name", loginBtn: "Anmelden", loggingIn: "Anmeldung...", registerBtn: "Registrieren", registering: "Registrierung...", noAccount: "Kein Konto?", hasAccount: "Bereits ein Konto?", wantToHost: "Gäste empfangen?", wrongCreds: "Ungültige E-Mail oder Passwort", passMismatch: "Passwörter stimmen nicht überein", minPass: "Mindestens 6 Zeichen" },
   },
@@ -519,6 +560,11 @@ const t: Record<LangCode, Translations> = {
       aboutFamily: "Sobre la familia", amenities: "Comodidades", experiences: "Lo que le espera",
       languages: "Idiomas", reviews: "Reseñas", newGuest: "¡Sé el primer huésped!",
       freeCancel: "Cancelación gratuita 48h", directContact: "Contacto directo", noHidden: "Sin cargos ocultos",
+      writeReview: "Escribir reseña",
+      reviewPlaceholder: "Cuente su experiencia... (mín 10 caracteres)",
+      submitReview: "Enviar reseña",
+      reviewSuccess: "¡Gracias por su reseña!",
+      mustBeGuest: "Solo huéspedes con reserva completada pueden dejar reseña",
     },
     home: {
       whyTitle: "¿Por qué HayHome?",
@@ -555,6 +601,7 @@ const t: Record<LangCode, Translations> = {
       aiImprovedLong: "IA mejoró — edita si es necesario",
     },
     common: { loading: "Cargando...", error: "Error", rating: "calificación", newHost: "Nuevo" },
+    legal: { privacy: "Política de privacidad", terms: "Términos de servicio", rules: "Reglas de la plataforma", back: "Inicio" },
     about: { heroTitle: "Sobre nosotros", heroSub: "No construimos una plataforma de alquiler. Construimos una red cultural viva.", missionLabel: "Nuestra misión", missionTitle: "Armenia se abre", missionTitle2: "a través del corazón de una familia", missionSub: "HayHome no es Airbnb. Es un ecosistema cultural de escala nacional. Preservamos los valores familiares armenios y fortalecemos la imagen de Armenia como el pueblo más hospitalario del mundo.", card1title: "Preservar tradiciones", card1desc: "Cada familia es guardiana de un código cultural. Ayudamos a que este código viva y se transmita a las generaciones futuras.", card2title: "Unir a los pueblos", card2desc: "Huéspedes de 40+ países ya han descubierto Armenia a través de nuestros anfitriones. Cada visita es un puente entre culturas.", card3title: "Orgullo por el país", card3desc: "Las familias armenias obtienen el estatus de «Guardián de tradiciones» — reconocimiento de toda la comunidad.", storyLabel: "Cómo empezó todo", storyTitle: "Una idea que nació en una cena", story1: "Todo empezó con una observación simple: en Armenia viven cientos de familias listas para recibir huéspedes y mostrar la verdadera hospitalidad, pero no tenían una herramienta para contárselo al mundo.", story2: "Y los turistas de todo el mundo quieren exactamente eso — no servicio hotelero, sino una experiencia viva. Historias reales alrededor de una gran mesa.", story3: "HayHome fue creado para conectar a estas personas. Es una plataforma de confianza, cultura y calidez. No solo un negocio — un movimiento.", valuesLabel: "Nuestros valores", valuesTitle: "Por qué no somos Airbnb", v1t: "Anfitrión, no arrendador", v1d: "Cada anfitrión es un «Guardián de tradiciones». Presenta su forma de vida, cultura e historia.", v2t: "Experiencia, no una cama", v2d: "El huésped no busca un lugar para dormir, sino una experiencia única: talleres, cenas, historias.", v3t: "Confianza mediante verificación", v3d: "Cada familia es verificada. El sistema de estrellas garantiza la calidad.", v4t: "Los armenios se conocen entre sí", v4d: "Familias armenias de diferentes regiones se conocen a través de la plataforma.", v5t: "Gamificación y estatus", v5d: "Insignias como «Mejor cocina», «Maestro del vino» son reconocimiento de la comunidad.", v6t: "Historias, no reseñas", v6d: "«Llegué como turista y me fui como su hijo» — esa es una verdadera reseña.", statsTitle: "HayHome hoy", s1: "Familias en la red", s2: "Regiones de Armenia", s3: "Países de origen", s4: "Calificación promedio", toneLabel: "Nuestra voz", toneTitle: "Cómo hablamos", toneSub: "Hablamos como un hermano mayor, un anfitrión acogedor, un patriota sin soberbia — no como una corporación.", secTitle: "Seguridad y confianza", secDesc: "Cada familia pasa por una verificación de documentos. Seguro y soporte 24/7.", ctaTitle: "Entra — sé parte de una gran familia armenia", ctaSub: "No importa de dónde vengas. Lo importante es que estás listo para abrirte a algo nuevo." },
     auth: { loginTitle: "Iniciar sesión", registerTitle: "Crear cuenta", registerSub: "Registro de huésped — gratis", password: "Contraseña", confirmPassword: "Confirmar contraseña", name: "Tu nombre", loginBtn: "Iniciar sesión", loggingIn: "Iniciando...", registerBtn: "Registrarse", registering: "Registrando...", noAccount: "¿Sin cuenta?", hasAccount: "¿Ya tienes cuenta?", wantToHost: "¿Quieres recibir huéspedes?", wrongCreds: "Email o contraseña incorrectos", passMismatch: "Las contraseñas no coinciden", minPass: "Mínimo 6 caracteres" },
   },
@@ -582,6 +629,11 @@ const t: Record<LangCode, Translations> = {
       aboutFamily: "Sulla famiglia", amenities: "Servizi", experiences: "Cosa ti aspetta",
       languages: "Lingue", reviews: "Recensioni", newGuest: "Sii il primo ospite!",
       freeCancel: "Cancellazione gratuita 48h", directContact: "Contatto diretto", noHidden: "Nessuna tariffa nascosta",
+      writeReview: "Scrivi recensione",
+      reviewPlaceholder: "Racconta la tua esperienza... (min 10 caratteri)",
+      submitReview: "Invia recensione",
+      reviewSuccess: "Grazie per la recensione!",
+      mustBeGuest: "Solo ospiti con prenotazione completata possono lasciare recensione",
     },
     home: {
       whyTitle: "Perché HayHome?",
@@ -618,6 +670,7 @@ const t: Record<LangCode, Translations> = {
       aiImprovedLong: "IA ha migliorato — modifica se necessario",
     },
     common: { loading: "Caricamento...", error: "Errore", rating: "valutazione", newHost: "Nuovo" },
+    legal: { privacy: "Informativa sulla privacy", terms: "Termini di servizio", rules: "Regole della piattaforma", back: "Home" },
     auth: { loginTitle: "Accedi", registerTitle: "Crea account", registerSub: "Registrazione ospite — gratuita", password: "Password", confirmPassword: "Conferma password", name: "Il tuo nome", loginBtn: "Accedi", loggingIn: "Accesso...", registerBtn: "Registrati", registering: "Registrazione...", noAccount: "Nessun account?", hasAccount: "Hai già un account?", wantToHost: "Vuoi ospitare?", wrongCreds: "Email o password errati", passMismatch: "Le password non corrispondono", minPass: "Minimo 6 caratteri" },
   },
 
@@ -644,6 +697,11 @@ const t: Record<LangCode, Translations> = {
       aboutFamily: "عن العائلة", amenities: "المرافق", experiences: "ما ينتظرك",
       languages: "اللغات", reviews: "التقييمات", newGuest: "كن أول ضيف!",
       freeCancel: "إلغاء مجاني خلال 48 ساعة", directContact: "تواصل مباشر", noHidden: "لا رسوم خفية",
+      writeReview: "اكتب تقييماً",
+      reviewPlaceholder: "احكِ عن تجربتك... (10 أحرف على الأقل)",
+      submitReview: "إرسال التقييم",
+      reviewSuccess: "شكراً لتقييمك!",
+      mustBeGuest: "فقط الضيوف الذين أكملوا الحجز يمكنهم ترك تقييم",
     },
     home: {
       whyTitle: "لماذا HayHome؟",
@@ -680,6 +738,7 @@ const t: Record<LangCode, Translations> = {
       aiImprovedLong: "حسّن الذكاء الاصطناعي — راجع إذا لزم الأمر",
     },
     common: { loading: "جار التحميل...", error: "خطأ", rating: "تقييم", newHost: "جديد" },
+    legal: { privacy: "سياسة الخصوصية", terms: "شروط الخدمة", rules: "قواعد المنصة", back: "الرئيسية" },
     auth: { loginTitle: "تسجيل الدخول", registerTitle: "إنشاء حساب", registerSub: "تسجيل الضيف — مجاني", password: "كلمة المرور", confirmPassword: "تأكيد كلمة المرور", name: "اسمك", loginBtn: "دخول", loggingIn: "جار الدخول...", registerBtn: "إنشاء حساب", registering: "جار التسجيل...", noAccount: "ليس لديك حساب؟", hasAccount: "لديك حساب بالفعل؟", wantToHost: "تريد استقبال الضيوف؟", wrongCreds: "بريد إلكتروني أو كلمة مرور غير صحيحة", passMismatch: "كلمتا المرور غير متطابقتين", minPass: "6 أحرف على الأقل" },
   },
 
@@ -706,6 +765,11 @@ const t: Record<LangCode, Translations> = {
       aboutFamily: "关于家庭", amenities: "设施", experiences: "等待您的体验",
       languages: "语言", reviews: "评价", newGuest: "成为第一位客人！",
       freeCancel: "48小时内免费取消", directContact: "与家庭直接联系", noHidden: "无隐藏费用",
+      writeReview: "写评价",
+      reviewPlaceholder: "分享您的体验...（至少10个字符）",
+      submitReview: "提交评价",
+      reviewSuccess: "感谢您的评价！",
+      mustBeGuest: "只有完成预订的客人才能留下评价",
     },
     home: {
       whyTitle: "为什么选择HayHome？",
@@ -742,6 +806,7 @@ const t: Record<LangCode, Translations> = {
       aiImprovedLong: "AI已优化——如有需要请编辑",
     },
     common: { loading: "加载中...", error: "错误", rating: "评分", newHost: "新" },
+    legal: { privacy: "隐私政策", terms: "服务条款", rules: "平台规则", back: "首页" },
     auth: { loginTitle: "登录", registerTitle: "创建账户", registerSub: "游客注册 — 免费", password: "密码", confirmPassword: "确认密码", name: "您的姓名", loginBtn: "登录", loggingIn: "登录中...", registerBtn: "注册", registering: "注册中...", noAccount: "没有账户？", hasAccount: "已有账户？", wantToHost: "想接待客人？", wrongCreds: "邮箱或密码错误", passMismatch: "密码不匹配", minPass: "最少6个字符" },
   },
 
@@ -768,6 +833,11 @@ const t: Record<LangCode, Translations> = {
       aboutFamily: "درباره خانواده", amenities: "امکانات", experiences: "آنچه در انتظار شماست",
       languages: "زبان‌ها", reviews: "نظرات", newGuest: "اولین مهمان باشید!",
       freeCancel: "لغو رایگان در 48 ساعت", directContact: "تماس مستقیم", noHidden: "بدون هزینه‌های پنهان",
+      writeReview: "نظر بنویسید",
+      reviewPlaceholder: "تجربه خود را بیان کنید... (حداقل ۱۰ کاراکتر)",
+      submitReview: "ارسال نظر",
+      reviewSuccess: "از نظر شما سپاسگزاریم!",
+      mustBeGuest: "فقط مهمانانی که رزرو را تکمیل کرده‌اند می‌توانند نظر بدهند",
     },
     home: {
       whyTitle: "چرا HayHome؟",
@@ -804,6 +874,7 @@ const t: Record<LangCode, Translations> = {
       aiImprovedLong: "هوش مصنوعی بهبود داد — در صورت نیاز ویرایش کنید",
     },
     common: { loading: "بارگذاری...", error: "خطا", rating: "امتیاز", newHost: "جدید" },
+    legal: { privacy: "سیاست حریم خصوصی", terms: "شرایط خدمات", rules: "قوانین پلتفرم", back: "خانه" },
     auth: { loginTitle: "ورود به حساب", registerTitle: "ایجاد حساب", registerSub: "ثبت‌نام مهمان — رایگان", password: "رمز عبور", confirmPassword: "تأیید رمز عبور", name: "نام شما", loginBtn: "ورود", loggingIn: "در حال ورود...", registerBtn: "ثبت‌نام", registering: "در حال ثبت‌نام...", noAccount: "حساب ندارید؟", hasAccount: "قبلاً حساب دارید؟", wantToHost: "می‌خواهید مهمان بپذیرید؟", wrongCreds: "ایمیل یا رمز عبور نادرست", passMismatch: "رمزهای عبور مطابقت ندارند", minPass: "حداقل ۶ کاراکتر" },
   },
 };
