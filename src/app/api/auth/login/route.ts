@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserByEmail } from "@/lib/data";
 import { signToken, setAuthCookie } from "@/lib/auth";
+import { rateLimit } from "@/lib/rateLimit";
 import bcrypt from "bcryptjs";
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function POST(req: NextRequest) {
+  // Rate limit
+  const blocked = rateLimit(req);
+  if (blocked) return blocked;
+
   const { email, password } = await req.json();
 
-  if (!email || !password) {
-    return NextResponse.json({ error: "Email and password required" }, { status: 400 });
+  if (!email || !password || !EMAIL_RE.test(email)) {
+    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
   const user = await getUserByEmail(email);
