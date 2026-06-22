@@ -11,7 +11,7 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || null;
-  const { tr } = useLang();
+  const { tr, lang } = useLang();
   const { refresh } = useAuth();
   const a = tr.auth;
   const n = tr.nav;
@@ -63,7 +63,12 @@ function LoginContent() {
               className={inputCls} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">{a.password}</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-sm font-semibold text-gray-700">{a.password}</label>
+              <Link href="/forgot-password" className="text-xs hover:underline" style={{ color: "#D4001A" }}>
+                {lang === "ru" ? "Забыли пароль?" : lang === "fr" ? "Mot de passe oublié?" : lang === "de" ? "Passwort vergessen?" : lang === "es" ? "¿Olvidaste tu contraseña?" : lang === "ar" ? "نسيت كلمة المرор?" : lang === "zh" ? "忘记密码?" : lang === "hy" ? "Լաբծացել գաղտնաբառը?" : "Forgot password?"}
+              </Link>
+            </div>
             <div className="relative">
               <input required type={showPassword ? "text" : "password"} value={form.password}
                 onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
