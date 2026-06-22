@@ -80,7 +80,7 @@ export default function Header() {
                     <button
                       onClick={() => { setUserMenuOpen(false); logout(); }}
                       className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50">
-                      <LogOut size={14} /> {n.logout ?? "Выйти"}
+                      <LogOut size={14} /> {n.logout}
                     </button>
                   </div>
                 )}
@@ -131,7 +131,7 @@ export default function Header() {
                   Dashboard
                 </Link>
                 <button onClick={() => { setOpen(false); logout(); }} className="py-2 rounded-full text-red-600 border border-red-200 font-medium">
-                  {n.logout ?? "Выйти"}
+                  {n.logout}
                 </button>
               </>
             ) : (

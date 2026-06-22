@@ -371,7 +371,7 @@ const t: Record<LangCode, Translations> = {
   },
 
   fr: {
-    nav: { findFamily: "Trouver une famille", hostGuests: "Accueillir des hôtes", about: "À propos", login: "Connexion", register: "S'inscrire", logout: "Se déconnecter" },
+    nav: { findFamily: "Trouver une famille", hostGuests: "Accueillir des hôtes", about: "À propos", login: "Connexion", register: "S'inscrire", logout: "Se déconnecter", partner: "Partenaires" },
     hero: {
       greeting: "Bari Ekeq!",
       title1: "Entrez — devenez",
@@ -434,7 +434,7 @@ const t: Record<LangCode, Translations> = {
   },
 
   de: {
-    nav: { findFamily: "Familie finden", hostGuests: "Gäste empfangen", about: "Über uns", login: "Anmelden", register: "Registrieren", logout: "Abmelden" },
+    nav: { findFamily: "Familie finden", hostGuests: "Gäste empfangen", about: "Über uns", login: "Anmelden", register: "Registrieren", logout: "Abmelden", partner: "Partner" },
     hero: {
       greeting: "Bari Ekeq!",
       title1: "Komm rein — werde",
@@ -497,7 +497,7 @@ const t: Record<LangCode, Translations> = {
   },
 
   es: {
-    nav: { findFamily: "Encontrar familia", hostGuests: "Recibir huéspedes", about: "Sobre nosotros", login: "Iniciar sesión", register: "Registrarse", logout: "Cerrar sesión" },
+    nav: { findFamily: "Encontrar familia", hostGuests: "Recibir huéspedes", about: "Sobre nosotros", login: "Iniciar sesión", register: "Registrarse", logout: "Cerrar sesión", partner: "Socios" },
     hero: {
       greeting: "¡Bari Ekeq!",
       title1: "Entra — conviértete",
@@ -560,7 +560,7 @@ const t: Record<LangCode, Translations> = {
   },
 
   it: {
-    nav: { findFamily: "Trova una famiglia", hostGuests: "Ospita viaggiatori", about: "Chi siamo", login: "Accedi", register: "Registrati", logout: "Esci" },
+    nav: { findFamily: "Trova una famiglia", hostGuests: "Ospita viaggiatori", about: "Chi siamo", login: "Accedi", register: "Registrati", logout: "Esci", partner: "Partner" },
     hero: {
       greeting: "Bari Ekeq!",
       title1: "Entra — diventa",
@@ -622,7 +622,7 @@ const t: Record<LangCode, Translations> = {
   },
 
   ar: {
-    nav: { findFamily: "ابحث عن عائلة", hostGuests: "استقبال الضيوف", about: "من نحن", login: "تسجيل الدخول", register: "إنشاء حساب", logout: "تسجيل الخروج" },
+    nav: { findFamily: "ابحث عن عائلة", hostGuests: "استقبال الضيوف", about: "من نحن", login: "تسجيل الدخول", register: "إنشاء حساب", logout: "تسجيل الخروج", partner: "شركاء" },
     hero: {
       greeting: "!Bari Ekeq",
       title1: "ادخل — كن",
@@ -684,7 +684,7 @@ const t: Record<LangCode, Translations> = {
   },
 
   zh: {
-    nav: { findFamily: "寻找家庭", hostGuests: "接待客人", about: "关于我们", login: "登录", register: "注册", logout: "退出" },
+    nav: { findFamily: "寻找家庭", hostGuests: "接待客人", about: "关于我们", login: "登录", register: "注册", logout: "退出", partner: "合作伙伴" },
     hero: {
       greeting: "欢迎！Bari Ekeq!",
       title1: "加入我们——成为",
@@ -746,7 +746,7 @@ const t: Record<LangCode, Translations> = {
   },
 
   fa: {
-    nav: { findFamily: "یافتن خانواده", hostGuests: "پذیرش مهمان", about: "درباره ما", login: "ورود", register: "ثبت‌نام", logout: "خروج" },
+    nav: { findFamily: "یافتن خانواده", hostGuests: "پذیرش مهمان", about: "درباره ما", login: "ورود", register: "ثبت‌نام", logout: "خروج", partner: "همکاران" },
     hero: {
       greeting: "!Bari Ekeq",
       title1: "بیایید — بخشی از",
