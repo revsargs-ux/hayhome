@@ -161,9 +161,9 @@ const t: Record<LangCode, Translations> = {
       partner: "Партнёры",
     },
     hero: {
-      greeting: "Bari Ekeq!",
-      title1: "Войди — стань",
-      title2: "частью большой",
+      greeting: "Բարի դես!",
+      title1: "Открой дверь — стань",
+      title2: "частью",
       title3: "армянской семьи",
       subtitle: "Армения открывается через сердце семьи. Настоящий ужин, живые истории, вид на Арарат. Не отель — дом.",
       searchPlaceholder: "Ереван, Дилижан, Севан...",
@@ -219,7 +219,7 @@ const t: Record<LangCode, Translations> = {
       step3: "Стань своим", step3desc: "Уедешь другом. Вернёшься снова.",
       becomeTitle: "У вас есть дом и желание принять гостей?",
       becomeSub: "Зарегистрируйтесь бесплатно. Первые 12 месяцев — без комиссии.",
-      becomeCta: "Принять гостей бесплатно",
+      becomeCta: "Принять гостей",
       browseBtn: "Посмотреть семьи",
     },
     become: {
@@ -247,10 +247,10 @@ const t: Record<LangCode, Translations> = {
   en: {
     nav: { findFamily: "Find a Family", hostGuests: "Host Guests", about: "About", partner: "Partners", login: "Log In", register: "Sign Up", logout: "Sign Out" },
     hero: {
-      greeting: "Bari Ekeq!",
-      title1: "Come in — become",
-      title2: "part of one big",
-      title3: "Armenian family",
+      greeting: "Բարի դես!",
+      title1: "Open the door — become",
+      title2: "part of",
+      title3: "an Armenian family",
       subtitle: "Armenia opens through the heart of a family. A real dinner, living stories, a view of Ararat. Not a hotel — a home.",
       searchPlaceholder: "Yerevan, Dilijan, Sevan...",
       searchBtn: "Find a Family",
@@ -282,7 +282,7 @@ const t: Record<LangCode, Translations> = {
       step3: "Become one of them", step3desc: "You'll leave as a friend. And come back again.",
       becomeTitle: "Do you have a home and want to welcome guests?",
       becomeSub: "Register for free. First 12 months — no commission.",
-      becomeCta: "Host Guests for Free",
+      becomeCta: "Host Guests",
       browseBtn: "Browse Families",
     },
     become: {
@@ -310,9 +310,9 @@ const t: Record<LangCode, Translations> = {
   hy: {
     nav: { findFamily: "Գտնել ընտանիք", hostGuests: "Ընդունել հյուրեր", about: "Մեր մասին", partner: "Գործընկերներ", login: "Մուտք", register: "Գրանցում" , logout: "Ելք" },
     hero: {
-      greeting: "Բարի եկաք!",
-      title1: "Արի — դարձիր",
-      title2: "հայկական մեծ",
+      greeting: "Բարի դես!",
+      title1: "Բացիր դուռը — դարձիր",
+      title2: "հայկական",
       title3: "ընտանիքի մաս",
       subtitle: "Հայաստանը բացվում է ընտանիքի սրտի միջոցով: Իրական ընթրիք, կենդանի պատմություններ, Արարատի տեսարան:",
       searchPlaceholder: "Երևան, Դիլիջան, Սևան...",
@@ -373,7 +373,7 @@ const t: Record<LangCode, Translations> = {
   fr: {
     nav: { findFamily: "Trouver une famille", hostGuests: "Accueillir des hôtes", about: "À propos", login: "Connexion", register: "S'inscrire", logout: "Se déconnecter", partner: "Partenaires" },
     hero: {
-      greeting: "Bari Ekeq!",
+      greeting: "Բարի դես!",
       title1: "Entrez — devenez",
       title2: "membre d'une grande",
       title3: "famille arménienne",
@@ -436,7 +436,7 @@ const t: Record<LangCode, Translations> = {
   de: {
     nav: { findFamily: "Familie finden", hostGuests: "Gäste empfangen", about: "Über uns", login: "Anmelden", register: "Registrieren", logout: "Abmelden", partner: "Partner" },
     hero: {
-      greeting: "Bari Ekeq!",
+      greeting: "Բարի դես!",
       title1: "Komm rein — werde",
       title2: "Teil einer großen",
       title3: "armenischen Familie",
@@ -562,7 +562,7 @@ const t: Record<LangCode, Translations> = {
   it: {
     nav: { findFamily: "Trova una famiglia", hostGuests: "Ospita viaggiatori", about: "Chi siamo", login: "Accedi", register: "Registrati", logout: "Esci", partner: "Partner" },
     hero: {
-      greeting: "Bari Ekeq!",
+      greeting: "Բարի դես!",
       title1: "Entra — diventa",
       title2: "parte di una grande",
       title3: "famiglia armena",
