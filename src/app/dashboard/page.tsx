@@ -93,7 +93,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 mb-1">
-              {lang === "ru" ? "Личный кабинет" : lang === "hy" ? "Անձнный кабинет" : lang === "fr" ? "Mon espace" : lang === "de" ? "Mein Bereich" : lang === "es" ? "Mi espacio" : lang === "ar" ? "لوحتي" : lang === "zh" ? "我的控制台" : "Dashboard"}
+              {tr.nav.about && (lang === "ru" ? "Личный кабинет" : lang === "hy" ? "Անձնական կաbiнет" : lang === "fr" ? "Mon espace" : lang === "de" ? "Mein Bereich" : lang === "es" ? "Mi espacio" : lang === "it" ? "Il mio spazio" : lang === "ar" ? "لوحتي" : lang === "zh" ? "我的控制台" : lang === "fa" ? "داشبورد من" : "Dashboard")}
             </h1>
             <p className="text-gray-500">{user?.name} · {user?.email}</p>
           </div>
