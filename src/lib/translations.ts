@@ -161,9 +161,9 @@ const t: Record<LangCode, Translations> = {
       partner: "Партнёры",
     },
     hero: {
-      greeting: "Բարի դես!",
-      title1: "Открой дверь — стань",
-      title2: "частью",
+      greeting: "Bari Ekeq!",
+      title1: "Войди — стань",
+      title2: "частью большой",
       title3: "армянской семьи",
       subtitle: "Армения открывается через сердце семьи. Настоящий ужин, живые истории, вид на Арарат. Не отель — дом.",
       searchPlaceholder: "Ереван, Дилижан, Севан...",
@@ -247,10 +247,10 @@ const t: Record<LangCode, Translations> = {
   en: {
     nav: { findFamily: "Find a Family", hostGuests: "Host Guests", about: "About", partner: "Partners", login: "Log In", register: "Sign Up", logout: "Sign Out" },
     hero: {
-      greeting: "Բարի դես!",
-      title1: "Open the door — become",
-      title2: "part of",
-      title3: "an Armenian family",
+      greeting: "Bari Ekeq!",
+      title1: "Come in — become",
+      title2: "part of one big",
+      title3: "Armenian family",
       subtitle: "Armenia opens through the heart of a family. A real dinner, living stories, a view of Ararat. Not a hotel — a home.",
       searchPlaceholder: "Yerevan, Dilijan, Sevan...",
       searchBtn: "Find a Family",
@@ -310,9 +310,9 @@ const t: Record<LangCode, Translations> = {
   hy: {
     nav: { findFamily: "Գտնել ընտանիք", hostGuests: "Ընդունել հյուրեր", about: "Մեր մասին", partner: "Գործընկերներ", login: "Մուտք", register: "Գրանցում" , logout: "Ելք" },
     hero: {
-      greeting: "Բարի դես!",
-      title1: "Բացիր դուռը — դարձիր",
-      title2: "հայկական",
+      greeting: "Bari Ekeq!",
+      title1: "Արի — դարձիր",
+      title2: "հայկական մեծ",
       title3: "ընտանիքի մաս",
       subtitle: "Հայաստանը բացվում է ընտանիքի սրտի միջոցով: Իրական ընթրիք, կենդանի պատմություններ, Արարատի տեսարան:",
       searchPlaceholder: "Երևան, Դիլիջան, Սևան...",
@@ -345,7 +345,7 @@ const t: Record<LangCode, Translations> = {
       step3: "Դարձեք իրենցից", step3desc: "Կհեռանաք որպես ընկեր:",
       becomeTitle: "Ունե՞ք տուն և ցանկություն ընդունել հյուրեր:",
       becomeSub: "Գրանցվեք անվճար:",
-      becomeCta: "Ընդունել հյուրեր անվճար",
+      becomeCta: "Ընդունել հյուրեր",
       browseBtn: "Դիտել ընտանիքները",
     },
     become: {
@@ -373,7 +373,7 @@ const t: Record<LangCode, Translations> = {
   fr: {
     nav: { findFamily: "Trouver une famille", hostGuests: "Accueillir des hôtes", about: "À propos", login: "Connexion", register: "S'inscrire", logout: "Se déconnecter", partner: "Partenaires" },
     hero: {
-      greeting: "Բարի դես!",
+      greeting: "Bari Ekeq!",
       title1: "Entrez — devenez",
       title2: "membre d'une grande",
       title3: "famille arménienne",
@@ -408,7 +408,7 @@ const t: Record<LangCode, Translations> = {
       step3: "Devenez des leurs", step3desc: "Vous repartirez comme un ami.",
       becomeTitle: "Vous avez une maison et souhaitez accueillir des hôtes?",
       becomeSub: "Inscrivez-vous gratuitement. 12 premiers mois sans commission.",
-      becomeCta: "Accueillir des hôtes gratuitement",
+      becomeCta: "Accueillir des hôtes",
       browseBtn: "Voir les familles",
     },
     become: {
@@ -436,7 +436,7 @@ const t: Record<LangCode, Translations> = {
   de: {
     nav: { findFamily: "Familie finden", hostGuests: "Gäste empfangen", about: "Über uns", login: "Anmelden", register: "Registrieren", logout: "Abmelden", partner: "Partner" },
     hero: {
-      greeting: "Բարի դես!",
+      greeting: "Bari Ekeq!",
       title1: "Komm rein — werde",
       title2: "Teil einer großen",
       title3: "armenischen Familie",
@@ -471,7 +471,7 @@ const t: Record<LangCode, Translations> = {
       step3: "Einer von ihnen werden", step3desc: "Sie gehen als Freund weg.",
       becomeTitle: "Haben Sie ein Zuhause und möchten Gäste empfangen?",
       becomeSub: "Kostenlos registrieren. Erste 12 Monate ohne Provision.",
-      becomeCta: "Gäste kostenlos empfangen",
+      becomeCta: "Gäste empfangen",
       browseBtn: "Familien ansehen",
     },
     become: {
@@ -534,7 +534,7 @@ const t: Record<LangCode, Translations> = {
       step3: "Conviértete en uno de ellos", step3desc: "Te irás como amigo.",
       becomeTitle: "¿Tienes casa y quieres recibir huéspedes?",
       becomeSub: "Regístrate gratis. Primeros 12 meses sin comisión.",
-      becomeCta: "Recibir huéspedes gratis",
+      becomeCta: "Recibir huéspedes",
       browseBtn: "Ver familias",
     },
     become: {
@@ -562,7 +562,7 @@ const t: Record<LangCode, Translations> = {
   it: {
     nav: { findFamily: "Trova una famiglia", hostGuests: "Ospita viaggiatori", about: "Chi siamo", login: "Accedi", register: "Registrati", logout: "Esci", partner: "Partner" },
     hero: {
-      greeting: "Բարի դես!",
+      greeting: "Bari Ekeq!",
       title1: "Entra — diventa",
       title2: "parte di una grande",
       title3: "famiglia armena",
@@ -597,7 +597,7 @@ const t: Record<LangCode, Translations> = {
       step3: "Diventa uno di loro", step3desc: "Partirai come un amico.",
       becomeTitle: "Hai una casa e vuoi ospitare viaggiatori?",
       becomeSub: "Registrati gratis. Primi 12 mesi senza commissioni.",
-      becomeCta: "Ospita gratis",
+      becomeCta: "Ospita viaggiatori",
       browseBtn: "Vedi le famiglie",
     },
     become: {
