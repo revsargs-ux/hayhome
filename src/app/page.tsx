@@ -2,18 +2,23 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Star } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useLightbox } from "@/contexts/LightboxContext";
 import { Host, Review } from "@/lib/types";
+import { getHistory } from "@/lib/viewHistory";
+import getUI from "@/lib/ui";
 
 export default function HomePage() {
   const { lang, tr } = useLang();
+  const u = getUI(lang);
   const h = tr.home;
   const lightbox = useLightbox();
   const [hosts, setHosts] = useState<Host[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [recentHosts, setRecentHosts] = useState<Host[]>([]);
 
   useEffect(() => {
     Promise.all([
@@ -23,6 +28,19 @@ export default function HomePage() {
       setHosts(h.filter((x: Host) => x.status === "active").slice(0, 10));
       setReviews(r.slice(0, 3));
       setLoading(false);
+    });
+  }, []);
+
+  // Load recently viewed hosts
+  useEffect(() => {
+    const history = getHistory();
+    if (history.length === 0) return;
+    const recentIds = history.slice(0, 6).map((h) => h.hostId);
+    Promise.all(
+      recentIds.map((id) => fetch(`/api/hosts/${id}`).then((r) => r.json()).catch(() => null))
+    ).then((results) => {
+      const valid = results.filter((r) => r && r.id) as Host[];
+      setRecentHosts(valid);
     });
   }, []);
 
@@ -170,6 +188,49 @@ export default function HomePage() {
                   <p className="text-sm font-semibold text-gray-900">— {review.guestName}</p>
                   <p className="text-xs text-gray-400">{review.guestCountry} · {review.date}</p>
                 </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Recently viewed */}
+      {recentHosts.length > 0 && (
+        <section className="py-12 bg-white border-t border-gray-100">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-extrabold text-gray-900 mb-6">{u.recentlyViewed}</h2>
+            <div className="flex gap-4 overflow-x-auto pb-4 snap-x scrollbar-hide">
+              {recentHosts.map((host) => (
+                <Link
+                  key={host.id}
+                  href={`/hosts/${host.id}`}
+                  className="flex-shrink-0 w-64 snap-start group block rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition bg-white border border-gray-100"
+                >
+                  <div className="relative h-36 overflow-hidden bg-gray-200">
+                    <Image
+                      src={host.coverPhoto}
+                      alt={host.familyName}
+                      fill
+                      className="object-cover group-hover:scale-105 transition duration-300"
+                      sizes="256px"
+                    />
+                  </div>
+                  <div className="p-3">
+                    <h3 className="font-bold text-gray-900 text-sm mb-1 truncate">
+                      {(host.i18n?.[lang]?.familyName) || host.familyName}
+                    </h3>
+                    <p className="text-gray-500 text-xs mb-2">📍 {host.city}, {host.region}</p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <Star size={12} fill="#F2A900" color="#F2A900" />
+                        <span className="text-xs font-semibold text-gray-700">
+                          {host.rating > 0 ? host.rating.toFixed(1) : "New"}
+                        </span>
+                      </div>
+                      <span className="text-sm font-bold" style={{ color: "#D4001A" }}>${host.pricePerNight}</span>
+                    </div>
+                  </div>
+                </Link>
               ))}
             </div>
           </div>

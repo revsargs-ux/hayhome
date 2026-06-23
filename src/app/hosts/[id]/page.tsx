@@ -1,14 +1,18 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Users, Globe, Star, Phone, Mail, Check, ChevronLeft } from "lucide-react";
+import { MapPin, Users, Globe, Star, Phone, Mail, Check, ChevronLeft, X } from "lucide-react";
 import { Host, Review, Booking } from "@/lib/types";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLightbox } from "@/contexts/LightboxContext";
 import { translateLang, translateBadge, translateAmenity, translateExperience, getLocalizedField } from "@/lib/i18n-utils";
+import FavoriteButton from "@/components/FavoriteButton";
+import ChatWidget from "@/components/ChatWidget";
+import getUI from "@/lib/ui";
+import { addToHistory } from "@/lib/viewHistory";
 
 export default function HostProfilePage() {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +31,13 @@ export default function HostProfilePage() {
   const [reviewComment, setReviewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const ui = getUI(lang);
+
+  // Review media state
+  const [reviewMedia, setReviewMedia] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [mediaError, setMediaError] = useState("");
 
   useEffect(() => {
     Promise.all([
@@ -37,6 +48,11 @@ export default function HostProfilePage() {
       setReviews(Array.isArray(reviewData) ? reviewData : []);
       setLoading(false);
     });
+  }, [id]);
+
+  // Add to view history on mount
+  useEffect(() => {
+    if (id) addToHistory(id);
   }, [id]);
 
   // Check if user can leave a review (has completed booking with this host)
@@ -53,28 +69,78 @@ export default function HostProfilePage() {
       .catch(() => setCanReview(false));
   }, [user, id]);
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMediaError("");
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    Array.from(files).forEach((file) => {
+      if (file.size > 1024 * 1024) {
+        setMediaError(ui.maxFileSize);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        setReviewMedia((prev) => [...prev, result]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset input
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removeMedia = (index: number) => {
+    setReviewMedia((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const getMediaType = (url: string): "image" | "audio" | "video" => {
+    if (url.startsWith("data:image")) return "image";
+    if (url.startsWith("data:audio")) return "audio";
+    if (url.startsWith("data:video")) return "video";
+    if (/\.(jpg|jpeg|png|gif|webp|svg)/i.test(url)) return "image";
+    if (/\.(mp3|wav|ogg|m4a|aac)/i.test(url)) return "audio";
+    if (/\.(mp4|webm|mov|avi|mkv)/i.test(url)) return "video";
+    return "image";
+  };
+
+  const computeMediaType = (media: string[]): "image" | "audio" | "video" | "mixed" => {
+    const types = new Set(media.map(getMediaType));
+    if (types.size <= 1) {
+      return (Array.from(types)[0] as "image" | "audio" | "video") || "image";
+    }
+    return "mixed";
+  };
+
   const submitReview = async () => {
     if (reviewComment.trim().length < 10 || submitting) return;
     setSubmitting(true);
     setReviewSuccess(false);
     try {
+      const body: Record<string, unknown> = {
+        hostId: id,
+        guestName: user?.name || "",
+        guestEmail: user?.email || "",
+        rating: reviewRating,
+        comment: reviewComment.trim(),
+        guestCountry: "Unknown",
+      };
+      if (reviewMedia.length > 0) {
+        body.media = reviewMedia;
+        body.media_type = computeMediaType(reviewMedia);
+      }
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          hostId: id,
-          guestName: user?.name || "",
-          guestEmail: user?.email || "",
-          rating: reviewRating,
-          comment: reviewComment.trim(),
-          guestCountry: "Unknown",
-        }),
+        body: JSON.stringify(body),
       });
       if (res.ok) {
         const newReview = await res.json();
         setReviews((prev) => [newReview, ...prev]);
         setReviewComment("");
         setReviewRating(5);
+        setReviewMedia([]);
         setReviewSuccess(true);
         setTimeout(() => setReviewSuccess(false), 4000);
       }
@@ -144,7 +210,6 @@ export default function HostProfilePage() {
                       className="relative rounded-xl overflow-hidden aspect-square bg-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
                       onClick={() => {
                         const imgs = [host.coverPhoto, ...host.photos.filter(p => p !== host.coverPhoto)];
-                        // idx maps into imgs starting at 1 (0 = cover)
                         const targetIdx = Math.min(idx + 1, imgs.length - 1);
                         lightbox.open(imgs, targetIdx);
                       }}
@@ -250,6 +315,42 @@ export default function HostProfilePage() {
                         ))}
                       </div>
                       <p className="text-gray-700 text-sm leading-relaxed mb-5 italic">&ldquo;{rev.comment}&rdquo;</p>
+
+                      {/* Review media gallery */}
+                      {rev.media && rev.media.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {rev.media.map((m, idx) => {
+                            const type = getMediaType(m);
+                            if (type === "image") {
+                              return (
+                                <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-200 cursor-pointer group">
+                                  <Image src={m} alt={`media-${idx}`} fill className="object-cover" sizes="80px"
+                                    onClick={() => lightbox.open(rev.media!.filter((mm) => getMediaType(mm) === "image"), idx)} />
+                                </div>
+                              );
+                            }
+                            if (type === "audio") {
+                              return (
+                                <div key={idx} className="bg-white rounded-lg p-2 border border-gray-200">
+                                  <audio controls className="h-8 max-w-[200px]">
+                                    <source src={m} />
+                                  </audio>
+                                </div>
+                              );
+                            }
+                            // video thumbnail
+                            return (
+                              <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-800 cursor-pointer group">
+                                <video src={m} className="w-full h-full object-cover" muted />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <span className="text-white text-2xl opacity-80 group-hover:opacity-100">▶</span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
                         <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
                           style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
@@ -294,6 +395,80 @@ export default function HostProfilePage() {
                       rows={4}
                       className="w-full p-3 border border-gray-200 rounded-xl text-sm text-gray-800 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400 resize-none"
                     />
+
+                    {/* Media upload buttons */}
+                    <div>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition text-sm font-medium text-gray-700"
+                        >
+                          {ui.addPhoto}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition text-sm font-medium text-gray-700"
+                        >
+                          {ui.addAudio}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition text-sm font-medium text-gray-700"
+                        >
+                          {ui.addVideo}
+                        </button>
+                      </div>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*,audio/*,video/*"
+                        multiple
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
+                      {mediaError && (
+                        <p className="text-red-500 text-xs mt-1">{mediaError}</p>
+                      )}
+
+                      {/* Media preview */}
+                      {reviewMedia.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {reviewMedia.map((m, idx) => {
+                            const type = getMediaType(m);
+                            return (
+                              <div key={idx} className="relative group">
+                                {type === "image" && (
+                                  <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-200">
+                                    <Image src={m} alt={`preview-${idx}`} fill className="object-cover" sizes="80px" />
+                                  </div>
+                                )}
+                                {type === "audio" && (
+                                  <div className="w-20 h-20 rounded-lg bg-purple-50 border border-purple-200 flex items-center justify-center">
+                                    <span className="text-2xl">🎙️</span>
+                                  </div>
+                                )}
+                                {type === "video" && (
+                                  <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-800">
+                                    <video src={m} className="w-full h-full object-cover" muted />
+                                  </div>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => removeMedia(idx)}
+                                  className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center shadow-md hover:scale-110 transition"
+                                >
+                                  <X size={11} />
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
                     <button
                       onClick={submitReview}
                       disabled={reviewComment.trim().length < 10 || submitting}
@@ -333,10 +508,26 @@ export default function HostProfilePage() {
               </div>
 
               <Link href={`/book/${host.id}`}
-                className="w-full block text-center py-4 rounded-xl text-white font-bold text-lg mb-4 hover:opacity-90 transition active:scale-95"
+                className="w-full block text-center py-4 rounded-xl text-white font-bold text-lg mb-3 hover:opacity-90 transition active:scale-95"
                 style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
                 {h.book}
               </Link>
+
+              <div className="flex gap-2 mb-4">
+                {user && host.user_id && (
+                  <button
+                    onClick={() => setShowChat(true)}
+                    className="flex-1 py-2.5 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 transition flex items-center justify-center gap-1.5"
+                  >
+                    💬 {ui.writeMessage}
+                  </button>
+                )}
+                {user && (
+                  <div className="flex-shrink-0">
+                    <FavoriteButton hostId={host.id} size={24} />
+                  </div>
+                )}
+              </div>
 
               <div className="space-y-3 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
@@ -368,6 +559,14 @@ export default function HostProfilePage() {
           </div>
         </div>
       </div>
+
+      {showChat && user && host.user_id && (
+        <ChatWidget
+          initialWithUserId={host.user_id}
+          openInitially
+          onClose={() => setShowChat(false)}
+        />
+      )}
     </div>
   );
 }

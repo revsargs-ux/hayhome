@@ -24,8 +24,23 @@ function HostsContent() {
   const [maxPrice, setMaxPrice] = useState(200);
   const [experience, setExperience] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState<"rating" | "price_asc" | "price_desc">("rating");
+  const [sortBy, setSortBy] = useState<"rating" | "price_asc" | "price_desc" | "value">("rating");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  const [valueRanks, setValueRanks] = useState<Record<string, number>>({});
+
+  // Fetch value ratings
+  useEffect(() => {
+    fetch("/api/ratings")
+      .then((r) => r.json())
+      .then((data: any[]) => {
+        if (Array.isArray(data)) {
+          const ranks: Record<string, number> = {};
+          data.forEach((h) => { ranks[h.id] = h.rank; });
+          setValueRanks(ranks);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/hosts")
@@ -50,9 +65,10 @@ function HostsContent() {
     if (experience) result = result.filter((h) => h.experiences?.some(e => e.toLowerCase().includes(experience.toLowerCase())));
     if (sortBy === "rating") result.sort((a, b) => b.rating - a.rating);
     else if (sortBy === "price_asc") result.sort((a, b) => a.pricePerNight - b.pricePerNight);
-    else result.sort((a, b) => b.pricePerNight - a.pricePerNight);
+    else if (sortBy === "price_desc") result.sort((a, b) => b.pricePerNight - a.pricePerNight);
+    else if (sortBy === "value") result.sort((a, b) => (valueRanks[a.id] || 999) - (valueRanks[b.id] || 999));
     setFiltered(result);
-  }, [hosts, search, region, minStars, maxPrice, sortBy, experience]);
+  }, [hosts, search, region, minStars, maxPrice, sortBy, experience, valueRanks]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -82,6 +98,7 @@ function HostsContent() {
               className="hidden sm:block px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 bg-white outline-none cursor-pointer"
             >
               <option value="rating">{h.byRating}</option>
+              <option value="value">🏆 {lang === "ru" ? "Лучшее соотношение цена/качество" : "Best value for money"}</option>
               <option value="price_asc">{h.byPriceAsc}</option>
               <option value="price_desc">{h.byPriceDesc}</option>
             </select>
@@ -196,7 +213,7 @@ function HostsContent() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((host) => <HostCard key={host.id} host={host} />)}
+            {filtered.map((host) => <HostCard key={host.id} host={host} valueRank={valueRanks[host.id]} />)}
           </div>
         )}
       </div>

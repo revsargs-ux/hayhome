@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { hostId, rating, comment } = body;
+  const { hostId, rating, comment, media, media_type } = body;
 
   // Validation
   if (!hostId || typeof hostId !== "string") {
@@ -40,6 +40,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Comment too long (max ${MAX_COMMENT})` }, { status: 400 });
   }
 
+  // Media validation
+  const mediaUrls: string[] = Array.isArray(media) ? media.filter((m: unknown) => typeof m === "string") : [];
+  let mediaType: "image" | "audio" | "video" | "mixed" | undefined;
+  if (typeof media_type === "string" && ["image", "audio", "video", "mixed"].includes(media_type)) {
+    mediaType = media_type as "image" | "audio" | "video" | "mixed";
+  } else if (mediaUrls.length > 0) {
+    mediaType = "mixed";
+  }
+
   // Use authenticated user's name, not client-provided
   const review = await createReview({
     hostId,
@@ -48,6 +57,7 @@ export async function POST(req: NextRequest) {
     rating: Math.round(rating),
     comment: comment.trim(),
     date: new Date().toISOString().split("T")[0],
+    ...(mediaUrls.length > 0 ? { media: mediaUrls, media_type: mediaType } : {}),
   });
 
   return NextResponse.json(review, { status: 201 });

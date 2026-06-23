@@ -51,7 +51,7 @@ export default function ProviderDashboardPage() {
   const { lang } = useLang();
   const u = getUI(lang);
 
-  const [tab, setTab] = useState<"services" | "orders" | "profile">("services");
+  const [tab, setTab] = useState<"services" | "orders" | "profile" | "messages">("services");
   const [services, setServices] = useState<Service[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -217,6 +217,7 @@ export default function ProviderDashboardPage() {
           {([
             { key: "services", label: t("myServices") },
             { key: "orders", label: t("orders") },
+            { key: "messages", label: `💬 ${u.messages}` },
             { key: "profile", label: t("profile") },
           ] as const).map((tb) => (
             <button
@@ -444,6 +445,64 @@ export default function ProviderDashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Messages Tab */}
+        {tab === "messages" && (
+          <ProviderMessagesTab userId={user.id} lang={lang} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Provider Messages Tab ──
+function ProviderMessagesTab({ userId, lang }: { userId: string; lang: string }) {
+  const u = getUI(lang as any);
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/chat/conversations", { credentials: "include" })
+      .then(r => r.ok ? r.json() : [])
+      .then(data => { setConversations(Array.isArray(data) ? data : []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="bg-white rounded-2xl shadow-sm p-12 text-center text-gray-400">{u.loadingText}</div>;
+
+  if (conversations.length === 0) return (
+    <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
+      <div className="text-4xl mb-3">💬</div>
+      <p className="text-gray-500">{u.noMessages}</p>
+    </div>
+  );
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div className="divide-y divide-gray-50">
+        {conversations.map(conv => (
+          <a
+            key={conv.userId}
+            href={`/dashboard`}
+            className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition text-left"
+          >
+            <div className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg, #C45D3E, #D4A04A)" }}>
+              {conv.userName?.[0]?.toUpperCase() || "?"}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-0.5">
+                <span className="font-semibold text-gray-900 text-sm">{conv.userName}</span>
+                <span className="text-xs text-gray-400">{new Date(conv.lastAt).toLocaleDateString()}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-500 truncate">{conv.lastMessage}</span>
+                {conv.unread > 0 && (
+                  <span className="bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 ml-2">{conv.unread}</span>
+                )}
+              </div>
+            </div>
+          </a>
+        ))}
       </div>
     </div>
   );

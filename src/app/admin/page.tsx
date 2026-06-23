@@ -7,7 +7,7 @@ import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";
 import type { LangCode } from "@/lib/translations";
 
-type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar" | "users" | "services";
+type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar" | "users" | "services" | "promocodes";
 
 // Full 10-language status labels
 const STATUS_LABELS: Record<string, Record<string, string>> = {
@@ -85,6 +85,11 @@ export default function AdminPage() {
   const [calYear, setCalYear] = useState(new Date().getFullYear());
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
 
+  // Promocodes state
+  const [promocodes, setPromocodes] = useState<any[]>([]);
+  const [promoForm, setPromoForm] = useState({ code: "", discount_type: "percent", discount_value: 10, min_amount: 0, max_uses: 100, expires_at: "" });
+  const [promoLoading, setPromoLoading] = useState(false);
+
   const { lang } = useLang();
   const u = getUI(lang);
 
@@ -92,16 +97,18 @@ export default function AdminPage() {
 
   const load = async () => {
     setLoading(true);
-    const [h, b, p, usr] = await Promise.all([
+    const [h, b, p, usr, promos] = await Promise.all([
       fetch("/api/hosts?all=1", { credentials: "include" }).then((r) => r.json()),
       fetch("/api/bookings", { credentials: "include" }).then((r) => r.json()),
       fetch("/api/partners/payout/", { credentials: "include" }).then((r) => r.json()).catch(() => []),
       fetch("/api/auth/users", { credentials: "include" }).then((r) => r.json()).catch(() => []),
+      fetch("/api/promocodes", { credentials: "include" }).then((r) => r.json()).catch(() => []),
     ]);
     setHosts(h);
     setBookings(b);
     setPayouts(Array.isArray(p) ? p : []);
     setUsers(Array.isArray(usr) ? usr : []);
+    setPromocodes(Array.isArray(promos) ? promos : []);
     setLoading(false);
   };
 
@@ -157,6 +164,7 @@ export default function AdminPage() {
     { key: "calendar", label: u.calendarTabAdmin },
     { key: "users", label: u.usersTab, badge: users.length || undefined },
     { key: "services", label: u.servicesTab },
+    { key: "promocodes", label: u.promocodesTab },
   ];
 
   return (
@@ -438,6 +446,159 @@ export default function AdminPage() {
             {/* Services tab */}
             {tab === "services" && (
               <AdminServicesTab lang={lang} />
+            )}
+
+            {/* Promocodes tab */}
+            {tab === "promocodes" && (
+              <div className="space-y-4">
+                {/* Create form */}
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <h3 className="font-bold text-gray-900 mb-3">{u.createPromocode}</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">{u.promocodeCode}</label>
+                      <input
+                        type="text"
+                        value={promoForm.code}
+                        onChange={(e) => setPromoForm({ ...promoForm, code: e.target.value.toUpperCase() })}
+                        placeholder="SUMMER2025"
+                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-red-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">{u.discountType}</label>
+                      <select
+                        value={promoForm.discount_type}
+                        onChange={(e) => setPromoForm({ ...promoForm, discount_type: e.target.value })}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none bg-white"
+                      >
+                        <option value="percent">%</option>
+                        <option value="fixed">$</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">{u.discountValue}</label>
+                      <input
+                        type="number"
+                        value={promoForm.discount_value}
+                        onChange={(e) => setPromoForm({ ...promoForm, discount_value: Number(e.target.value) })}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-red-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">{u.minAmount} ($)</label>
+                      <input
+                        type="number"
+                        value={promoForm.min_amount}
+                        onChange={(e) => setPromoForm({ ...promoForm, min_amount: Number(e.target.value) })}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-red-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">{u.maxUses}</label>
+                      <input
+                        type="number"
+                        value={promoForm.max_uses}
+                        onChange={(e) => setPromoForm({ ...promoForm, max_uses: Number(e.target.value) })}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-red-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">{u.expiresAt}</label>
+                      <input
+                        type="date"
+                        value={promoForm.expires_at}
+                        onChange={(e) => setPromoForm({ ...promoForm, expires_at: e.target.value })}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-red-400"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      if (!promoForm.code.trim()) return;
+                      setPromoLoading(true);
+                      const res = await fetch("/api/promocodes", {
+                        method: "POST",
+                        credentials: "include",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          code: promoForm.code,
+                          discount_type: promoForm.discount_type,
+                          discount_value: promoForm.discount_value,
+                          min_amount: promoForm.min_amount,
+                          max_uses: promoForm.max_uses,
+                          expires_at: promoForm.expires_at || null,
+                        }),
+                      });
+                      if (res.ok) {
+                        setPromoForm({ code: "", discount_type: "percent", discount_value: 10, min_amount: 0, max_uses: 100, expires_at: "" });
+                        load();
+                      }
+                      setPromoLoading(false);
+                    }}
+                    disabled={promoLoading || !promoForm.code.trim()}
+                    className="mt-3 px-5 py-2.5 rounded-full text-white font-semibold text-sm disabled:opacity-50"
+                    style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
+                  >
+                    {promoLoading ? "..." : u.createPromocode}
+                  </button>
+                </div>
+
+                {/* List */}
+                {promocodes.length === 0 ? (
+                  <div className="p-8 text-center text-gray-400">{u.noPromocodes}</div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-200 text-gray-500">
+                          <th className="text-left py-2 px-3">{u.promocodeCode}</th>
+                          <th className="text-left py-2 px-3">{u.discountType}</th>
+                          <th className="text-left py-2 px-3">{u.discountValue}</th>
+                          <th className="text-left py-2 px-3">{u.minAmount}</th>
+                          <th className="text-left py-2 px-3">{u.usedCount}</th>
+                          <th className="text-left py-2 px-3">{u.expiresAt}</th>
+                          <th className="text-left py-2 px-3">{u.statusLabel}</th>
+                          <th className="text-left py-2 px-3"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {promocodes.map((p) => (
+                          <tr key={p.id} className="border-b border-gray-100">
+                            <td className="py-2 px-3 font-mono font-bold text-gray-900">{p.code}</td>
+                            <td className="py-2 px-3">{p.discount_type}</td>
+                            <td className="py-2 px-3">{p.discount_type === "percent" ? `${p.discount_value}%` : `$${p.discount_value}`}</td>
+                            <td className="py-2 px-3">${p.min_amount || 0}</td>
+                            <td className="py-2 px-3">{p.used_count}{p.max_uses ? `/${p.max_uses}` : ""}</td>
+                            <td className="py-2 px-3">{p.expires_at ? new Date(p.expires_at).toLocaleDateString() : "—"}</td>
+                            <td className="py-2 px-3">
+                              <span className={`px-2 py-0.5 rounded-full text-xs ${p.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                                {p.active ? u.activeStatus : u.cancelledStatus}
+                              </span>
+                            </td>
+                            <td className="py-2 px-3">
+                              {p.active && (
+                                <button
+                                  onClick={async () => {
+                                    await fetch(`/api/promocodes?id=${p.id}`, {
+                                      method: "DELETE",
+                                      credentials: "include",
+                                    });
+                                    load();
+                                  }}
+                                  className="text-red-500 hover:text-red-700 text-xs"
+                                >
+                                  {u.deleteText}
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             )}
           </>
         )}

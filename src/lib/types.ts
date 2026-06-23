@@ -9,6 +9,7 @@ export interface HostI18nEntry {
 export interface Host {
   i18n?: Record<string, HostI18nEntry>;
   id: string;
+  user_id?: string;
   name: string;
   familyName: string;
   location: string;
@@ -50,6 +51,8 @@ export interface Review {
   rating: number;
   comment: string;
   date: string;
+  media?: string[];
+  media_type?: "image" | "audio" | "video" | "mixed";
 }
 
 export interface Partner {

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Booking, Host } from "@/lib/types";
-import { Calendar, DollarSign, Users, Star, Edit2, Save, X, RefreshCw, LogOut, Shield, Share2, ChevronLeft, ChevronRight, Navigation } from "lucide-react";
+import { Calendar, DollarSign, Users, Star, Edit2, Save, X, RefreshCw, LogOut, Shield, Share2, ChevronLeft, ChevronRight, Navigation, Heart, MessageCircle } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,6 +11,8 @@ import dynamic from "next/dynamic";
 import NavigatorLinks from "@/components/NavigatorLinks";
 import { getCityCoords } from "@/components/Map";
 import getUI from "@/lib/ui";
+import ChatWidget from "@/components/ChatWidget";
+import FavoriteButton from "@/components/FavoriteButton";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false });
 
@@ -42,12 +44,16 @@ export default function DashboardPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [myProfile, setMyProfile] = useState<Host | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"bookings" | "profile" | "calendar">("bookings");
+  const [tab, setTab] = useState<"bookings" | "profile" | "calendar" | "messages" | "favorites">("bookings");
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editForm, setEditForm] = useState({ description: "", phone: "", pricePerNight: 30 });
   const [partnerCode, setPartnerCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [favHosts, setFavHosts] = useState<Host[]>([]);
+  const [favLoading, setFavLoading] = useState(false);
+  const [showChatWidget, setShowChatWidget] = useState(false);
+  const [chatWithUser, setChatWithUser] = useState<string | null>(null);
 
   const statusLabels = STATUS_LABELS[lang] ?? STATUS_LABELS.en;
 
@@ -160,12 +166,14 @@ export default function DashboardPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
+        <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-xl w-fit flex-wrap">
           {([
             { key: "bookings", label: u.bookingsTab },
+            { key: "messages", label: `💬 ${u.messages}` },
+            { key: "favorites", label: `❤️ ${u.favorites}` },
             { key: "profile", label: u.profileTab },
             ...(myProfile ? [{ key: "calendar" as const, label: u.calendarTab }] : []),
-          ] as { key: "bookings" | "profile" | "calendar"; label: string }[]).map(t => (
+          ] as { key: "bookings" | "profile" | "calendar" | "messages" | "favorites"; label: string }[]).map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === t.key ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
               {t.label}
@@ -375,16 +383,36 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* Messages tab */}
+        {tab === "messages" && (
+          <DashboardMessages
+            lang={lang}
+            onOpenChat={(userId: string) => { setChatWithUser(userId); setShowChatWidget(true); }}
+          />
+        )}
+
+        {/* Favorites tab */}
+        {tab === "favorites" && (
+          <DashboardFavorites lang={lang} />
+        )}
+
         {/* Calendar tab */}
         {tab === "calendar" && myProfile && (
           <CalendarTabContent hostId={myProfile.id} lang={lang} tr={tr} />
         )}
       </div>
+
+      {/* Floating chat widget */}
+      {showChatWidget && (
+        <ChatWidget
+          initialWithUserId={chatWithUser || undefined}
+          openInitially
+          onClose={() => { setShowChatWidget(false); setChatWithUser(null); }}
+        />
+      )}
     </div>
   );
 }
-
-// ── Calendar Tab Content ──
 function CalendarTabContent({ hostId, lang, tr }: { hostId: string; lang: string; tr: any }) {
   const h = tr.hosts;
   const u = getUI(lang as any);
@@ -663,6 +691,137 @@ function ServiceBookingsList({ bookingId, lang }: { bookingId: string; lang: str
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ── Dashboard Messages Tab ──
+function DashboardMessages({ lang, onOpenChat }: { lang: string; onOpenChat: (userId: string) => void }) {
+  const u = getUI(lang as any);
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/chat/conversations", { credentials: "include" })
+      .then(r => r.ok ? r.json() : [])
+      .then(data => { setConversations(Array.isArray(data) ? data : []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="bg-white rounded-2xl shadow-sm p-12 text-center text-gray-400">{u.loadingText}</div>;
+
+  if (conversations.length === 0) return (
+    <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
+      <div className="text-4xl mb-3">💬</div>
+      <p className="text-gray-500">{u.noMessages}</p>
+    </div>
+  );
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div className="divide-y divide-gray-50">
+        {conversations.map(conv => (
+          <button
+            key={conv.userId}
+            onClick={() => onOpenChat(conv.userId)}
+            className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition text-left"
+          >
+            <div className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
+              {conv.userName?.[0]?.toUpperCase() || "?"}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-0.5">
+                <span className="font-semibold text-gray-900 text-sm">{conv.userName}</span>
+                <span className="text-xs text-gray-400">{new Date(conv.lastAt).toLocaleDateString()}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-500 truncate">{conv.lastMessage}</span>
+                {conv.unread > 0 && (
+                  <span className="bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 ml-2">{conv.unread}</span>
+                )}
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Dashboard Favorites Tab ──
+function DashboardFavorites({ lang }: { lang: string }) {
+  const u = getUI(lang as any);
+  const [favorites, setFavorites] = useState<any[]>([]);
+  const [hosts, setHosts] = useState<Host[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadFavorites = () => {
+    setLoading(true);
+    Promise.all([
+      fetch("/api/favorites", { credentials: "include" }).then(r => r.ok ? r.json() : []),
+      fetch("/api/hosts", { credentials: "include" }).then(r => r.ok ? r.json() : []),
+    ]).then(([favs, allHosts]) => {
+      setFavorites(Array.isArray(favs) ? favs : []);
+      setHosts(Array.isArray(allHosts) ? allHosts : []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  };
+
+  useEffect(() => { loadFavorites(); }, []);
+
+  const removeFavorite = async (hostId: string) => {
+    await fetch("/api/favorites", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ host_id: hostId }),
+    });
+    loadFavorites();
+  };
+
+  if (loading) return <div className="bg-white rounded-2xl shadow-sm p-12 text-center text-gray-400">{u.loadingText}</div>;
+
+  const favHosts = favorites.map(f => hosts.find(h => h.id === f.host_id)).filter(Boolean) as Host[];
+
+  if (favHosts.length === 0) return (
+    <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
+      <div className="text-4xl mb-3">❤️</div>
+      <p className="text-gray-500 mb-4">{u.noFavorites}</p>
+      <Link href="/hosts" className="text-sm font-semibold" style={{ color: "#D4001A" }}>→</Link>
+    </div>
+  );
+
+  return (
+    <div>
+      <div className="mb-4 text-sm text-gray-500">{u.favorites}: <strong className="text-gray-900">{favHosts.length}</strong></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {favHosts.map(host => (
+          <div key={host.id} className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 relative">
+            <button
+              onClick={() => removeFavorite(host.id)}
+              className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center hover:bg-red-50 transition"
+            >
+              <Heart size={16} className="fill-red-500 text-red-500" />
+            </button>
+            <Link href={`/hosts/${host.id}`}>
+              {host.coverPhoto && (
+                <img src={host.coverPhoto} alt={host.familyName} className="w-full h-40 object-cover" />
+              )}
+              <div className="p-4">
+                <h3 className="font-bold text-gray-900 text-sm mb-1">{host.familyName}</h3>
+                <p className="text-xs text-gray-500 mb-2">{host.city}, {host.region}</p>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-gray-900">${host.pricePerNight}</span>
+                  <div className="flex items-center gap-1 text-xs text-gray-500">
+                    <Star size={12} fill="#F2A900" color="#F2A900" />
+                    {host.rating > 0 ? host.rating.toFixed(1) : "New"}
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

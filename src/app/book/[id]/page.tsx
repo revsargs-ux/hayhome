@@ -31,6 +31,16 @@ export default function BookPage() {
   const [error, setError] = useState("");
   const [authRequired, setAuthRequired] = useState(false);
 
+  // Promocode state
+  const [promoCode, setPromoCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState<{ code: string; discount_amount: number; final_amount: number } | null>(null);
+  const [promoError, setPromoError] = useState("");
+  const [promoLoading, setPromoLoading] = useState(false);
+
+  // Payment state
+  const [paymentMethod, setPaymentMethod] = useState<"online" | "onsite">("onsite");
+  const [paymentLoading, setPaymentLoading] = useState(false);
+
   const [form, setForm] = useState({
     guestName: "", guestEmail: "", guestPhone: "",
     guestCountry: "", checkIn: "", checkOut: "", guests: 1, message: "",
@@ -184,6 +194,66 @@ export default function BookPage() {
   })();
 
   const total = host ? nights * host.pricePerNight : 0;
+  const finalTotal = promoApplied ? promoApplied.final_amount : total;
+  const discountAmount = promoApplied ? promoApplied.discount_amount : 0;
+
+  // Check if online payment is available
+  const onlinePaymentEnabled = !!(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_YOOKASSA_ENABLED);
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim() || total <= 0) return;
+    setPromoLoading(true);
+    setPromoError("");
+    try {
+      const res = await fetch("/api/promocodes/validate", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoCode.trim(), amount: total }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.valid) {
+        setPromoError(data.error || u.invalidPromo);
+        setPromoApplied(null);
+      } else {
+        setPromoApplied(data);
+        setPromoError("");
+      }
+    } catch {
+      setPromoError(u.invalidPromo);
+      setPromoApplied(null);
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
+  const handlePayment = async (bookingId: string) => {
+    setPaymentLoading(true);
+    try {
+      const method = lang === "ru" ? "yookassa" : "stripe";
+      const res = await fetch("/api/payments/create", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: finalTotal,
+          booking_id: bookingId,
+          method,
+          currency: method === "stripe" ? "USD" : "RUB",
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setError(lang === "ru" ? "Платёжная система не настроена" : "Payment system not configured");
+      }
+    } catch {
+      setError(lang === "ru" ? "Ошибка платежа" : "Payment error");
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -197,14 +267,23 @@ export default function BookPage() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, hostId: id, hostName: host.familyName, totalPrice: total }),
+        body: JSON.stringify({ ...form, hostId: id, hostName: host.familyName, totalPrice: finalTotal, promoCode: promoApplied?.code || null, discountAmount }),
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.error || "Error");
       }
+      const bookingResult = await res.json();
+      const bookingId = bookingResult?.id || bookingResult?.[0]?.id;
       // Clear draft on successful booking
       try { localStorage.removeItem(`hayhome_booking_draft_${id}`); } catch {}
+
+      // If online payment selected, redirect to payment
+      if (paymentMethod === "online" && bookingId) {
+        await handlePayment(bookingId);
+        return;
+      }
+
       setSuccess(true);
     } catch (e) {
       const msg = e instanceof Error ? e.message : undefined;
@@ -290,7 +369,7 @@ export default function BookPage() {
           <p className="font-semibold text-gray-800 mb-2">{t("details")}:</p>
           <p>📅 {form.checkIn} → {form.checkOut} ({nights} {t("nights")})</p>
           <p>👥 {form.guests} {tr.hosts.guests}</p>
-          <p>💵 {t("total")}: ${total}</p>
+          <p>💵 {t("total")}: ${finalTotal}</p>
         </div>
         <div className="flex flex-col gap-3">
           <Link href="/dashboard" className="block w-full py-3 rounded-full text-white font-semibold text-center"
@@ -416,10 +495,74 @@ export default function BookPage() {
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900 resize-none" />
                 </div>
                 {error && <p className="text-red-600 text-sm">{error}</p>}
-                <button type="submit" disabled={loading}
+
+                {/* Promocode Section */}
+                {nights > 0 && (
+                  <div className="border border-gray-200 rounded-xl p-4 space-y-3">
+                    <label className="block text-sm font-semibold text-gray-700">{u.promocode}</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value)}
+                        placeholder="PROMO2025"
+                        className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900 uppercase"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleApplyPromo}
+                        disabled={promoLoading || !promoCode.trim()}
+                        className="px-5 py-2.5 rounded-xl text-white font-semibold text-sm disabled:opacity-50"
+                        style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
+                      >
+                        {promoLoading ? "..." : u.applyPromo}
+                      </button>
+                    </div>
+                    {promoError && <p className="text-red-600 text-xs">{promoError}</p>}
+                    {promoApplied && (
+                      <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2 text-sm text-green-700">
+                        ✓ {u.promoCodeApplied} ({promoApplied.code})
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Payment Method Section */}
+                {nights > 0 && (
+                  <div className="border border-gray-200 rounded-xl p-4 space-y-3">
+                    <label className="block text-sm font-semibold text-gray-700">
+                      {lang === "ru" ? "Способ оплаты" : "Payment method"}
+                    </label>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod("onsite")}
+                        className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition ${paymentMethod === "onsite" ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+                      >
+                        🏠 {u.payOnSite}
+                      </button>
+                      {onlinePaymentEnabled && (
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod("online")}
+                          className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition ${paymentMethod === "online" ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+                        >
+                          💳 {u.payOnline}
+                        </button>
+                      )}
+                    </div>
+                    {paymentMethod === "online" && (
+                      <p className="text-xs text-gray-400">
+                        {lang === "ru" ? "После отправки заявки вы будете перенаправлены на страницу оплаты." : "After submitting the request, you will be redirected to the payment page."}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <button type="submit" disabled={loading || paymentLoading}
                   className="w-full py-4 rounded-xl text-white font-bold text-lg hover:opacity-90 transition disabled:opacity-70"
                   style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  {loading ? "..." : `${t("submit")} · $${total}`}
+                  {loading || paymentLoading ? u.processingPayment : `${t("submit")} · $${finalTotal}`}
                 </button>
                 <p className="text-center text-xs text-gray-400">{t("cancel")}</p>
               </form>
@@ -447,12 +590,20 @@ export default function BookPage() {
                     <span>${host.pricePerNight} × {nights} {t("nights")}</span>
                     <span>${total}</span>
                   </div>
+                  {promoApplied && (
+                    <>
+                      <div className="flex justify-between text-green-600">
+                        <span>{u.discount} ({promoApplied.code})</span>
+                        <span>−${discountAmount}</span>
+                      </div>
+                    </>
+                  )}
                   <div className="flex justify-between text-gray-500 text-xs">
                     <span>{t("service")}</span>
                     <span className="text-green-600 font-medium">{t("free")}</span>
                   </div>
                   <div className="flex justify-between font-bold text-gray-900 text-base pt-2 border-t border-gray-100">
-                    <span>{t("total")}</span><span>${total}</span>
+                    <span>{t("total")}</span><span>${finalTotal}</span>
                   </div>
                 </div>
               ) : (

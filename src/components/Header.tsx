@@ -1,19 +1,34 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X, Home, Search, Heart, User, LogOut, Shield } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import LanguageSwitcher from "./LanguageSwitcher";
 import getUI from "@/lib/ui";
 
+const COMPARE_KEY = "hayhome_compare";
+
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [compareCount, setCompareCount] = useState(0);
   const { tr, lang } = useLang();
   const { user, logout } = useAuth();
   const n = tr.nav;
   const u = getUI(lang);
+
+  useEffect(() => {
+    const updateCount = () => {
+      try {
+        const ids = JSON.parse(localStorage.getItem(COMPARE_KEY) || "[]");
+        setCompareCount(Array.isArray(ids) ? ids.length : 0);
+      } catch { setCompareCount(0); }
+    };
+    updateCount();
+    window.addEventListener("hayhome_compare_change", updateCount);
+    return () => window.removeEventListener("hayhome_compare_change", updateCount);
+  }, []);
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -42,6 +57,16 @@ export default function Header() {
             <Link href="/services" className="flex items-center gap-1.5 text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
               ✨ {u.services}
             </Link>
+            {compareCount > 0 && (
+              <Link href="/compare" className="flex items-center gap-1.5 text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
+                <span className="relative">
+                  ⚖️ {u.compare}
+                  <span className="ml-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold text-white rounded-full" style={{ background: "#D4001A" }}>
+                    {compareCount}
+                  </span>
+                </span>
+              </Link>
+            )}
           </nav>
 
           {/* Right: lang + auth */}
@@ -156,6 +181,14 @@ export default function Header() {
           <Link href="/services" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
             ✨ {u.services}
           </Link>
+          {compareCount > 0 && (
+            <Link href="/compare" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
+              ⚖️ {u.compare}
+              <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold text-white rounded-full" style={{ background: "#D4001A" }}>
+                {compareCount}
+              </span>
+            </Link>
+          )}
           {user && (
             <Link href="/partner" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
               🤝 {n.partner || "Партнёры"}
