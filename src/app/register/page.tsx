@@ -6,6 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Suspense } from "react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { SocialLogin } from "@/components/SocialLogin";
 
 function RegisterContent() {
   const router = useRouter();
@@ -107,6 +108,8 @@ function RegisterContent() {
             {loading ? a.registering : a.registerBtn}
           </button>
         </form>
+
+        <SocialLogin />
 
         <p className="text-center text-sm text-gray-500 mt-6">
           {a.hasAccount}{" "}

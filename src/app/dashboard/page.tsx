@@ -2,11 +2,22 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Booking, Host } from "@/lib/types";
-import { Calendar, DollarSign, Users, Star, Edit2, Save, X, RefreshCw, LogOut, Shield, Share2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, DollarSign, Users, Star, Edit2, Save, X, RefreshCw, LogOut, Shield, Share2, ChevronLeft, ChevronRight, Navigation } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import NavigatorLinks from "@/components/NavigatorLinks";
+import { getCityCoords } from "@/components/Map";
+
+const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false });
+
+// Route translation labels for dashboard
+const DASH_RT = {
+  route: { ru: "Маршрут", en: "Route", hy: "Երթուղի", fr: "Itinéraire", de: "Route", es: "Ruta", it: "Percorso", ar: "الطريق", zh: "路线", fa: "مسیر" },
+  useGeo: { ru: "Определить местоположение", en: "Use my location", hy: "Իմ գտնվելու վայրը", fr: "Ma position", de: "Mein Standort", es: "Mi ubicación", it: "Mia posizione", ar: "موقعي", zh: "我的位置", fa: "موقعیت من" },
+};
 
 const STATUS_LABELS: Record<string, Record<string, string>> = {
   ru: { pending: "Ожидает", confirmed: "Подтверждено", completed: "Завершено", cancelled: "Отменено" },
@@ -150,8 +161,8 @@ export default function DashboardPage() {
         <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
           {([
             { key: "bookings", label: lang === "ru" ? "Бронирования" : lang === "fr" ? "Réservations" : lang === "de" ? "Buchungen" : lang === "ar" ? "الحجوزات" : lang === "zh" ? "预订" : "Bookings" },
-            ...(myProfile ? [{ key: "profile", label: lang === "ru" ? "Мой профиль" : lang === "fr" ? "Mon profil" : lang === "de" ? "Mein Profil" : lang === "ar" ? "ملفي" : lang === "zh" ? "我的资料" : "My Profile" }] : []),
-            ...(myProfile ? [{ key: "calendar", label: lang === "ru" ? "Календарь" : lang === "fr" ? "Calendrier" : lang === "de" ? "Kalender" : lang === "ar" ? "التقويم" : lang === "zh" ? "日历" : "Calendar" }] : []),
+            { key: "profile", label: lang === "ru" ? "Профиль" : lang === "fr" ? "Profil" : lang === "de" ? "Profil" : lang === "ar" ? "ملفي" : lang === "zh" ? "资料" : "Profile" },
+            ...(myProfile ? [{ key: "calendar" as const, label: lang === "ru" ? "Календарь" : lang === "fr" ? "Calendrier" : lang === "de" ? "Kalender" : lang === "ar" ? "التقويم" : lang === "zh" ? "日历" : "Calendar" }] : []),
           ] as { key: "bookings" | "profile" | "calendar"; label: string }[]).map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === t.key ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
@@ -223,6 +234,10 @@ export default function DashboardPage() {
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">{b.guestEmail} · {b.guestPhone}</p>
                       {b.message && <p className="text-xs text-gray-500 italic mt-1">"{b.message}"</p>}
+                      {/* Route for confirmed/completed bookings */}
+                      {(b.status === "confirmed" || b.status === "completed") && (
+                        <DashRouteSection booking={b} lang={lang} />
+                      )}
                     </div>
                     <div className="flex gap-2 flex-shrink-0">
                       <Link href={`/hosts/${b.hostId}`}
@@ -319,6 +334,38 @@ export default function DashboardPage() {
                     <p className="text-gray-600 text-sm">${myProfile.pricePerNight}</p>
                   )}
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Guest profile tab (no host profile) */}
+        {tab === "profile" && !myProfile && (
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
+              {tr.dashboard?.profileInfo || (lang === "ru" ? "Профиль гостя" : "Guest Profile")}
+            </h2>
+            <p className="text-gray-500 text-sm mb-4">
+              {tr.dashboard?.profileInfoDesc || (lang === "ru" ? "Ваши данные аккаунта" : "Your account details")}
+            </p>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="p-3 bg-gray-50 rounded-xl">
+                <p className="text-gray-400 text-xs mb-1">{lang === "ru" ? "Имя" : "Name"}</p>
+                <span className="font-semibold text-gray-900">{user?.name}</span>
+              </div>
+              <div className="p-3 bg-gray-50 rounded-xl">
+                <p className="text-gray-400 text-xs mb-1">Email</p>
+                <span className="font-semibold text-gray-900 text-xs break-all">{user?.email}</span>
+              </div>
+              <div className="p-3 bg-gray-50 rounded-xl">
+                <p className="text-gray-400 text-xs mb-1">{lang === "ru" ? "Роль" : "Role"}</p>
+                <span className="font-semibold text-gray-900 capitalize">{user?.role}</span>
+              </div>
+              <div className="p-3 bg-gray-50 rounded-xl">
+                <p className="text-gray-400 text-xs mb-1">{lang === "ru" ? "Хотите стать хозяином?" : "Want to host?"}</p>
+                <Link href="/become-host" className="font-semibold text-sm" style={{ color: "#D4001A" }}>
+                  {lang === "ru" ? "Зарегистрироваться →" : "Register →"}
+                </Link>
               </div>
             </div>
           </div>
@@ -466,6 +513,95 @@ function CalendarTabContent({ hostId, lang, tr }: { hostId: string; lang: string
           {lang === "ru" ? "Открыть полный календарь →" : "Open full calendar →"}
         </a>
       </div>
+    </div>
+  );
+}
+
+// ── Dashboard Route Section ──
+function DashRouteSection({ booking, lang }: { booking: Booking; lang: string }) {
+  const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(null);
+  const [originLabel, setOriginLabel] = useState("");
+  const [showMap, setShowMap] = useState(false);
+  const [geoWarn, setGeoWarn] = useState("");
+  const [destCoords, setDestCoords] = useState<{ lat: number; lng: number } | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/hosts/${booking.hostId}`)
+      .then(r => r.json())
+      .then(h => {
+        if (h && h.city) {
+          setDestCoords(getCityCoords(h.city));
+        }
+      })
+      .catch(() => {});
+  }, [booking.hostId]);
+
+  const dashLabel = (key: string): string => {
+    const labels: Record<string, Record<string, string>> = {
+      route: { ru: "Маршрут", en: "Route", hy: "Երթուղի", fr: "Itinéraire", de: "Route", es: "Ruta", it: "Percorso", ar: "الطريق", zh: "路线", fa: "مسیر" },
+      showRoute: { ru: "Показать маршрут", en: "Show route", hy: "Ցույց տալ երթուղին", fr: "Voir l'itinéraire", de: "Route anzeigen", es: "Ver ruta", it: "Mostra percorso", ar: "إظهار الطريق", zh: "显示路线", fa: "نمایش مسیر" },
+      geoWarn: { ru: "Разрешите доступ к геолокации", en: "Allow geolocation access", hy: "Թույլատրեք երկրաչափությունը", fr: "Autorisez la géolocalisation", de: "Geolokalisierung erlauben", es: "Permita geolocalización", it: "Consenti geolocalizzazione", ar: "اسمح بالموقع", zh: "允许地理定位", fa: "دسترسی به مکان را مجاز کنید" },
+    };
+    return labels[key]?.[lang] ?? labels[key]?.en ?? key;
+  };
+
+  const handleGeo = () => {
+    if (!navigator.geolocation) {
+      setGeoWarn(dashLabel("geoWarn"));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setOrigin({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setOriginLabel("GPS");
+        setShowMap(true);
+        setGeoWarn("");
+      },
+      () => setGeoWarn(dashLabel("geoWarn")),
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  };
+
+  if (!destCoords) return null;
+
+  return (
+    <div className="mt-3 pt-3 border-t border-gray-100">
+      <div className="flex items-center gap-2 mb-2">
+        <Navigation size={14} className="text-red-600" />
+        <span className="text-xs font-semibold text-gray-700">{dashLabel("route")}</span>
+        {!showMap && (
+          <button onClick={handleGeo} className="text-xs text-blue-600 hover:underline ml-auto">
+            {dashLabel("showRoute")}
+          </button>
+        )}
+      </div>
+      {geoWarn && <p className="text-xs text-orange-600 mb-1">⚠️ {geoWarn}</p>}
+      {showMap && origin && (
+        <>
+          <RouteMap
+            fromLat={origin.lat}
+            fromLng={origin.lng}
+            toLat={destCoords.lat}
+            toLng={destCoords.lng}
+            fromLabel={originLabel}
+            toLabel={booking.hostName}
+            height={200}
+          />
+          <div className="mt-2">
+            <NavigatorLinks
+              fromLat={origin.lat}
+              fromLng={origin.lng}
+              toLat={destCoords.lat}
+              toLng={destCoords.lng}
+              toName={booking.hostName}
+              lang={lang}
+            />
+          </div>
+        </>
+      )}
+      {showMap && !origin && (
+        <p className="text-xs text-gray-400">{dashLabel("geoWarn")}</p>
+      )}
     </div>
   );
 }

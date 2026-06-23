@@ -48,62 +48,63 @@ export default function Footer() {
       </div>
 
       {/* Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-          <div className="col-span-2 md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="col-span-2 md:col-span-1">
+            <div className="flex items-center gap-2 mb-3">
               <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-extrabold text-sm"
                 style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>H</div>
               <span className="text-xl font-extrabold text-white">
                 Hay<span style={{ color: "#F2A900" }}>Home</span>
               </span>
             </div>
-            <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
-              Armenian hospitality platform. Connecting guests with Armenian families worldwide.
+            <p className="text-sm text-gray-500 leading-relaxed">
+              🇦🇲 Armenian hospitality platform.
             </p>
-            <div className="flex gap-1 mt-4">
+            <a href="mailto:info@hayhome.am" className="text-sm text-gray-400 hover:text-white transition-colors mt-2 inline-block">
+              ✉️ info@hayhome.am
+            </a>
+            <div className="flex gap-1 mt-3">
               <div className="h-1 w-8 rounded-full" style={{ background: "#D4001A" }} />
               <div className="h-1 w-8 rounded-full" style={{ background: "#0033A0" }} />
               <div className="h-1 w-8 rounded-full" style={{ background: "#F2A900" }} />
             </div>
-            <p className="text-xs text-gray-600 mt-4">🇦🇲 Armenia, Yerevan</p>
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wide">{n.findFamily}</h4>
-            <ul className="space-y-2.5 text-sm">
+            <h4 className="text-white font-bold mb-3 text-sm uppercase tracking-wide">{n.about}</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link href="/about" className="hover:text-white transition-colors">{n.about}</Link></li>
+              <li><Link href="/partner" className="hover:text-white transition-colors">{n.partner || "Партнёры"}</Link></li>
               <li><Link href="/hosts" className="hover:text-white transition-colors">{n.findFamily}</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white font-bold mb-3 text-sm uppercase tracking-wide">{n.hostGuests}</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link href="/become-host" className="hover:text-white transition-colors">{n.hostGuests}</Link></li>
               <li><Link href="/register" className="hover:text-white transition-colors">{n.register}</Link></li>
               <li><Link href="/login" className="hover:text-white transition-colors">{n.login}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wide">{n.hostGuests}</h4>
-            <ul className="space-y-2.5 text-sm">
-              <li><Link href="/become-host" className="hover:text-white transition-colors">{n.hostGuests}</Link></li>
-              <li><Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
-              <li><Link href="/admin" className="hover:text-white transition-colors">Admin</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wide">{n.about}</h4>
-            <ul className="space-y-2.5 text-sm">
-              <li><Link href="/about" className="hover:text-white transition-colors">{n.about}</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Mission</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Press</Link></li>
+            <h4 className="text-white font-bold mb-3 text-sm uppercase tracking-wide">{tr.legal?.terms || "Terms"}</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link href="/terms" className="hover:text-white transition-colors">{tr.legal?.terms || "Terms"}</Link></li>
+              <li><Link href="/privacy" className="hover:text-white transition-colors">{tr.legal?.privacy || "Privacy"}</Link></li>
+              <li><Link href="/rules" className="hover:text-white transition-colors">{tr.legal?.rules || "Rules"}</Link></li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-white/5 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-gray-600">© 2025 HayHome. All rights reserved.</p>
+        <div className="border-t border-white/5 mt-8 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-gray-600">© 2025 HayHome. Made with ❤️ in Armenia.</p>
           <div className="flex items-center gap-4 text-xs text-gray-600">
-            <Link href="/terms" className="hover:text-gray-400 transition-colors">Terms</Link>
-            <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy</Link>
-            <Link href="/rules" className="hover:text-gray-400 transition-colors">Rules</Link>
-            <span>Made with ❤️ in Armenia</span>
+            <Link href="/terms" className="hover:text-gray-400 transition-colors">{tr.legal?.terms || "Terms"}</Link>
+            <Link href="/privacy" className="hover:text-gray-400 transition-colors">{tr.legal?.privacy || "Privacy"}</Link>
+            <Link href="/rules" className="hover:text-gray-400 transition-colors">{tr.legal?.rules || "Rules"}</Link>
           </div>
         </div>
       </div>

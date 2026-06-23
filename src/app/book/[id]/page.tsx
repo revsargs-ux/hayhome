@@ -3,10 +3,17 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { Host } from "@/lib/types";
-import { ChevronLeft, Star, Check, ChevronRight } from "lucide-react";
+import { ChevronLeft, Star, Check, ChevronRight, Navigation, MapPin } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { getLocalizedField } from "@/lib/i18n-utils";
+import AddressAutocomplete from "@/components/AddressAutocomplete";
+import type { NominatimResult } from "@/components/AddressAutocomplete";
+import dynamic from "next/dynamic";
+import NavigatorLinks from "@/components/NavigatorLinks";
+import { getCityCoords } from "@/components/Map";
+
+const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false });
 
 export default function BookPage() {
   const params = useParams();
@@ -26,6 +33,49 @@ export default function BookPage() {
     guestCountry: "", checkIn: "", checkOut: "", guests: 1, message: "",
   });
   const [draftRestored, setDraftRestored] = useState(false);
+
+  // Route / geolocation state
+  const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(null);
+  const [originLabel, setOriginLabel] = useState("");
+  const [geoWarning, setGeoWarning] = useState("");
+
+  // Route translation strings
+  const RT = {
+    routeTitle: { ru: "Маршрут", en: "Route", hy: "Երթուղի", fr: "Itinéraire", de: "Route", es: "Ruta", it: "Percorso", ar: "الطريق", zh: "路线", fa: "مسیر" },
+    whereFrom: { ru: "Откуда вы едете?", en: "Where are you traveling from?", hy: "Որտեղից եք գալիս?", fr: "D'où venez-vous?", de: "Woher kommen Sie?", es: "¿De dónde viene?", it: "Da dove vieni?", ar: "من أين تأتي؟", zh: "您从哪里来？", fa: "از کجا می‌آیید؟" },
+    useGeo: { ru: "Определить местоположение", en: "Use my location", hy: "Իմ գտնվելու վայրը", fr: "Utiliser ma position", de: "Meinen Standort verwenden", es: "Usar mi ubicación", it: "Usa la mia posizione", ar: "استخدم موقعي", zh: "使用我的位置", fa: "از موقعیت من استفاده کن" },
+    enterAddress: { ru: "Укажите адрес отправления", en: "Enter departure address", hy: "Մուտքագրեք հասցեն", fr: "Entrez l'adresse de départ", de: "Abfahrtsadresse eingeben", es: "Ingrese dirección de salida", it: "Inserisci indirizzo di partenza", ar: "أدخل عنوان المغادرة", zh: "输入出发地址", fa: "آدرس مبدا را وارد کنید" },
+    geoWarn: { ru: "Для точного определения местоположения разрешите доступ к геолокации", en: "Allow geolocation access for accurate positioning", hy: "Թույլատրեք երկրաչափության հասանելիությունը", fr: "Autorisez la géolocalisation pour une position précise", de: "Erlauben Sie Geolokalisierung für genaue Positionierung", es: "Permita el acceso a geolocalización", it: "Consenti geolocalizzazione per posizionamento accurato", ar: "اسمح بالوصول إلى الموقع للحصول على تحديد دقيق", zh: "允许地理定位访问以精确定位", fa: "برای تعیین مکان دقیق، دسترسی به مکان را مجاز کنید" },
+    hostLocation: { ru: "Семья", en: "Host family", hy: "Ընտանիք", fr: "Famille hôte", de: "Gastfamilie", es: "Familia anfitriona", it: "Famiglia ospitante", ar: "العائلة المضيفة", zh: "房东家庭", fa: "خانواده میزبان" },
+  };
+  const rt = (key: keyof typeof RT): string => (RT[key] as Record<string, string>)[lang] ?? (RT[key] as Record<string, string>).en ?? "";
+
+  // Geolocation handler
+  const handleGeolocate = () => {
+    if (!navigator.geolocation) {
+      setGeoWarning(rt("geoWarn"));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setOrigin({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setOriginLabel("GPS");
+        setGeoWarning("");
+      },
+      () => {
+        setGeoWarning(rt("geoWarn"));
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  };
+
+  const handleAddressSelect = (result: NominatimResult) => {
+    setOrigin({ lat: parseFloat(result.lat), lng: parseFloat(result.lon) });
+    setOriginLabel(result.display_name.split(", ").slice(0, 2).join(", "));
+  };
+
+  // Host destination coordinates
+  const hostCoords = host ? getCityCoords(host.city) : null;
 
   // Mini calendar state
   const [calendarData, setCalendarData] = useState<Map<string, string>>(new Map());

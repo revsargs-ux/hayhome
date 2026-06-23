@@ -6,6 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Suspense } from "react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { SocialLogin } from "@/components/SocialLogin";
 
 function LoginContent() {
   const router = useRouter();
@@ -87,6 +88,8 @@ function LoginContent() {
             {loading ? a.loggingIn : a.loginBtn}
           </button>
         </form>
+
+        <SocialLogin />
 
         <p className="text-center text-sm text-gray-500 mt-6">
           {a.noAccount}{" "}

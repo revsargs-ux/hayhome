@@ -6,7 +6,7 @@ import L from "leaflet";
 import { Host } from "@/lib/types";
 
 // Armenian city → coordinates lookup
-const CITY_COORDS: Record<string, [number, number]> = {
+export const CITY_COORDS: Record<string, [number, number]> = {
   "Ереван": [40.1792, 44.4991],
   "Yerevan": [40.1792, 44.4991],
   "Gyumri": [40.7860, 43.8453],
@@ -26,7 +26,7 @@ const CITY_COORDS: Record<string, [number, number]> = {
 };
 
 // Region fallback coordinates
-const REGION_COORDS: Record<string, [number, number]> = {
+export const REGION_COORDS: Record<string, [number, number]> = {
   "Ереван": [40.1792, 44.4991],
   "Ширак": [40.7860, 43.8453],
   "Тавуш": [40.7392, 44.8560],
@@ -38,6 +38,19 @@ const REGION_COORDS: Record<string, [number, number]> = {
   "Арагацотн": [40.3167, 44.3833],
   "Арарат": [40.0167, 44.5667],
 };
+
+// Exported city coordinate lookup for reuse
+export function getCityCoords(cityName: string): { lat: number; lng: number } {
+  const cityKey = Object.keys(CITY_COORDS).find(
+    (k) => k.toLowerCase() === cityName.toLowerCase()
+  );
+  if (cityKey) {
+    const [lat, lng] = CITY_COORDS[cityKey];
+    return { lat, lng };
+  }
+  // Default: Yerevan
+  return { lat: 40.1792, lng: 44.4991 };
+}
 
 function getHostCoords(host: Host): [number, number] {
   const cityKey = Object.keys(CITY_COORDS).find(

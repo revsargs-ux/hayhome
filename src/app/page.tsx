@@ -37,7 +37,7 @@ export default function HomePage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, rgba(20,5,0,0.92) 0%, rgba(10,3,0,0.80) 60%, rgba(0,5,30,0.88) 100%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, rgba(196,93,62,0.85) 0%, rgba(212,160,74,0.75) 60%, rgba(60,30,10,0.90) 100%)" }} />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 text-center w-full">
           <p className="text-xl md:text-2xl text-amber-300 font-semibold mb-2 md:mb-4">🇦🇲 {tr.hero.greeting}</p>
           <h1 className="text-3xl md:text-6xl font-extrabold text-white mb-4 md:mb-6 leading-tight">
@@ -66,29 +66,29 @@ export default function HomePage() {
               className="w-full px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/40 outline-none focus:bg-white/20 transition text-sm"
             />
           </div>
-          <p className="text-white/50 mt-3 text-sm">{hosts.length}+ {tr.hero.familiesWaiting}</p>
+          <p className="text-white/70 mt-3 text-sm">{loading ? "" : hosts.length} {tr.hero.familiesWaiting}</p>
         </div>
       </section>
 
       {/* Why HayHome */}
-      <section className="py-20 bg-white">
+      <section className="py-20" style={{ background: "#FFF8F0" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-extrabold text-gray-900 mb-4">{h.whyTitle}</h2>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">{h.whySub}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-8 rounded-2xl hover:shadow-lg transition" style={{ background: "#FFFCF5" }}>
+            <div className="text-center p-8 rounded-2xl hover:shadow-md transition bg-white" style={{ boxShadow: "0 2px 12px rgba(196,93,62,0.06)" }}>
               <div className="text-5xl mb-4">🏡</div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">{h.realHome}</h3>
               <p className="text-gray-600">{h.realHomeDesc}</p>
             </div>
-            <div className="text-center p-8 rounded-2xl hover:shadow-lg transition" style={{ background: "#FDF6EC" }}>
+            <div className="text-center p-8 rounded-2xl hover:shadow-md transition bg-white" style={{ boxShadow: "0 2px 12px rgba(196,93,62,0.06)" }}>
               <div className="text-5xl mb-4">✅</div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">{h.verified}</h3>
               <p className="text-gray-600">{h.verifiedDesc}</p>
             </div>
-            <div className="text-center p-8 rounded-2xl hover:shadow-lg transition" style={{ background: "#F0F4FF" }}>
+            <div className="text-center p-8 rounded-2xl hover:shadow-md transition bg-white" style={{ boxShadow: "0 2px 12px rgba(196,93,62,0.06)" }}>
               <div className="text-5xl mb-4">🌍</div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">{h.unite}</h3>
               <p className="text-gray-600">{h.uniteDesc}</p>
@@ -98,7 +98,7 @@ export default function HomePage() {
       </section>
 
       {/* Our Families */}
-      <section className="py-20" style={{ background: "#FAFAF8" }}>
+      <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-extrabold text-gray-900 mb-4">{h.ourFamilies}</h2>
@@ -151,33 +151,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-extrabold text-gray-900 mb-4">{h.howTitle}</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { num: "1", title: h.step1, desc: h.step1desc },
-              { num: "2", title: h.step2, desc: h.step2desc },
-              { num: "3", title: h.step3, desc: h.step3desc },
-            ].map((step) => (
-              <div key={step.num} className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl font-bold text-white" style={{ background: "#D4001A" }}>
-                  {step.num}
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{step.title}</h3>
-                <p className="text-gray-600">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Reviews */}
       {reviews.length > 0 && (
-        <section className="py-20" style={{ background: "#FAFAF8" }}>
+        <section className="py-20 bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-extrabold text-gray-900 mb-4">{tr.hosts.reviews}</h2>
@@ -201,11 +177,11 @@ export default function HomePage() {
       )}
 
       {/* CTA */}
-      <section className="py-20" style={{ background: "linear-gradient(135deg, #D4001A 0%, #8B0000 100%)" }}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-extrabold text-white mb-4">{h.becomeTitle}</h2>
-          <p className="text-white/80 text-lg mb-8">{h.becomeSub}</p>
-          <Link href="/become-host" className="inline-block px-8 py-4 rounded-full bg-white text-lg font-bold transition hover:scale-105" style={{ color: "#D4001A" }}>
+      <section className="py-14" style={{ background: "linear-gradient(135deg, #C45D3E 0%, #D4A04A 100%)" }}>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-extrabold text-white mb-3">{h.becomeTitle}</h2>
+          <p className="text-white/85 text-base mb-6 max-w-xl mx-auto">{h.becomeSub}</p>
+          <Link href="/become-host" className="inline-block px-7 py-3 rounded-full bg-white text-base font-bold transition hover:scale-105" style={{ color: "#C45D3E" }}>
             {h.becomeCta}
           </Link>
         </div>

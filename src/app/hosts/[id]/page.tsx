@@ -317,7 +317,7 @@ export default function HostProfilePage() {
 
           {/* Right: booking card */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sticky top-24">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 lg:sticky lg:top-24">
               <div className="text-center mb-6">
                 <div className="text-4xl font-extrabold text-gray-900">
                   ${host.pricePerNight}
