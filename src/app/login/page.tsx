@@ -67,7 +67,7 @@ function LoginContent() {
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-sm font-semibold text-gray-700">{a.password}</label>
               <Link href="/forgot-password" className="text-xs hover:underline" style={{ color: "#D4001A" }}>
-                {lang === "ru" ? "Забыли пароль?" : lang === "fr" ? "Mot de passe oublié?" : lang === "de" ? "Passwort vergessen?" : lang === "es" ? "¿Olvidaste tu contraseña?" : lang === "ar" ? "نسيت كلمة المرор?" : lang === "zh" ? "忘记密码?" : lang === "hy" ? "Լաբծացել գաղտնաբառը?" : "Forgot password?"}
+                {lang === "ru" ? "Забыли пароль?" : lang === "fr" ? "Mot de passe oublié?" : lang === "de" ? "Passwort vergessen?" : lang === "es" ? "¿Olvidaste tu contraseña?" : lang === "ar" ? "نسيت كلمة المرор?" : lang === "zh" ? "忘记密码?" : lang === "hy" ? "Մոռացել գաղտնաբառը?" : "Forgot password?"}
               </Link>
             </div>
             <div className="relative">

@@ -9,7 +9,7 @@ export interface JWTPayload {
   id: string;
   email: string;
   name: string;
-  role: "guest" | "host" | "admin";
+  role: "guest" | "host" | "admin" | "provider";
 }
 
 export async function signToken(payload: JWTPayload): Promise<string> {

@@ -3,11 +3,13 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import getUI from "@/lib/ui";
 import { Users, Target, MapPin, DollarSign, ChevronRight, Star, Gift, Shield } from "lucide-react";
 
 function PartnerContent() {
   const { tr, lang } = useLang();
   const { user } = useAuth();
+  const u = getUI(lang);
   const [tab, setTab] = useState<"ambassador" | "hunter">("ambassador");
 
   const T: Record<string, Record<string, string>> = {
@@ -73,23 +75,23 @@ function PartnerContent() {
         {/* Roles */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">
-            {lang === "ru" ? "Что делает партнёр" : "What partners do"}
+            u.whatPartnersDo
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white rounded-2xl shadow-sm p-5 text-center">
               <Users size={28} className="text-red-600 mx-auto mb-3" />
-              <h3 className="font-bold text-gray-900 text-sm mb-1">{lang === "ru" ? "Привлекает туристов" : "Invites tourists"}</h3>
-              <p className="text-gray-500 text-xs">{lang === "ru" ? "Делится ссылкой с туристами и диаспорой" : "Shares link with tourists & diaspora"}</p>
+              <h3 className="font-bold text-gray-900 text-sm mb-1">u.invitesTourists</h3>
+              <p className="text-gray-500 text-xs">u.sharesLinkDiaspora</p>
             </div>
             <div className="bg-white rounded-2xl shadow-sm p-5 text-center">
               <MapPin size={28} className="text-red-600 mx-auto mb-3" />
-              <h3 className="font-bold text-gray-900 text-sm mb-1">{lang === "ru" ? "Находит семьи" : "Finds families"}</h3>
-              <p className="text-gray-500 text-xs">{lang === "ru" ? "Помогает семьям и мастерам зарегистрироваться" : "Helps families & artisans register"}</p>
+              <h3 className="font-bold text-gray-900 text-sm mb-1">u.findsFamilies</h3>
+              <p className="text-gray-500 text-xs">u.helpsRegister</p>
             </div>
             <div className="bg-white rounded-2xl shadow-sm p-5 text-center">
               <DollarSign size={28} className="text-red-600 mx-auto mb-3" />
-              <h3 className="font-bold text-gray-900 text-sm mb-1">5% × 2 {lang === "ru" ? "года" : "years"}</h3>
-              <p className="text-gray-500 text-xs">{lang === "ru" ? "С первой сделки, вывод от $30/мес" : "From first deal, min $30/mo"}</p>
+              <h3 className="font-bold text-gray-900 text-sm mb-1">5% × 2 "u.yearsLabel"</h3>
+              <p className="text-gray-500 text-xs">u.fromFirstDeal</p>
             </div>
           </div>
           </div>

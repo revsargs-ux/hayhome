@@ -28,13 +28,13 @@ export default function NavigatorLinks({ fromLat, fromLng, toLat, toLng, toName,
     {
       name: "Apple Maps",
       icon: "🍎",
-      url: `https://maps.apple.com/?daddr=${toLat},${toLng}&saddr=${fromLat},${fromLng}`,
+      url: `https://maps.apple.com/maps?saddr=${fromLat},${fromLng}&daddr=${toLat},${toLng}&dirflg=d`,
       color: "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100",
     },
     {
       name: "2GIS",
       icon: "📍",
-      url: `https://2gis.ru/routeSearch/rsType/car/from/${fromLng},${fromLat}/to/${toLng},${toLat}`,
+      url: `https://2gis.ru/?routePoint/src=${fromLng},${fromLat}&routePoint/dst=${toLng},${toLat}`,
       color: "bg-green-50 text-green-700 border-green-200 hover:bg-green-100",
     },
   ];

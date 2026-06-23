@@ -31,7 +31,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative overflow-hidden flex items-center md:min-h-[600px]" style={{ minHeight: "520px" }}>
         <Image
-          src="https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=1600&q=80&auto=format&fit=crop"
+          src="/hero-bg.jpg"
           alt={tr.hero.title1}
           fill
           className="object-cover"

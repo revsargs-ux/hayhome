@@ -111,6 +111,38 @@ export interface User {
   name: string;
   email: string;
   password: string;
-  role: "guest" | "host" | "admin";
+  role: "guest" | "host" | "admin" | "provider";
   createdAt: string;
+}
+
+export interface Service {
+  id: string;
+  provider_id: string;
+  category: string;
+  title: string;
+  description: string;
+  price: number;
+  price_unit: "per_hour" | "per_event" | "per_person";
+  min_duration: number;
+  max_duration: number;
+  photos: string[];
+  region: string;
+  available: boolean;
+  rating: number;
+  review_count: number;
+  created_at: string;
+}
+
+export interface ServiceBooking {
+  id: string;
+  booking_id: string;
+  service_id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  guests_count: number;
+  status: "requested" | "confirmed" | "cancelled" | "completed";
+  total_price: number;
+  client_note: string;
+  created_at: string;
 }

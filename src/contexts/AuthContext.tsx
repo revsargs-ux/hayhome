@@ -5,7 +5,7 @@ interface AuthUser {
   id: string;
   name: string;
   email: string;
-  role: "guest" | "host" | "admin";
+  role: "guest" | "host" | "admin" | "provider";
 }
 
 interface AuthContextType {

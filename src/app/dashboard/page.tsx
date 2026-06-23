@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import NavigatorLinks from "@/components/NavigatorLinks";
 import { getCityCoords } from "@/components/Map";
+import getUI from "@/lib/ui";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false });
 
@@ -22,7 +23,7 @@ const DASH_RT = {
 const STATUS_LABELS: Record<string, Record<string, string>> = {
   ru: { pending: "Ожидает", confirmed: "Подтверждено", completed: "Завершено", cancelled: "Отменено" },
   en: { pending: "Pending", confirmed: "Confirmed", completed: "Completed", cancelled: "Cancelled" },
-  hy: { pending: "Սպասում", confirmed: "Հաuтвержenо", completed: "Ьавarteл", cancelled: "Аnnvovеl" },
+  hy: { pending: "Սպասում", confirmed: "Հաստատված", completed: "Ավարտված", cancelled: "Չեղարկված" },
   fr: { pending: "En attente", confirmed: "Confirmé", completed: "Terminé", cancelled: "Annulé" },
   de: { pending: "Ausstehend", confirmed: "Bestätigt", completed: "Abgeschlossen", cancelled: "Storniert" },
   es: { pending: "Pendiente", confirmed: "Confirmado", completed: "Completado", cancelled: "Cancelado" },
@@ -36,6 +37,7 @@ export default function DashboardPage() {
   const { tr, lang } = useLang();
   const { user, logout, loading: authLoading } = useAuth();
   const router = useRouter();
+  const u = getUI(lang);
 
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [myProfile, setMyProfile] = useState<Host | null>(null);
@@ -120,14 +122,14 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 mb-1">
-              {tr.nav.about && (lang === "ru" ? "Личный кабинет" : lang === "hy" ? "Անձնական կաbiнет" : lang === "fr" ? "Mon espace" : lang === "de" ? "Mein Bereich" : lang === "es" ? "Mi espacio" : lang === "it" ? "Il mio spazio" : lang === "ar" ? "لوحتي" : lang === "zh" ? "我的控制台" : lang === "fa" ? "داشبورد من" : "Dashboard")}
+              {u.dashboard}
             </h1>
             <p className="text-gray-500">{user?.name} · {user?.email}</p>
           </div>
           <div className="flex items-center gap-2">
             {user?.role === "admin" && (
               <Link href="/admin" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-purple-700 bg-purple-50 rounded-xl hover:bg-purple-100 transition">
-                <Shield size={14} /> Admin
+                <Shield size={14} /> {u.adminPanel}
               </Link>
             )}
             <button onClick={loadData} className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition">
@@ -142,10 +144,10 @@ export default function DashboardPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {[
-            { icon: <Calendar size={20} />, value: pending, label: lang === "ru" ? "Новых заявок" : lang === "fr" ? "Nouvelles demandes" : lang === "de" ? "Neue Anfragen" : lang === "ar" ? "طلبات جديدة" : lang === "zh" ? "新请求" : "New requests", color: "text-yellow-500" },
-            { icon: <Users size={20} />, value: confirmed, label: lang === "ru" ? "Подтверждённых" : lang === "fr" ? "Confirmés" : lang === "de" ? "Bestätigt" : lang === "ar" ? "مؤكدة" : lang === "zh" ? "已确认" : "Confirmed", color: "text-blue-500" },
-            { icon: <Star size={20} />, value: myBookings.length, label: lang === "ru" ? "Всего бронирований" : lang === "fr" ? "Total réservations" : lang === "de" ? "Buchungen gesamt" : lang === "ar" ? "إجمالي الحجوزات" : lang === "zh" ? "总预订" : "Total bookings", color: "text-purple-500" },
-            { icon: <DollarSign size={20} />, value: `$${revenue}`, label: lang === "ru" ? "Заработано" : lang === "fr" ? "Revenus" : lang === "de" ? "Verdient" : lang === "ar" ? "المكتسبة" : lang === "zh" ? "已赚取" : "Earned", color: "text-green-500" },
+            { icon: <Calendar size={20} />, value: pending, label: u.newRequests, color: "text-yellow-500" },
+            { icon: <Users size={20} />, value: confirmed, label: u.confirmedLabel, color: "text-blue-500" },
+            { icon: <Star size={20} />, value: myBookings.length, label: u.totalBookings, color: "text-purple-500" },
+            { icon: <DollarSign size={20} />, value: `$${revenue}`, label: u.earnedLabel, color: "text-green-500" },
           ].map((stat) => (
             <div key={stat.label} className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3">
               <div className={`${stat.color} flex-shrink-0`}>{stat.icon}</div>
@@ -160,9 +162,9 @@ export default function DashboardPage() {
         {/* Tabs */}
         <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
           {([
-            { key: "bookings", label: lang === "ru" ? "Бронирования" : lang === "fr" ? "Réservations" : lang === "de" ? "Buchungen" : lang === "ar" ? "الحجوزات" : lang === "zh" ? "预订" : "Bookings" },
-            { key: "profile", label: lang === "ru" ? "Профиль" : lang === "fr" ? "Profil" : lang === "de" ? "Profil" : lang === "ar" ? "ملفي" : lang === "zh" ? "资料" : "Profile" },
-            ...(myProfile ? [{ key: "calendar" as const, label: lang === "ru" ? "Календарь" : lang === "fr" ? "Calendrier" : lang === "de" ? "Kalender" : lang === "ar" ? "التقويم" : lang === "zh" ? "日历" : "Calendar" }] : []),
+            { key: "bookings", label: u.bookingsTab },
+            { key: "profile", label: u.profileTab },
+            ...(myProfile ? [{ key: "calendar" as const, label: u.calendarTab }] : []),
           ] as { key: "bookings" | "profile" | "calendar"; label: string }[]).map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === t.key ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
@@ -175,24 +177,24 @@ export default function DashboardPage() {
         {!partnerCode && (
           <div className="mt-4 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ background: "linear-gradient(135deg, #D4001A10, #F2A90010)" }}>
             <div>
-              <p className="font-semibold text-gray-900 text-sm">{lang === "ru" ? "🤝 Зарабатывайте с HayHome" : "🤝 Earn with HayHome"}</p>
-              <p className="text-xs text-gray-500">{lang === "ru" ? "Приглашайте друзей и получайте 5% от их бронирований" : "Invite friends and earn 5% from their bookings"}</p>
+              <p className="font-semibold text-gray-900 text-sm">{u.earnWith}</p>
+              <p className="text-xs text-gray-500">{u.inviteFriends}</p>
             </div>
             <Link href="/partner/register" className="px-5 py-2 rounded-full text-white text-sm font-semibold flex-shrink-0 hover:opacity-90 transition" style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-              {lang === "ru" ? "Стать партнёром" : "Become a Partner"}
+              {u.becomePartner}
             </Link>
           </div>
         )}
         {partnerCode && (
           <div className="mt-4 rounded-xl p-4 bg-white shadow-sm">
-            <p className="text-xs text-gray-500 mb-2">{lang === "ru" ? "🤝 Ваша партнёрская ссылка — делитесь с друзьями" : "🤝 Your referral link — share with friends"}</p>
+            <p className="text-xs text-gray-500 mb-2">{u.partnerLink}</p>
             <div className="flex items-center gap-2 mb-3">
               <code className="flex-1 text-sm bg-gray-50 rounded-lg px-3 py-2 truncate">https://hay-home.com/register?ref={partnerCode}</code>
               <button onClick={() => { navigator.clipboard.writeText("https://hay-home.com/register?ref=" + partnerCode); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="px-3 py-2 rounded-lg text-sm font-medium transition" style={{ background: copied ? "#16a34a" : "#D4001A", color: "white" }}>
-                {copied ? (lang === "ru" ? "✓" : "✓") : (lang === "ru" ? "Копировать" : "Copy")}
+                {copied ? "✓" : u.copyText}
               </button>
               <button onClick={() => { if (navigator.share) navigator.share({ title: "HayHome", url: "https://hay-home.com/register?ref=" + partnerCode }); else { navigator.clipboard.writeText("https://hay-home.com/register?ref=" + partnerCode); setCopied(true); setTimeout(() => setCopied(false), 2000); } }} className="px-3 py-2 rounded-lg text-sm font-medium border transition hover:bg-gray-50" style={{ borderColor: "#D4001A", color: "#D4001A" }}>
-                <Share2 size={16} /> {lang === "ru" ? "Поделиться" : "Share"}
+                <Share2 size={16} /> {u.shareText}
               </button>
             </div>
             <div className="flex justify-center">
@@ -209,7 +211,7 @@ export default function DashboardPage() {
             ) : myBookings.length === 0 ? (
               <div className="p-12 text-center">
                 <div className="text-4xl mb-3">📭</div>
-                <p className="text-gray-500 mb-4">{lang === "ru" ? "Пока нет заявок" : lang === "fr" ? "Pas encore de réservations" : lang === "de" ? "Noch keine Buchungen" : lang === "ar" ? "لا حجوزات بعد" : lang === "zh" ? "暂无预订" : "No bookings yet"}</p>
+                <p className="text-gray-500 mb-4">{u.noBookings}</p>
                 <Link href="/hosts" className="text-sm font-semibold" style={{ color: "#D4001A" }}>
                   {tr.nav.findFamily}
                 </Link>
@@ -230,10 +232,12 @@ export default function DashboardPage() {
                         }`}>{statusLabels[b.status]}</span>
                       </div>
                       <p className="text-sm text-gray-600">
-                        {b.hostName} · {b.checkIn} → {b.checkOut} · {b.guests} {lang === "ru" ? "гост." : "guests"} · <strong>${b.totalPrice}</strong>
+                        {b.hostName} · {b.checkIn} → {b.checkOut} · {b.guests} {u.guestsLabel} · <strong>${b.totalPrice}</strong>
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">{b.guestEmail} · {b.guestPhone}</p>
                       {b.message && <p className="text-xs text-gray-500 italic mt-1">"{b.message}"</p>}
+                      {/* Service bookings for this booking */}
+                      <ServiceBookingsList bookingId={b.id} lang={lang} />
                       {/* Route for confirmed/completed bookings */}
                       {(b.status === "confirmed" || b.status === "completed") && (
                         <DashRouteSection booking={b} lang={lang} />
@@ -242,13 +246,13 @@ export default function DashboardPage() {
                     <div className="flex gap-2 flex-shrink-0">
                       <Link href={`/hosts/${b.hostId}`}
                         className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 transition">
-                        {lang === "ru" ? "Профиль" : "Profile"}
+                        {u.profileTab}
                       </Link>
                       {b.status === "completed" && (
                         <Link href={`/hosts/${b.hostId}#reviews`}
                           className="px-3 py-1.5 rounded-lg text-xs font-medium text-white transition"
                           style={{ background: "#D4001A" }}>
-                          {lang === "ru" ? "Отзыв" : lang === "fr" ? "Avis" : lang === "de" ? "Bewertung" : lang === "ar" ? "تقييم" : lang === "zh" ? "评价" : "Review"}
+                          {u.reviewBtn}
                         </Link>
                       )}
                     </div>
@@ -268,13 +272,13 @@ export default function DashboardPage() {
                 <button onClick={() => setEditing(true)}
                   className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white rounded-xl hover:opacity-90 transition"
                   style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  <Edit2 size={14} /> {lang === "ru" ? "Редактировать" : lang === "fr" ? "Modifier" : lang === "de" ? "Bearbeiten" : lang === "ar" ? "تعديل" : lang === "zh" ? "编辑" : "Edit"}
+                  <Edit2 size={14} /> {u.edit}
                 </button>
               ) : (
                 <div className="flex gap-2">
                   <button onClick={saveProfile} disabled={saving}
                     className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-xl hover:bg-green-600 disabled:opacity-50 transition">
-                    <Save size={14} /> {saving ? "..." : lang === "ru" ? "Сохранить" : "Save"}
+                    <Save size={14} /> {saving ? "..." : u.save}
                   </button>
                   <button onClick={() => setEditing(false)}
                     className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition">
@@ -287,20 +291,20 @@ export default function DashboardPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  <p className="text-gray-400 text-xs mb-1">{lang === "ru" ? "Статус" : "Status"}</p>
+                  <p className="text-gray-400 text-xs mb-1">{u.statusLabel}</p>
                   <span className={`font-semibold ${myProfile.status === "active" ? "text-green-600" : myProfile.status === "pending" ? "text-yellow-600" : "text-red-600"}`}>
-                    {myProfile.status === "active" ? (lang === "ru" ? "Активен" : "Active") : myProfile.status === "pending" ? (lang === "ru" ? "На проверке" : "Pending") : (lang === "ru" ? "Приостановлен" : "Suspended")}
+                    {myProfile.status === "active" ? u.activeStatus : myProfile.status === "pending" ? u.pendingReviewStatus : u.suspendedStatus}
                   </span>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  <p className="text-gray-400 text-xs mb-1">{lang === "ru" ? "Рейтинг" : "Rating"}</p>
-                  <span className="font-semibold text-gray-900">⭐ {myProfile.rating || (lang === "ru" ? "Новый" : "New")}</span>
+                  <p className="text-gray-400 text-xs mb-1">{tr.common.rating}</p>
+                  <span className="font-semibold text-gray-900">⭐ {myProfile.rating || tr.common.newHost}</span>
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  {lang === "ru" ? "Описание" : lang === "fr" ? "Description" : lang === "de" ? "Beschreibung" : lang === "ar" ? "الوصف" : lang === "zh" ? "描述" : "Description"}
+                  {u.descriptionLabel}
                 </label>
                 {editing ? (
                   <textarea value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
@@ -313,7 +317,7 @@ export default function DashboardPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    {lang === "ru" ? "Телефон" : "Phone"}
+                    {u.phoneLabel}
                   </label>
                   {editing ? (
                     <input value={editForm.phone} onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))}
@@ -324,7 +328,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    {lang === "ru" ? "Цена за ночь" : "Price/night"}
+                    {u.pricePerNight}
                   </label>
                   {editing ? (
                     <input type="number" min={10} max={500} value={editForm.pricePerNight}
@@ -343,14 +347,14 @@ export default function DashboardPage() {
         {tab === "profile" && !myProfile && (
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">
-              {tr.dashboard?.profileInfo || (lang === "ru" ? "Профиль гостя" : "Guest Profile")}
+              {u.guestProfile}
             </h2>
             <p className="text-gray-500 text-sm mb-4">
-              {tr.dashboard?.profileInfoDesc || (lang === "ru" ? "Ваши данные аккаунта" : "Your account details")}
+              {u.accountDetails}
             </p>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="p-3 bg-gray-50 rounded-xl">
-                <p className="text-gray-400 text-xs mb-1">{lang === "ru" ? "Имя" : "Name"}</p>
+                <p className="text-gray-400 text-xs mb-1">{u.nameLabel}</p>
                 <span className="font-semibold text-gray-900">{user?.name}</span>
               </div>
               <div className="p-3 bg-gray-50 rounded-xl">
@@ -358,13 +362,13 @@ export default function DashboardPage() {
                 <span className="font-semibold text-gray-900 text-xs break-all">{user?.email}</span>
               </div>
               <div className="p-3 bg-gray-50 rounded-xl">
-                <p className="text-gray-400 text-xs mb-1">{lang === "ru" ? "Роль" : "Role"}</p>
+                <p className="text-gray-400 text-xs mb-1">{u.roleLabel}</p>
                 <span className="font-semibold text-gray-900 capitalize">{user?.role}</span>
               </div>
               <div className="p-3 bg-gray-50 rounded-xl">
-                <p className="text-gray-400 text-xs mb-1">{lang === "ru" ? "Хотите стать хозяином?" : "Want to host?"}</p>
+                <p className="text-gray-400 text-xs mb-1">{u.wantToHost}</p>
                 <Link href="/become-host" className="font-semibold text-sm" style={{ color: "#D4001A" }}>
-                  {lang === "ru" ? "Зарегистрироваться →" : "Register →"}
+                  {u.registerCta}
                 </Link>
               </div>
             </div>
@@ -383,6 +387,7 @@ export default function DashboardPage() {
 // ── Calendar Tab Content ──
 function CalendarTabContent({ hostId, lang, tr }: { hostId: string; lang: string; tr: any }) {
   const h = tr.hosts;
+  const u = getUI(lang as any);
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
@@ -429,9 +434,7 @@ function CalendarTabContent({ hostId, lang, tr }: { hostId: string; lang: string
     else setViewMonth(viewMonth + 1);
   };
 
-  const monthNames = lang === "ru"
-    ? ["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"]
-    : ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const monthNames = u.months;
 
   const dayLabels = [h.mon, h.tue, h.wed, h.thu, h.fri, h.sat, h.sun];
 
@@ -507,10 +510,10 @@ function CalendarTabContent({ hostId, lang, tr }: { hostId: string; lang: string
       ))}
       <div className="mt-4 flex items-center justify-between">
         <p className="text-xs text-gray-400">
-          {lang === "ru" ? "Нажмите на дату, чтобы заблокировать/разблокировать" : "Click a date to toggle blocked/available"}
+          {u.clickToToggle}
         </p>
         <a href="/dashboard/calendar" className="text-xs font-medium" style={{ color: "#D4001A" }}>
-          {lang === "ru" ? "Открыть полный календарь →" : "Open full calendar →"}
+          {u.openFullCalendar}
         </a>
       </div>
     </div>
@@ -602,6 +605,58 @@ function DashRouteSection({ booking, lang }: { booking: Booking; lang: string })
       {showMap && !origin && (
         <p className="text-xs text-gray-400">{dashLabel("geoWarn")}</p>
       )}
+    </div>
+  );
+}
+
+// ── Service Bookings List (for dashboard) ──
+import type { ServiceBooking } from "@/lib/types";
+
+function ServiceBookingsList({ bookingId, lang }: { bookingId: string; lang: string }) {
+  const u = getUI(lang as any);
+  const [svcBookings, setSvcBookings] = useState<any[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/service-bookings", { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
+        const all = Array.isArray(data) ? data : [];
+        setSvcBookings(all.filter((s: any) => s.booking_id === bookingId));
+        setLoaded(true);
+      })
+      .catch(() => setLoaded(true));
+  }, [bookingId]);
+
+  if (!loaded || svcBookings.length === 0) return null;
+
+  return (
+    <div className="mt-2 pt-2 border-t border-gray-50">
+      <p className="text-xs font-semibold text-gray-400 mb-1">
+        {u.additionalServices}
+      </p>
+      {svcBookings.map((sb: any) => {
+        const svcTitle = sb.service?.title || "Service";
+        const svcCat = sb.service?.category || "custom";
+        const catIcon: Record<string, string> = {
+          photo: "📸", video: "🎥", music: "🎵", costume: "👗", decor: "🎨", dance: "💃", guide: "🗺️", chef: "👨‍🍳", custom: "✨",
+        };
+        return (
+          <div key={sb.id} className="flex items-center gap-2 text-xs text-gray-600 py-0.5">
+            <span>{catIcon[svcCat] || "✨"}</span>
+            <span className="font-medium">{svcTitle}</span>
+            <span className="text-gray-400">— {sb.date} {sb.start_time}</span>
+            <span className="font-semibold text-gray-700">${sb.total_price}</span>
+            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium ${
+              sb.status === "confirmed" ? "bg-green-100 text-green-700" :
+              sb.status === "cancelled" ? "bg-red-100 text-red-600" :
+              "bg-yellow-100 text-yellow-700"
+            }`}>
+              {sb.status}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }

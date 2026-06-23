@@ -4,8 +4,63 @@ import { Host, Booking } from "@/lib/types";
 import { Check, X, Star, Users, DollarSign, Home, RefreshCw } from "lucide-react";
 import AdminCalendarView from "@/components/AdminCalendarView";
 import { useLang } from "@/contexts/LanguageContext";
+import getUI from "@/lib/ui";
+import type { LangCode } from "@/lib/translations";
 
-type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar" | "users";
+type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar" | "users" | "services";
+
+// Full 10-language status labels
+const STATUS_LABELS: Record<string, Record<string, string>> = {
+  ru: { pending: "Ожидает", confirmed: "Подтверждено", completed: "Завершено", cancelled: "Отменено" },
+  en: { pending: "Pending", confirmed: "Confirmed", completed: "Completed", cancelled: "Cancelled" },
+  hy: { pending: "Սպասում", confirmed: "Հաստատված", completed: "Ավարտված", cancelled: "Չեղարկված" },
+  fr: { pending: "En attente", confirmed: "Confirmé", completed: "Terminé", cancelled: "Annulé" },
+  de: { pending: "Ausstehend", confirmed: "Bestätigt", completed: "Abgeschlossen", cancelled: "Storniert" },
+  es: { pending: "Pendiente", confirmed: "Confirmado", completed: "Completado", cancelled: "Cancelado" },
+  it: { pending: "In attesa", confirmed: "Confermato", completed: "Completato", cancelled: "Annullato" },
+  ar: { pending: "قيد الانتظار", confirmed: "مؤكد", completed: "مكتمل", cancelled: "ملغي" },
+  zh: { pending: "待处理", confirmed: "已确认", completed: "已完成", cancelled: "已取消" },
+  fa: { pending: "در انتظار", confirmed: "تأیید شده", completed: "تکمیل شده", cancelled: "لغو شده" },
+};
+
+const HOST_STATUS_LABELS: Record<string, Record<string, string>> = {
+  ru: { active: "Активен", pending: "На проверке", suspended: "Приостановлен" },
+  en: { active: "Active", pending: "Pending", suspended: "Suspended" },
+  hy: { active: "Ակտիվ", pending: "Ստուգման տակ", suspended: "Կասեցված" },
+  fr: { active: "Actif", pending: "En attente", suspended: "Suspendu" },
+  de: { active: "Aktiv", pending: "Ausstehend", suspended: "Gesperrt" },
+  es: { active: "Activo", pending: "Pendiente", suspended: "Suspendido" },
+  it: { active: "Attivo", pending: "In attesa", suspended: "Sospeso" },
+  ar: { active: "نشط", pending: "قيد المراجعة", suspended: "معلق" },
+  zh: { active: "活跃", pending: "待审核", suspended: "已暂停" },
+  fa: { active: "فعال", pending: "در حال بررسی", suspended: "معلق" },
+};
+
+const PAYOUT_STATUS_LABELS: Record<string, Record<string, string>> = {
+  ru: { pending: "Ожидает", confirmed: "Выплачен", rejected: "Отклонён" },
+  en: { pending: "Pending", confirmed: "Paid", rejected: "Rejected" },
+  hy: { pending: "Սպասում", confirmed: "Վճարված", rejected: "Մերժված" },
+  fr: { pending: "En attente", confirmed: "Payé", rejected: "Rejeté" },
+  de: { pending: "Ausstehend", confirmed: "Bezahlt", rejected: "Abgelehnt" },
+  es: { pending: "Pendiente", confirmed: "Pagado", rejected: "Rechazado" },
+  it: { pending: "In attesa", confirmed: "Pagato", rejected: "Rifiutato" },
+  ar: { pending: "قيد الانتظار", confirmed: "مدفوع", rejected: "مرفوض" },
+  zh: { pending: "待处理", confirmed: "已支付", rejected: "已拒绝" },
+  fa: { pending: "در انتظار", confirmed: "پرداخت شده", rejected: "رد شده" },
+};
+
+const ACTION_LABELS: Record<string, Record<string, string>> = {
+  ru: { submitted: "Заявка подана", approved: "Одобрена", rejected: "Отклонена", suspended: "Приостановлена", restored: "Восстановлена", note_added: "Заметка" },
+  en: { submitted: "Application submitted", approved: "Approved", rejected: "Rejected", suspended: "Suspended", restored: "Restored", note_added: "Note" },
+  hy: { submitted: "Հայտը ներկայացված է", approved: "Հաստատված", rejected: "Մերժված", suspended: "Կասեցված", restored: "Վերականգնված", note_added: "Նշում" },
+  fr: { submitted: "Candidature soumise", approved: "Approuvée", rejected: "Rejetée", suspended: "Suspendue", restored: "Restaurée", note_added: "Note" },
+  de: { submitted: "Antrag eingereicht", approved: "Genehmigt", rejected: "Abgelehnt", suspended: "Gesperrt", restored: "Wiederhergestellt", note_added: "Notiz" },
+  es: { submitted: "Solicitud enviada", approved: "Aprobada", rejected: "Rechazada", suspended: "Suspendida", restored: "Restaurada", note_added: "Nota" },
+  it: { submitted: "Domanda inviata", approved: "Approvata", rejected: "Rifiutata", suspended: "Sospesa", restored: "Ripristinata", note_added: "Nota" },
+  ar: { submitted: "تم تقديم الطلب", approved: "موافق عليه", rejected: "مرفوض", suspended: "معلق", restored: "مستعاد", note_added: "ملاحظة" },
+  zh: { submitted: "申请已提交", approved: "已批准", rejected: "已拒绝", suspended: "已暂停", restored: "已恢复", note_added: "备注" },
+  fa: { submitted: "درخواست ارسال شد", approved: "تأیید شده", rejected: "رد شده", suspended: "معلق", restored: "بازگردانی شده", note_added: "یادداشت" },
+};
 
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>("hosts");
@@ -31,12 +86,13 @@ export default function AdminPage() {
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
 
   const { lang } = useLang();
+  const u = getUI(lang);
 
-  const a = (ru: string, en: string) => lang === "ru" ? ru : en;
+  const a = (ru: string, en: string) => lang === "ru" ? ru : en; // Keep for backwards compat with AdminCalendarView
 
   const load = async () => {
     setLoading(true);
-    const [h, b, p, u] = await Promise.all([
+    const [h, b, p, usr] = await Promise.all([
       fetch("/api/hosts?all=1", { credentials: "include" }).then((r) => r.json()),
       fetch("/api/bookings", { credentials: "include" }).then((r) => r.json()),
       fetch("/api/partners/payout/", { credentials: "include" }).then((r) => r.json()).catch(() => []),
@@ -45,7 +101,7 @@ export default function AdminPage() {
     setHosts(h);
     setBookings(b);
     setPayouts(Array.isArray(p) ? p : []);
-    setUsers(Array.isArray(u) ? u : []);
+    setUsers(Array.isArray(usr) ? usr : []);
     setLoading(false);
   };
 
@@ -94,12 +150,13 @@ export default function AdminPage() {
   const totalRevenue = bookings.filter((b) => b.status === "completed").reduce((s, b) => s + b.totalPrice, 0);
 
   const tabs: { key: Tab; label: string; badge?: number }[] = [
-    { key: "hosts", label: a("Хозяева", "Hosts"), badge: pendingHosts.length },
-    { key: "bookings", label: a("Бронирования", "Bookings"), badge: pendingBookings.length },
-    { key: "payouts", label: a("Выплаты", "Payouts"), badge: payouts.filter(p => p.status === "pending").length || undefined },
-    { key: "stats", label: a("Статистика", "Statistics") },
-    { key: "calendar", label: a("Календарь", "Calendar") },
-    { key: "users", label: a("Пользователи", "Users"), badge: users.length || undefined },
+    { key: "hosts", label: u.hostsTab, badge: pendingHosts.length },
+    { key: "bookings", label: u.bookingsTab, badge: pendingBookings.length },
+    { key: "payouts", label: u.payoutsTab, badge: payouts.filter(p => p.status === "pending").length || undefined },
+    { key: "stats", label: u.statisticsTab },
+    { key: "calendar", label: u.calendarTabAdmin },
+    { key: "users", label: u.usersTab, badge: users.length || undefined },
+    { key: "services", label: u.servicesTab },
   ];
 
   return (
@@ -108,11 +165,11 @@ export default function AdminPage() {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{a("Панель администратора", "Admin Panel")}</h1>
-            <p className="text-sm text-gray-500">HayHome · {a("Управление платформой", "Platform Management")}</p>
+            <h1 className="text-2xl font-bold text-gray-900">{u.adminPanel}</h1>
+            <p className="text-sm text-gray-500">HayHome · {u.platformManagement}</p>
           </div>
           <button onClick={load} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm">
-            <RefreshCw size={14} /> Обновить
+            <RefreshCw size={14} /> {u.refreshBtn}
           </button>
         </div>
 
@@ -120,10 +177,10 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { icon: <Home size={18} />, value: activeHosts.length, label: a("Активных семей", "Active families"), color: "text-blue-600" },
-              { icon: <Star size={18} />, value: pendingHosts.length, label: a("На проверке", "Pending review"), color: "text-yellow-600" },
-              { icon: <Users size={18} />, value: bookings.length, label: a("Бронирований", "Bookings"), color: "text-green-600" },
-              { icon: <DollarSign size={18} />, value: `$${totalRevenue}`, label: a("Выручка (завершённые)", "Revenue (completed)"), color: "text-red-600" },
+              { icon: <Home size={18} />, value: activeHosts.length, label: u.activeFamilies, color: "text-blue-600" },
+              { icon: <Star size={18} />, value: pendingHosts.length, label: u.pendingReviewAdmin, color: "text-yellow-600" },
+              { icon: <Users size={18} />, value: bookings.length, label: u.bookingsTab, color: "text-green-600" },
+              { icon: <DollarSign size={18} />, value: `$${totalRevenue}`, label: u.revenue, color: "text-red-600" },
             ].map((stat) => (
               <div key={stat.label} className="bg-gray-50 rounded-xl p-3 flex items-center gap-3">
                 <div className={`${stat.color} flex-shrink-0`}>{stat.icon}</div>
@@ -152,7 +209,7 @@ export default function AdminPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
-          <div className="text-center py-20 text-gray-400">{a("Загрузка...", "Loading...")}</div>
+          <div className="text-center py-20 text-gray-400">{u.loadingText}</div>
         ) : (
           <>
             {/* Hosts tab */}
@@ -161,27 +218,27 @@ export default function AdminPage() {
                 {pendingHosts.length > 0 && (
                   <div>
                     <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-                      <span className="w-2 h-2 bg-yellow-400 rounded-full" /> a("На проверке", "Pending") ({pendingHosts.length})
+                      <span className="w-2 h-2 bg-yellow-400 rounded-full" /> {u.pendingReviewAdmin} ({pendingHosts.length})
                     </h2>
                     <div className="space-y-3">
                       {pendingHosts.map((host) => (
-                        <HostRow key={host.id} host={host} updating={updating} onUpdate={updateHost} onLogAction={logAction} />
+                        <HostRow key={host.id} host={host} updating={updating} onUpdate={updateHost} onLogAction={logAction} lang={lang} />
                       ))}
                     </div>
                   </div>
                 )}
                 <div>
                   <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <span className="w-2 h-2 bg-green-400 rounded-full" /> a("Активные семьи", "Active families") ({activeHosts.length})
+                    <span className="w-2 h-2 bg-green-400 rounded-full" /> {u.activeFamilies} ({activeHosts.length})
                   </h2>
                   <div className="space-y-3">
                     {activeHosts.map((host) => (
-                      <HostRow key={host.id} host={host} updating={updating} onUpdate={updateHost} onLogAction={logAction} />
+                      <HostRow key={host.id} host={host} updating={updating} onUpdate={updateHost} onLogAction={logAction} lang={lang} />
                     ))}
                   </div>
                 </div>
                 {hosts.filter(h => h.status === "suspended").map((host) => (
-                  <HostRow key={host.id} host={host} updating={updating} onUpdate={updateHost} onLogAction={logAction} />
+                  <HostRow key={host.id} host={host} updating={updating} onUpdate={updateHost} onLogAction={logAction} lang={lang} />
                 ))}
               </div>
             )}
@@ -190,7 +247,7 @@ export default function AdminPage() {
             {tab === "bookings" && (
               <div className="space-y-3">
                 {bookings.length === 0 ? (
-                  <div className="text-center py-20 text-gray-400">{a("Нет бронирований", "No bookings")}</div>
+                  <div className="text-center py-20 text-gray-400">{u.noBookingsAdmin}</div>
                 ) : bookings.map((booking) => (
                   <div key={booking.id} className="bg-white rounded-xl shadow-sm p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -198,11 +255,11 @@ export default function AdminPage() {
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-semibold text-gray-900">{booking.guestName}</span>
                           <span className="text-gray-400 text-sm">· {booking.guestCountry}</span>
-                          <StatusBadge status={booking.status} />
+                          <StatusBadge status={booking.status} lang={lang} />
                         </div>
                         <p className="text-sm text-gray-600">
                           {booking.hostName} · {booking.checkIn} → {booking.checkOut}
-                          · {booking.guests} {a("гост.", "guests")} · <strong>${booking.totalPrice}</strong>
+                          · {booking.guests} {u.guestsLabel} · <strong>${booking.totalPrice}</strong>
                         </p>
                         {booking.message && (
                           <p className="text-xs text-gray-400 mt-1 italic">"{booking.message}"</p>
@@ -212,18 +269,18 @@ export default function AdminPage() {
                         <div className="flex gap-2">
                           <button onClick={() => updateBooking(booking.id, "confirmed")} disabled={updating === booking.id}
                             className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg font-medium hover:bg-green-600 disabled:opacity-50">
-                            <Check size={12} /> {a("Подтвердить", "Confirm")}
+                            <Check size={12} /> {u.confirmAction}
                           </button>
                           <button onClick={() => updateBooking(booking.id, "cancelled")} disabled={updating === booking.id}
                             className="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg font-medium hover:bg-red-600 disabled:opacity-50">
-                            <X size={12} /> {a("Отклонить", "Reject")}
+                            <X size={12} /> {u.reject}
                           </button>
                         </div>
                       )}
                       {booking.status === "confirmed" && (
                         <button onClick={() => updateBooking(booking.id, "completed")} disabled={updating === booking.id}
                           className="px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg font-medium hover:bg-blue-600 disabled:opacity-50">
-                          ✓ {a("Завершить", "Complete")}
+                          ✓ {u.completeBtn}
                         </button>
                       )}
                     </div>
@@ -232,20 +289,15 @@ export default function AdminPage() {
               </div>
             )}
 
-            {/* Stats tab */}
+            {/* Payouts tab */}
             {tab === "payouts" && (
               <div className="space-y-4">
                 {payouts.length === 0 ? (
-                  <div className="text-center py-20 text-gray-400">{a("Нет запросов на вывод", "No payout requests")}</div>
+                  <div className="text-center py-20 text-gray-400">{u.noPayoutRequests}</div>
                 ) : (
                   payouts.map((p: any) => {
                     const partner = p.hayhome_partners;
-                    const methodLabels: Record<string, string> = { idram: "Idram", bank_transfer: a("Банк", "Bank"), crypto: "Крипта" };
-                    const statusLabels: Record<string, Record<string, string>> = {
-                      pending: { ru: "Ожидает", en: "Pending" },
-                      confirmed: { ru: "Выплачен", en: "Paid" },
-                      rejected: { ru: "Отклонён", en: "Rejected" },
-                    };
+                    const methodLabels: Record<string, string> = { idram: u.idram, bank_transfer: u.bankTransfer, crypto: u.crypto };
                     return (
                       <div key={p.id} className="bg-white rounded-xl shadow-sm p-4">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -269,17 +321,17 @@ export default function AdminPage() {
                                 await load(); setPayoutLoading(false);
                               }} disabled={payoutLoading}
                                 className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg font-medium hover:bg-green-600 disabled:opacity-50">
-                                <Check size={12} /> {a("Выплатить", "Pay")}
+                                <Check size={12} /> {u.pay}
                               </button>
                               <button onClick={async () => {
-                                const reason = prompt(a("Причина отклонения (опционально):", "Rejection reason (optional):"));
+                                const reason = prompt(u.rejectionReason);
                                 if (reason === null) return;
                                 setPayoutLoading(true);
                                 await fetch("/api/partners/payout/", { method: "PATCH", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payoutId: p.id, decision: "rejected", reason }) });
                                 await load(); setPayoutLoading(false);
                               }} disabled={payoutLoading}
                                 className="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg font-medium hover:bg-red-600 disabled:opacity-50">
-                                <X size={12} /> {a("Отклонить", "Reject")}
+                                <X size={12} /> {u.reject}
                               </button>
                             </div>
                           )}
@@ -290,42 +342,44 @@ export default function AdminPage() {
                 )}
               </div>
             )}
+
+            {/* Users tab */}
             {tab === "users" && (
               <div className="space-y-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div className="flex gap-2 flex-wrap">
                     <select value={userFilter} onChange={(e) => setUserFilter(e.target.value)}
                       className="px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none">
-                      <option value="all">{a("Все", "All")} ({users.length})</option>
-                      <option value="guest">{a("Гости", "Guests")} ({users.filter(u => u.role === "guest").length})</option>
-                      <option value="host">{a("Хозяева", "Hosts")} ({users.filter(u => u.role === "host").length})</option>
-                      <option value="admin">Admin ({users.filter(u => u.role === "admin").length})</option>
+                      <option value="all">{u.allText} ({users.length})</option>
+                      <option value="guest">{u.guestsLabel} ({users.filter(usr => usr.role === "guest").length})</option>
+                      <option value="host">{u.hostsTab} ({users.filter(usr => usr.role === "host").length})</option>
+                      <option value="admin">Admin ({users.filter(usr => usr.role === "admin").length})</option>
                     </select>
-                    <input value={userSearch} onChange={(e) => setUserSearch(e.target.value)} placeholder={a("Поиск по имени или email...", "Search by name or email...")}
+                    <input value={userSearch} onChange={(e) => setUserSearch(e.target.value)} placeholder={u.searchByName}
                       className="px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none flex-1 min-w-0" />
                   </div>
                 </div>
                 {filteredUsers.length === 0 ? (
-                  <div className="text-center py-20 text-gray-400">{a("Нет пользователей", "No users")}</div>
+                  <div className="text-center py-20 text-gray-400">{u.noUsers}</div>
                 ) : (
                   <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead><tr className="bg-gray-50 text-left">
-                          <th className="px-4 py-3 font-medium text-gray-600">{a("Имя", "Name")}</th>
+                          <th className="px-4 py-3 font-medium text-gray-600">{u.nameLabel}</th>
                           <th className="px-4 py-3 font-medium text-gray-600">Email</th>
-                          <th className="px-4 py-3 font-medium text-gray-600">{a("Роль", "Role")}</th>
-                          <th className="px-4 py-3 font-medium text-gray-600">{a("Реферал", "Referral")}</th>
-                          <th className="px-4 py-3 font-medium text-gray-600">{a("Дата", "Date")}</th>
+                          <th className="px-4 py-3 font-medium text-gray-600">{u.roleLabel}</th>
+                          <th className="px-4 py-3 font-medium text-gray-600">{u.referral}</th>
+                          <th className="px-4 py-3 font-medium text-gray-600">{u.dateLabel}</th>
                         </tr></thead>
                         <tbody className="divide-y divide-gray-100">
-                          {filteredUsers.map((u: any) => (
-                            <tr key={u.id} className="hover:bg-gray-50">
-                              <td className="px-4 py-3 font-medium text-gray-900">{u.name}</td>
-                              <td className="px-4 py-3 text-gray-500">{u.email}</td>
-                              <td className="px-4 py-3"><span className={"text-xs rounded-full px-2 py-0.5 font-medium " + (u.role === "admin" ? "bg-purple-100 text-purple-700" : u.role === "host" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600")}>{u.role}</span></td>
-                              <td className="px-4 py-3 text-gray-400 text-xs">{u.referred_by_code || "—"}</td>
-                              <td className="px-4 py-3 text-gray-400 text-xs">{u.created_at?.slice(0, 10)}</td>
+                          {filteredUsers.map((usr: any) => (
+                            <tr key={usr.id} className="hover:bg-gray-50">
+                              <td className="px-4 py-3 font-medium text-gray-900">{usr.name}</td>
+                              <td className="px-4 py-3 text-gray-500">{usr.email}</td>
+                              <td className="px-4 py-3"><span className={"text-xs rounded-full px-2 py-0.5 font-medium " + (usr.role === "admin" ? "bg-purple-100 text-purple-700" : usr.role === "host" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600")}>{usr.role}</span></td>
+                              <td className="px-4 py-3 text-gray-400 text-xs">{usr.referred_by_code || "—"}</td>
+                              <td className="px-4 py-3 text-gray-400 text-xs">{usr.created_at?.slice(0, 10)}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -335,10 +389,12 @@ export default function AdminPage() {
                 )}
               </div>
             )}
+
+            {/* Stats tab */}
             {tab === "stats" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-white rounded-2xl shadow-sm p-6">
-                  <h3 className="font-bold text-gray-900 mb-4">Семьи по регионам</h3>
+                  <h3 className="font-bold text-gray-900 mb-4">{u.familiesByRegion}</h3>
                   {Object.entries(
                     hosts.reduce((acc: Record<string, number>, h) => {
                       acc[h.region] = (acc[h.region] || 0) + 1;
@@ -352,16 +408,17 @@ export default function AdminPage() {
                   ))}
                 </div>
                 <div className="bg-white rounded-2xl shadow-sm p-6">
-                  <h3 className="font-bold text-gray-900 mb-4">Бронирования по статусу</h3>
+                  <h3 className="font-bold text-gray-900 mb-4">{u.bookingsByStatus}</h3>
                   {(["pending", "confirmed", "completed", "cancelled"] as const).map((status) => (
                     <div key={status} className="flex items-center justify-between py-2 border-b border-gray-50">
-                      <StatusBadge status={status} />
+                      <StatusBadge status={status} lang={lang} />
                       <span className="font-bold text-gray-900">{bookings.filter(b => b.status === status).length}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
+
             {/* Calendar tab */}
             {tab === "calendar" && calHostId && (
               <AdminCalendarView
@@ -377,6 +434,11 @@ export default function AdminPage() {
                 a={a}
               />
             )}
+
+            {/* Services tab */}
+            {tab === "services" && (
+              <AdminServicesTab lang={lang} />
+            )}
           </>
         )}
       </div>
@@ -384,14 +446,14 @@ export default function AdminPage() {
   );
 }
 
-function HostRow({ host, updating, onUpdate, onLogAction }: {
+function HostRow({ host, updating, onUpdate, onLogAction, lang }: {
   host: Host;
   updating: string | null;
   onUpdate: (id: string, updates: Partial<Host>) => void;
   onLogAction: (id: string, action: string, note?: string) => void;
+  lang: LangCode;
 }) {
-  const { lang } = useLang();
-  const a = (ru: string, en: string) => lang === "ru" ? ru : en;
+  const u = getUI(lang);
   const [note, setNote] = useState("");
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
@@ -412,15 +474,6 @@ function HostRow({ host, updating, onUpdate, onLogAction }: {
     setSavingNote(false);
   };
 
-  const actionLabels: Record<string, Record<string, string>> = {
-    submitted: { ru: "Заявка подана", en: "Application submitted" },
-    approved: { ru: "Одобрена", en: "Approved" },
-    rejected: { ru: "Отклонена", en: "Rejected" },
-    suspended: { ru: "Приостановлена", en: "Suspended" },
-    restored: { ru: "Восстановлена", en: "Restored" },
-    note_added: { ru: "Заметка", en: "Note" },
-  };
-
   return (
     <div className="bg-white rounded-xl shadow-sm p-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -428,12 +481,16 @@ function HostRow({ host, updating, onUpdate, onLogAction }: {
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="font-semibold text-gray-900">{host.familyName}</span>
             <span className="text-gray-400 text-sm">· {host.city}, {host.region}</span>
-            {host.verified && <span className="text-xs text-green-600 font-medium">✓ {a("Верифицировано", "Verified")}</span>}
-            <StatusBadgeHost status={host.status} />
+            {host.verified && <span className="text-xs text-green-600 font-medium">✓ {getUI(lang).activeStatus}</span>}
+            <span className={`text-xs rounded-full px-2 py-0.5 font-medium ${
+              host.status === "active" ? "bg-green-100 text-green-700" :
+              host.status === "pending" ? "bg-yellow-100 text-yellow-700" :
+              "bg-red-100 text-red-700"
+            }`}>{HOST_STATUS_LABELS[host.status]?.[lang] || HOST_STATUS_LABELS[host.status]?.en || host.status}</span>
           </div>
           <p className="text-sm text-gray-600">{host.description}</p>
           <p className="text-xs text-gray-400 mt-1">
-            {host.phone} · {host.email} · {"★".repeat(host.stars)} · ${host.pricePerNight}{a("/ночь", "/night")}
+            {host.phone} · {host.email} · {"★".repeat(host.stars)} · ${host.pricePerNight}{"/night"}
           </p>
           {host.admin_notes && (
             <p className="text-xs text-amber-600 mt-1 bg-amber-50 rounded px-2 py-1">📝 {host.admin_notes}</p>
@@ -444,11 +501,11 @@ function HostRow({ host, updating, onUpdate, onLogAction }: {
             <>
               <button onClick={() => { onUpdate(host.id, { status: "active", verified: true }); onLogAction(host.id, "approved"); }} disabled={updating === host.id}
                 className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg font-medium hover:bg-green-600 disabled:opacity-50">
-                <Check size={12} /> {a("Одобрить", "Approve")}
+                <Check size={12} /> {u.approve}
               </button>
               <button onClick={() => { onUpdate(host.id, { status: "suspended" }); onLogAction(host.id, "rejected"); }} disabled={updating === host.id}
                 className="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg font-medium hover:bg-red-600 disabled:opacity-50">
-                <X size={12} /> {a("Отклонить", "Reject")}
+                <X size={12} /> {u.reject}
               </button>
             </>
           )}
@@ -463,14 +520,14 @@ function HostRow({ host, updating, onUpdate, onLogAction }: {
               </div>
               <button onClick={() => { onUpdate(host.id, { status: "suspended" }); onLogAction(host.id, "suspended"); }} disabled={updating === host.id}
                 className="px-3 py-1.5 bg-gray-200 text-gray-700 text-xs rounded-lg font-medium hover:bg-gray-300 disabled:opacity-50">
-                {a("Приостановить", "Suspend")}
+                {u.suspend}
               </button>
             </>
           )}
           {host.status === "suspended" && (
             <button onClick={() => { onUpdate(host.id, { status: "active" }); onLogAction(host.id, "restored"); }} disabled={updating === host.id}
               className="px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg font-medium hover:bg-blue-600 disabled:opacity-50">
-              {a("Восстановить", "Restore")}
+              {u.restore}
             </button>
           )}
         </div>
@@ -479,26 +536,26 @@ function HostRow({ host, updating, onUpdate, onLogAction }: {
       <div className="mt-3 pt-3 border-t border-gray-100">
         <div className="flex gap-2">
           <input value={note} onChange={(e) => setNote(e.target.value)} onKeyDown={(e) => e.key === "Enter" && saveNote()}
-            placeholder={a("Добавить заметку...", "Add note...")}
+            placeholder={u.addNote}
             className="flex-1 px-3 py-1.5 text-xs border border-gray-200 rounded-lg outline-none focus:border-red-400" />
           <button onClick={saveNote} disabled={savingNote || !note.trim()}
             className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs rounded-lg hover:bg-gray-200 disabled:opacity-50">
-            {savingNote ? "..." : a("Сохранить", "Save")}
+            {savingNote ? "..." : u.save}
           </button>
           <button onClick={loadHistory}
             className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs rounded-lg hover:bg-gray-200">
-            {a("История", "History")}
+            {u.history}
           </button>
         </div>
         {showHistory && (
           <div className="mt-2 max-h-40 overflow-y-auto">
             {history.length === 0 ? (
-              <p className="text-xs text-gray-400">{a("Нет записей", "No records")}</p>
+              <p className="text-xs text-gray-400">{u.noRecords}</p>
             ) : (
               history.map((h: any) => (
                 <div key={h.id} className="text-xs text-gray-500 py-1 border-b border-gray-50">
                   <span className="text-gray-400">{h.created_at?.slice(0, 16)}</span>{" "}
-                  <span className="font-medium text-gray-700">{actionLabels[h.action]?.[lang] || actionLabels[h.action]?.en || h.action}</span>
+                  <span className="font-medium text-gray-700">{ACTION_LABELS[h.action]?.[lang] || ACTION_LABELS[h.action]?.en || h.action}</span>
                   {h.note && <span className="text-gray-500"> — {h.note}</span>}
                 </div>
               ))
@@ -510,27 +567,127 @@ function HostRow({ host, updating, onUpdate, onLogAction }: {
   );
 }
 
-function StatusBadge({ status }: { status: Booking["status"] }) {
-  const { lang } = useLang();
+function StatusBadge({ status, lang }: { status: Booking["status"]; lang: string }) {
   const map = {
     pending: "bg-yellow-100 text-yellow-700",
     confirmed: "bg-blue-100 text-blue-700",
     completed: "bg-green-100 text-green-700",
     cancelled: "bg-red-100 text-red-700",
   };
-  const labels: Record<string, Record<string, string>> = { pending: { ru: "Ожидает", en: "Pending" }, confirmed: { ru: "Подтверждено", en: "Confirmed" }, completed: { ru: "Завершено", en: "Completed" }, cancelled: { ru: "Отменено", en: "Cancelled" } };
-  return <span className={`text-xs rounded-full px-2 py-0.5 font-medium ${map[status]}`}>{labels[status]?.[lang] || labels[status]?.en || status}</span>;
-}
-
-function StatusBadgeHost({ status }: { status: Host["status"] }) {
-  const { lang } = useLang();
-  const map = { active: "bg-green-100 text-green-700", pending: "bg-yellow-100 text-yellow-700", suspended: "bg-red-100 text-red-700" };
-  const labels: Record<string, Record<string, string>> = { active: { ru: "Активен", en: "Active" }, pending: { ru: "На проверке", en: "Pending" }, suspended: { ru: "Приостановлен", en: "Suspended" } };
+  const labels = STATUS_LABELS;
   return <span className={`text-xs rounded-full px-2 py-0.5 font-medium ${map[status]}`}>{labels[status]?.[lang] || labels[status]?.en || status}</span>;
 }
 
 function PayoutBadge({ status, lang }: { status: string; lang: string }) {
   const map: Record<string, string> = { pending: "bg-yellow-100 text-yellow-700", confirmed: "bg-green-100 text-green-700", rejected: "bg-red-100 text-red-700" };
-  const labels: Record<string, Record<string, string>> = { pending: { ru: "Ожидает", en: "Pending" }, confirmed: { ru: "Выплачен", en: "Paid" }, rejected: { ru: "Отклонён", en: "Rejected" } };
+  const labels = PAYOUT_STATUS_LABELS;
   return <span className={"text-xs rounded-full px-2 py-0.5 font-medium " + (map[status] || "")}>{labels[status]?.[lang] || labels[status]?.en || status}</span>;
+}
+
+// ── Admin Services Tab ──
+function AdminServicesTab({ lang }: { lang: LangCode }) {
+  const u = getUI(lang);
+  const [services, setServices] = useState<any[]>([]);
+  const [svcBookings, setSvcBookings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    setLoading(true);
+    const [svcRes, ordRes] = await Promise.all([
+      fetch("/api/services?provider=all", { credentials: "include" }).then((r) => r.json()).catch(() => []),
+      fetch("/api/service-bookings", { credentials: "include" }).then((r) => r.json()).catch(() => []),
+    ]);
+    setServices(Array.isArray(svcRes) ? svcRes : []);
+    setSvcBookings(Array.isArray(ordRes) ? ordRes : []);
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const catIcons: Record<string, string> = {
+    photo: "📸", video: "🎥", music: "🎵", costume: "👗", decor: "🎨", dance: "💃", guide: "🗺️", chef: "👨‍🍳", custom: "✨",
+  };
+
+  if (loading) return <div className="text-center py-12 text-gray-400">{u.loadingText}</div>;
+
+  return (
+    <div className="space-y-6">
+      {/* All services */}
+      <div>
+        <h2 className="text-lg font-bold text-gray-900 mb-3">{u.allServices} ({services.length})</h2>
+        {services.length === 0 ? (
+          <p className="text-gray-400 text-sm">{u.noServicesAdmin}</p>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+                <tr>
+                  <th className="text-left px-4 py-3">{u.serviceName}</th>
+                  <th className="text-left px-4 py-3">{u.categoryLabel}</th>
+                  <th className="text-left px-4 py-3">Region</th>
+                  <th className="text-left px-4 py-3">{u.priceLabel}</th>
+                  <th className="text-left px-4 py-3">{u.serviceStatusLabel}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {services.map((svc: any) => (
+                  <tr key={svc.id}>
+                    <td className="px-4 py-3 font-medium text-gray-900">{svc.title}</td>
+                    <td className="px-4 py-3">{catIcons[svc.category] || "✨"} {svc.category}</td>
+                    <td className="px-4 py-3 text-gray-600">{svc.region}</td>
+                    <td className="px-4 py-3 font-semibold">${svc.price}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${svc.available ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                        {svc.available ? u.activeStatus : u.hiddenStatus}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Service bookings */}
+      <div>
+        <h2 className="text-lg font-bold text-gray-900 mb-3">{u.serviceOrders} ({svcBookings.length})</h2>
+        {svcBookings.length === 0 ? (
+          <p className="text-gray-400 text-sm">{u.noOrdersAdmin}</p>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+                <tr>
+                  <th className="text-left px-4 py-3">{u.serviceName}</th>
+                  <th className="text-left px-4 py-3">{u.dateLabel}</th>
+                  <th className="text-left px-4 py-3">Time</th>
+                  <th className="text-left px-4 py-3">{u.priceLabel}</th>
+                  <th className="text-left px-4 py-3">{u.serviceStatusLabel}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {svcBookings.map((sb: any) => (
+                  <tr key={sb.id}>
+                    <td className="px-4 py-3 font-medium text-gray-900">{sb.service?.title || "—"}</td>
+                    <td className="px-4 py-3 text-gray-600">{sb.date}</td>
+                    <td className="px-4 py-3 text-gray-600">{sb.start_time}–{sb.end_time}</td>
+                    <td className="px-4 py-3 font-semibold">${sb.total_price}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                        sb.status === "confirmed" ? "bg-green-100 text-green-700" :
+                        sb.status === "cancelled" ? "bg-red-100 text-red-600" :
+                        sb.status === "completed" ? "bg-blue-100 text-blue-700" :
+                        "bg-yellow-100 text-yellow-700"
+                      }`}>{sb.status}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

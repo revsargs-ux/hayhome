@@ -1,11 +1,13 @@
 "use client";
 import Link from "next/link";
 import { useLang } from "@/contexts/LanguageContext";
+import getUI from "@/lib/ui";
 
 export default function Footer() {
-  const { tr } = useLang();
+  const { tr, lang } = useLang();
   const n = tr.nav;
   const h = tr.home;
+  const u = getUI(lang);
 
   return (
     <footer className="bg-gray-950 text-gray-400 mt-auto">
@@ -17,7 +19,7 @@ export default function Footer() {
             Bari Ekeq!
           </h3>
           <p className="text-white/50 text-lg mb-8 max-w-xl mx-auto">
-            Armenia is waiting for you — not in a hotel, but at home.
+            {u.footerTagline}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/hosts"
@@ -59,7 +61,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm text-gray-500 leading-relaxed">
-              🇦🇲 Armenian hospitality platform.
+              {u.armenianPlatform}
             </p>
             <a href="mailto:info@hayhome.am" className="text-sm text-gray-400 hover:text-white transition-colors mt-2 inline-block">
               ✉️ info@hayhome.am
@@ -100,7 +102,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/5 mt-8 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-gray-600">© 2025 HayHome. Made with ❤️ in Armenia.</p>
+          <p className="text-xs text-gray-600">© 2025 HayHome. {u.madeInArmenia}</p>
           <div className="flex items-center gap-4 text-xs text-gray-600">
             <Link href="/terms" className="hover:text-gray-400 transition-colors">{tr.legal?.terms || "Terms"}</Link>
             <Link href="/privacy" className="hover:text-gray-400 transition-colors">{tr.legal?.privacy || "Privacy"}</Link>

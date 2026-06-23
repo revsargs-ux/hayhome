@@ -121,7 +121,7 @@ function HostsContent() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
-                  {lang === "ru" ? "Опыт / Впечатление" : lang === "hy" ? "Փորձ / Տպավորություն" : lang === "fr" ? "Expérience" : lang === "de" ? "Erlebnis" : lang === "es" ? "Experiencia" : lang === "ar" ? "تجربة" : lang === "zh" ? "体验" : "Experience"}
+                  {lang === "ru" ? "Опыт / Впечатление" : lang === "hy" ? "Փորձ / Տպավորություն" : lang === "fr" ? "Expérience" : lang === "de" ? "Erlebnis" : lang === "es" ? "Experiencia" : lang === "it" ? "Esperienza" : lang === "ar" ? "تجربة" : lang === "zh" ? "体验" : lang === "fa" ? "تجربه" : "Experience"}
                 </label>
                 <input type="text" value={experience}
                   onChange={(e) => setExperience(e.target.value)}

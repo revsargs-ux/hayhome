@@ -5,13 +5,15 @@ import { Menu, X, Home, Search, Heart, User, LogOut, Shield } from "lucide-react
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import LanguageSwitcher from "./LanguageSwitcher";
+import getUI from "@/lib/ui";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const { tr } = useLang();
+  const { tr, lang } = useLang();
   const { user, logout } = useAuth();
   const n = tr.nav;
+  const u = getUI(lang);
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -36,6 +38,9 @@ export default function Header() {
             </Link>
             <Link href="/about" className="text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
               {n.about}
+            </Link>
+            <Link href="/services" className="flex items-center gap-1.5 text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
+              ✨ {u.services}
             </Link>
           </nav>
 
@@ -65,18 +70,25 @@ export default function Header() {
                     <Link href="/dashboard"
                       className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
                       onClick={() => setUserMenuOpen(false)}>
-                      <User size={14} /> Dashboard
+                      <User size={14} /> {u.dashboard}
                     </Link>
                     <Link href="/partner"
                       className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
                       onClick={() => setUserMenuOpen(false)}>
                       🤝 {n.partner || "Партнёры"}
                     </Link>
+                    {user.role === "provider" && (
+                      <Link href="/provider/dashboard"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => setUserMenuOpen(false)}>
+                        🔧 {u.provider}
+                      </Link>
+                    )}
                     {user.role === "admin" && (
                       <Link href="/admin"
                         className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
                         onClick={() => setUserMenuOpen(false)}>
-                        <Shield size={14} /> Admin Panel
+                        <Shield size={14} /> {u.adminPanel}
                       </Link>
                     )}
                     <button
@@ -141,6 +153,9 @@ export default function Header() {
           <Link href="/about" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
             <Heart size={18} /> {n.about}
           </Link>
+          <Link href="/services" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
+            ✨ {u.services}
+          </Link>
           {user && (
             <Link href="/partner" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
               🤝 {n.partner || "Партнёры"}
@@ -150,7 +165,7 @@ export default function Header() {
             {user ? (
               <>
                 <Link href="/dashboard" className="text-center py-2 border border-gray-300 rounded-full text-gray-700 font-medium" onClick={() => setOpen(false)}>
-                  Dashboard
+                  {u.dashboard}
                 </Link>
                 <button onClick={() => { setOpen(false); logout(); }} className="py-2 rounded-full text-red-600 border border-red-200 font-medium">
                   {n.logout}

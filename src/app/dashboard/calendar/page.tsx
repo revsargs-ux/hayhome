@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Host } from "@/lib/types";
 import { useLang } from "@/contexts/LanguageContext";
+import getUI from "@/lib/ui";
 import { useAuth } from "@/contexts/AuthContext";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
@@ -51,6 +52,7 @@ function formatDate(d: Date): string {
 
 export default function HostCalendarPage() {
   const { tr, lang } = useLang();
+  const u = getUI(lang);
   const h = tr.hosts;
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -205,7 +207,7 @@ export default function HostCalendarPage() {
             <p className="text-gray-500 text-sm">{myProfile.familyName}</p>
           </div>
           <a href="/dashboard" className="text-sm text-gray-500 hover:text-gray-900 flex items-center gap-1">
-            <ChevronLeft size={16} /> {lang === "ru" ? "Назад" : "Back"}
+            <ChevronLeft size={16} /> {u.backBtn}
           </a>
         </div>
 
@@ -303,15 +305,15 @@ export default function HostCalendarPage() {
               </div>
               {booking ? (
                 <div className="space-y-2 text-sm">
-                  <div><span className="text-gray-500">{lang === "ru" ? "Гость" : "Guest"}:</span> <span className="font-semibold">{booking.guestName}</span></div>
-                  <div><span className="text-gray-500">{lang === "ru" ? "Заезд" : "Check-in"}:</span> {booking.checkIn}</div>
-                  <div><span className="text-gray-500">{lang === "ru" ? "Выезд" : "Check-out"}:</span> {booking.checkOut}</div>
-                  <div><span className="text-gray-500">{lang === "ru" ? "Гостей" : "Guests"}:</span> {booking.guests}</div>
-                  <div><span className="text-gray-500">{lang === "ru" ? "Сумма" : "Total"}:</span> ${booking.totalPrice}</div>
-                  <div><span className="text-gray-500">{lang === "ru" ? "Статус" : "Status"}:</span> {booking.status}</div>
+                  <div><span className="text-gray-500">u.nameLabel:</span> <span className="font-semibold">{booking.guestName}</span></div>
+                  <div><span className="text-gray-500">"Check-in":</span> {booking.checkIn}</div>
+                  <div><span className="text-gray-500">"Check-out":</span> {booking.checkOut}</div>
+                  <div><span className="text-gray-500">u.guestsLabel:</span> {booking.guests}</div>
+                  <div><span className="text-gray-500">u.priceLabel:</span> ${booking.totalPrice}</div>
+                  <div><span className="text-gray-500">u.statusLabel:</span> {booking.status}</div>
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">{lang === "ru" ? "Нет информации о бронировании" : "No booking info"}</p>
+                <p className="text-sm text-gray-500">u.noData</p>
               )}
             </div>
           </div>

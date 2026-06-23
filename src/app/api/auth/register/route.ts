@@ -29,8 +29,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Password too short (min 6)" }, { status: 400 });
   }
 
-  // CRITICAL FIX: never allow "admin" role from public registration
-  const safeRole = role === "host" ? "host" : "guest";
+  // Allow "host" and "provider" roles, block "admin"
+  const safeRole = role === "host" ? "host" : role === "provider" ? "provider" : "guest";
 
   const existing = await getUserByEmail(email);
   if (existing) {

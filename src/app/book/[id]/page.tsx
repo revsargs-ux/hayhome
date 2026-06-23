@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Host } from "@/lib/types";
 import { ChevronLeft, Star, Check, ChevronRight, Navigation, MapPin } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
+import getUI from "@/lib/ui";
 import { useAuth } from "@/contexts/AuthContext";
 import { getLocalizedField } from "@/lib/i18n-utils";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
@@ -19,6 +20,7 @@ export default function BookPage() {
   const params = useParams();
   const router = useRouter();
   const { tr, lang } = useLang();
+  const u = getUI(lang);
   const { user } = useAuth();
   const id = params.id as string;
 
@@ -164,7 +166,7 @@ export default function BookPage() {
     e.preventDefault();
     if (!host) return;
     if (!user) { setAuthRequired(true); return; }
-    if (nights < 1) { setError(lang === "ru" ? "Выберите корректные даты" : "Please select valid dates"); return; }
+    if (nights < 1) { setError(lang === "ru" ? "Выберите корректные даты" : lang === "hy" ? "Ընտրեք ճիշտ ամսաթվեր" : "Please select valid dates"); return; }
     setLoading(true);
     setError("");
     try {
@@ -184,9 +186,9 @@ export default function BookPage() {
     } catch (e) {
       const msg = e instanceof Error ? e.message : undefined;
       if (msg === "Some dates are not available") {
-        setError(lang === "ru" ? "Выбранные даты недоступны. Пожалуйста, выберите другие даты." : "Selected dates are not available. Please choose different dates.");
+        setError(lang === "ru" ? "Выбранные даты недоступны." : lang === "hy" ? "Ընտրված ամսաթվերը հասանելի չեն։" : "Selected dates are not available.");
       } else {
-        setError(lang === "ru" ? "Ошибка отправки. Попробуйте ещё раз." : "Submission error. Please try again.");
+        setError(lang === "ru" ? "Ошибка отправки." : lang === "hy" ? "Ուղարկման սխալ։" : "Submission error.");
       }
     } finally {
       setLoading(false);
@@ -233,10 +235,10 @@ export default function BookPage() {
       <div className="bg-white rounded-2xl shadow-sm p-8 max-w-sm w-full text-center">
         <div className="text-5xl mb-4">🔐</div>
         <h2 className="text-xl font-bold text-gray-900 mb-3">
-          {lang === "ru" ? "Для бронирования нужно войти" : "Login required to book"}
+          lang === "ru" ? "Для бронирования нужно войти" : lang === "hy" ? "Ամրագրելու համար մուտք գործեք" : "Login required to book"
         </h2>
         <p className="text-gray-500 mb-6 text-sm">
-          {lang === "ru" ? "Создайте аккаунт или войдите, чтобы забронировать визит" : "Create an account or log in to book a visit"}
+          lang === "ru" ? "Создайте аккаунт или войдите" : lang === "hy" ? "Ստեղծեք հաշիվ կամ մուտք գործեք" : "Create an account or log in"
         </p>
         <div className="flex flex-col gap-3">
           <Link href={`/login?redirect=/book/${id}`}
@@ -270,7 +272,7 @@ export default function BookPage() {
         <div className="flex flex-col gap-3">
           <Link href="/dashboard" className="block w-full py-3 rounded-full text-white font-semibold text-center"
             style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-            {lang === "ru" ? "Мои бронирования" : lang === "hy" ? "Իմ ամրագրումները" : lang === "fr" ? "Mes réservations" : lang === "de" ? "Meine Buchungen" : lang === "es" ? "Mis reservas" : lang === "ar" ? "حجوزاتي" : lang === "zh" ? "我的预订" : "My bookings"}
+            lang === "ru" ? "Мои бронирования" : lang === "hy" ? "Իմ ամրագրումները" : lang === "fr" ? "Mes réservations" : lang === "de" ? "Meine Buchungen" : lang === "es" ? "Mis reservas" : lang === "it" ? "Le mie prenotazioni" : lang === "ar" ? "حجوزاتي" : lang === "zh" ? "我的预订" : lang === "fa" ? "رزروهای من" : "My bookings"
           </Link>
           <Link href="/hosts" className="block w-full py-3 rounded-full text-center font-semibold border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition">
             {t("moreFamilies")}
@@ -294,7 +296,7 @@ export default function BookPage() {
               <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("title")}</h1>
               {draftRestored && (
                 <div className="mb-4 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700 flex items-center gap-2">
-                  <span>💾</span> {lang === "ru" ? "Восстановлены данные предыдущего бронирования" : "Previous booking data restored"}
+                  <span>💾</span> lang === "ru" ? "Восстановлены данные предыдущего бронирования" : lang === "hy" ? "Վերականգնվել են նախորդ ամրագրման տվյալները" : lang === "fr" ? "Données précédentes restaurées" : lang === "de" ? "Vorherige Buchungsdaten wiederhergestellt" : lang === "es" ? "Datos de reserva anteriores restaurados" : lang === "it" ? "Dati prenotazione precedente ripristinati" : lang === "ar" ? "تمت استعادة بيانات الحجز السابق" : lang === "zh" ? "已恢复之前的预订数据" : lang === "fa" ? "اطلاعات رزرو قبلی بازیابی شد" : "Previous booking data restored"
                 </div>
               )}
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -435,6 +437,19 @@ export default function BookPage() {
             </div>
           </div>
         </div>
+
+        {/* Additional Services Section */}
+        {form.checkIn && form.checkOut && (
+          <div className="mt-8">
+            <AdditionalServicesSection
+              hostRegion={host.region}
+              checkIn={form.checkIn}
+              checkOut={form.checkOut}
+              guests={form.guests}
+              lang={lang}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -514,10 +529,149 @@ function MiniCalendar({ year, month, calendarData, checkIn, checkOut, lang, dayL
         </div>
       ))}
       <div className="flex items-center justify-center gap-3 mt-2 text-[10px] text-gray-400">
-        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-green-100" /> {lang === "ru" ? "Свободно" : "Available"}</div>
-        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-gray-200" /> {lang === "ru" ? "Занято" : "Taken"}</div>
-        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-yellow-200" /> {lang === "ru" ? "Выбрано" : "Selected"}</div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-green-100" /> lang === "ru" ? "Свободно" : lang === "hy" ? "Հասանելի" : lang === "fr" ? "Disponible" : lang === "de" ? "Verfügbar" : lang === "es" ? "Disponible" : lang === "it" ? "Disponibile" : lang === "ar" ? "متاح" : lang === "zh" ? "可预订" : lang === "fa" ? "در دسترس" : "Available"</div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-gray-200" /> lang === "ru" ? "Занято" : lang === "hy" ? "Զբաղված" : lang === "fr" ? "Pris" : lang === "de" ? "Belegt" : lang === "es" ? "Ocupado" : lang === "it" ? "Occupato" : lang === "ar" ? "محجوز" : lang === "zh" ? "已订" : lang === "fa" ? "اشغال" : "Booked"</div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-yellow-200" /> lang === "ru" ? "Выбрано" : lang === "hy" ? "Ընտրված" : lang === "fr" ? "Sélectionné" : lang === "de" ? "Gewählt" : lang === "es" ? "Seleccionado" : lang === "it" ? "Selezionato" : lang === "ar" ? "محدد" : lang === "zh" ? "已选" : lang === "fa" ? "انتخاب شده" : "Selected"</div>
       </div>
+    </div>
+  );
+}
+
+// ── Additional Services Section ──
+import type { Service } from "@/lib/types";
+
+const SVC_CATEGORIES = [
+  { key: "photo", icon: "📸" },
+  { key: "video", icon: "🎥" },
+  { key: "music", icon: "🎵" },
+  { key: "costume", icon: "👗" },
+  { key: "decor", icon: "🎨" },
+  { key: "dance", icon: "💃" },
+  { key: "guide", icon: "🗺️" },
+  { key: "chef", icon: "👨‍🍳" },
+];
+
+function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang }: {
+  hostRegion: string;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  lang: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [activeCat, setActiveCat] = useState<string>("");
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState<{ service: Service; date: string; startTime: string; endTime: string }[]>([]);
+
+  const fetchServices = async (cat: string) => {
+    setLoading(true);
+    const res = await fetch(`/api/services?category=${cat}&region=${encodeURIComponent(hostRegion)}`);
+    const data = await res.json();
+    setServices(Array.isArray(data) ? data : []);
+    setLoading(false);
+  };
+
+  const onCatClick = (cat: string) => {
+    setActiveCat(cat);
+    fetchServices(cat);
+  };
+
+  const addToSelected = (svc: Service) => {
+    setSelected((prev) => [...prev, { service: svc, date: checkIn, startTime: "10:00", endTime: "12:00" }]);
+  };
+
+  const removeFromSelected = (idx: number) => {
+    setSelected((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const calcTotal = (svc: Service) => {
+    if (svc.price_unit === "per_person") return svc.price * guests;
+    if (svc.price_unit === "per_hour") return svc.price * 2; // default 2h
+    return svc.price;
+  };
+
+  const totalExtra = selected.reduce((sum, s) => sum + calcTotal(s.service), 0);
+
+  const titleText = lang === "ru" ? "🎯 Улучшите ваш визит" : lang === "hy" ? "🎯 Բարելավեք ձեր այցը" : lang === "fr" ? "🎯 Améliorez votre visite" : lang === "de" ? "🎯 Verbessern Sie Ihren Besuch" : lang === "es" ? "🎯 Mejora tu visita" : lang === "it" ? "🎯 Migliora la tua visita" : lang === "ar" ? "🎯 حسّن زيارتك" : lang === "zh" ? "🎯 提升您的体验" : lang === "fa" ? "🎯 بازدید خود را بهبود بخشید" : "🎯 Enhance your visit";
+  const btnText = lang === "ru" ? "Добавить услуги" : lang === "hy" ? "Ծառայություններ ավելացնել" : lang === "fr" ? "Ajouter des services" : lang === "de" ? "Dienste hinzufügen" : lang === "es" ? "Añadir servicios" : lang === "it" ? "Aggiungi servizi" : lang === "ar" ? "إضافة خدمات" : lang === "zh" ? "添加服务" : lang === "fa" ? "افزودن خدمات" : "Add services";
+  const totalText = lang === "ru" ? "Дополнительно" : lang === "hy" ? "Լրացուցիչ" : lang === "fr" ? "Supplément" : lang === "de" ? "Zusätzlich" : lang === "es" ? "Adicional" : lang === "it" ? "Extra" : lang === "ar" ? "إضافي" : lang === "zh" ? "额外" : lang === "fa" ? "اضافی" : "Extra";
+  const noneText = lang === "ru" ? "Нет услуг в этой категории" : lang === "hy" ? "Այս կատեգորիայում ծառայություններ չկան" : lang === "fr" ? "Aucun service dans cette catégorie" : lang === "de" ? "Keine Dienste in dieser Kategorie" : lang === "es" ? "Sin servicios en esta categoría" : lang === "it" ? "Nessun servizio in questa categoria" : lang === "ar" ? "لا خدمات في هذه الفئة" : lang === "zh" ? "此类别无服务" : lang === "fa" ? "خدماتی در این دسته وجود ندارد" : "No services in this category";
+  const addText = lang === "ru" ? "Добавить" : lang === "hy" ? "Ավելացնել" : lang === "fr" ? "Ajouter" : lang === "de" ? "Hinzufügen" : lang === "es" ? "Añadir" : lang === "it" ? "Aggiungi" : lang === "ar" ? "إضافة" : lang === "zh" ? "添加" : lang === "fa" ? "افزودن" : "Add";
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-5">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-lg font-bold text-gray-900">{titleText}</h3>
+        {totalExtra > 0 && (
+          <span className="px-3 py-1 rounded-full bg-orange-50 text-orange-700 text-sm font-bold">{totalText}: ${totalExtra}</span>
+        )}
+      </div>
+
+      {!expanded ? (
+        <button onClick={() => setExpanded(true)}
+          className="px-4 py-2.5 rounded-full border-2 border-orange-300 text-orange-600 text-sm font-semibold hover:bg-orange-50 transition">
+          ✨ {btnText}
+        </button>
+      ) : (
+        <div>
+          {/* Category icons */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {SVC_CATEGORIES.map((c) => (
+              <button key={c.key} onClick={() => onCatClick(c.key)}
+                className={`px-3 py-2 rounded-full text-sm font-medium transition ${activeCat === c.key ? "text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                style={activeCat === c.key ? { background: "linear-gradient(135deg, #C45D3E, #D4A04A)" } : {}}
+              >
+                {c.icon}
+              </button>
+            ))}
+          </div>
+
+          {/* Services in category */}
+          {loading && (
+            <div className="flex justify-center py-4">
+              <div className="w-6 h-6 border-2 border-orange-200 border-t-orange-600 rounded-full animate-spin" />
+            </div>
+          )}
+
+          {!loading && activeCat && services.length === 0 && (
+            <p className="text-gray-400 text-sm text-center py-4">{noneText}</p>
+          )}
+
+          {!loading && services.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+              {services.map((svc) => (
+                <div key={svc.id} className="border border-gray-100 rounded-xl p-3 flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-gray-900 truncate">{svc.title}</p>
+                    <p className="text-xs text-gray-500">${svc.price} · {svc.price_unit}</p>
+                  </div>
+                  <button onClick={() => addToSelected(svc)}
+                    className="ml-2 px-3 py-1.5 rounded-full text-white text-xs font-semibold flex-shrink-0"
+                    style={{ background: "linear-gradient(135deg, #C45D3E, #D4A04A)" }}
+                  >{addText}</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Selected services */}
+          {selected.length > 0 && (
+            <div className="border-t border-gray-100 pt-3 space-y-2">
+              {selected.map((s, idx) => (
+                <div key={idx} className="flex items-center justify-between bg-orange-50/50 rounded-lg px-3 py-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">{s.service.title}</p>
+                    <p className="text-xs text-gray-500">${calcTotal(s.service)} · {s.date}</p>
+                  </div>
+                  <button onClick={() => removeFromSelected(idx)}
+                    className="text-red-400 hover:text-red-600 text-xs ml-2 flex-shrink-0">✕</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
