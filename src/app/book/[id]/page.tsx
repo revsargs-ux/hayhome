@@ -13,6 +13,7 @@ import type { NominatimResult } from "@/components/AddressAutocomplete";
 import dynamic from "next/dynamic";
 import NavigatorLinks from "@/components/NavigatorLinks";
 import { getCityCoords } from "@/components/Map";
+import { reverseGeocode } from "@/lib/geo";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false });
 
@@ -35,6 +36,10 @@ export default function BookPage() {
     guestCountry: "", checkIn: "", checkOut: "", guests: 1, message: "",
   });
   const [draftRestored, setDraftRestored] = useState(false);
+
+  // Detected city from geolocation
+  const [detectedCity, setDetectedCity] = useState("");
+  const [detectedRegion, setDetectedRegion] = useState("");
 
   // Route / geolocation state
   const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(null);
@@ -154,6 +159,24 @@ export default function BookPage() {
       }));
     }
   }, [user]);
+
+  // Auto-detect city from geolocation on mount
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const geo = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+          if (geo.city) {
+            setDetectedCity(geo.city);
+            setDetectedRegion(geo.region);
+          }
+        } catch {}
+      },
+      () => {},
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  }, []);
 
   const nights = (() => {
     if (!form.checkIn || !form.checkOut) return 0;
@@ -378,6 +401,14 @@ export default function BookPage() {
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
                   <p className="text-xs text-gray-400 mt-1">{t("maxGuests")}: {host.maxGuests} {tr.hosts.guests}</p>
                 </div>
+
+                {/* Detected city display */}
+                {detectedCity && (
+                  <div className="px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700 flex items-center gap-2">
+                    <span>📍</span>
+                    <span>{lang === "ru" ? "Ваш город:" : lang === "hy" ? "Ձեր քաղաքը՝" : lang === "fr" ? "Votre ville:" : "Your city:"} <strong>{detectedCity}</strong>{detectedRegion ? `, ${detectedRegion}` : ""}</span>
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("message")}</label>
                   <textarea value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
@@ -538,7 +569,7 @@ function MiniCalendar({ year, month, calendarData, checkIn, checkOut, lang, dayL
 }
 
 // ── Additional Services Section ──
-import type { Service } from "@/lib/types";
+import type { Service, TimeOfDay } from "@/lib/types";
 
 const SVC_CATEGORIES = [
   { key: "photo", icon: "📸" },
@@ -551,6 +582,14 @@ const SVC_CATEGORIES = [
   { key: "chef", icon: "👨‍🍳" },
 ];
 
+// Default time-of-day per category: cooking/breakfast → morning, music/dance → evening
+const DEFAULT_TOD: Record<string, TimeOfDay> = {
+  chef: "morning",
+  music: "evening",
+  dance: "evening",
+  decor: "evening",
+};
+
 function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang }: {
   hostRegion: string;
   checkIn: string;
@@ -562,7 +601,7 @@ function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang
   const [activeCat, setActiveCat] = useState<string>("");
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState<{ service: Service; date: string; startTime: string; endTime: string }[]>([]);
+  const [selected, setSelected] = useState<{ service: Service; date: string; startTime: string; endTime: string; timeOfDay: TimeOfDay; customTime: string }[]>([]);
 
   const fetchServices = async (cat: string) => {
     setLoading(true);
@@ -578,11 +617,20 @@ function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang
   };
 
   const addToSelected = (svc: Service) => {
-    setSelected((prev) => [...prev, { service: svc, date: checkIn, startTime: "10:00", endTime: "12:00" }]);
+    const defaultTod: TimeOfDay = DEFAULT_TOD[svc.category] || "morning";
+    setSelected((prev) => [...prev, { service: svc, date: checkIn, startTime: "10:00", endTime: "12:00", timeOfDay: defaultTod, customTime: "" }]);
   };
 
   const removeFromSelected = (idx: number) => {
     setSelected((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const updateTod = (idx: number, tod: TimeOfDay) => {
+    setSelected((prev) => prev.map((s, i) => i === idx ? { ...s, timeOfDay: tod } : s));
+  };
+
+  const updateCustomTime = (idx: number, time: string) => {
+    setSelected((prev) => prev.map((s, i) => i === idx ? { ...s, customTime: time } : s));
   };
 
   const calcTotal = (svc: Service) => {
@@ -593,11 +641,21 @@ function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang
 
   const totalExtra = selected.reduce((sum, s) => sum + calcTotal(s.service), 0);
 
+  const todLabel = (tod: TimeOfDay): string => {
+    if (tod === "morning") return "🌅";
+    if (tod === "evening") return "🌙";
+    return "🕐";
+  };
+
   const titleText = lang === "ru" ? "🎯 Улучшите ваш визит" : lang === "hy" ? "🎯 Բարելավեք ձեր այցը" : lang === "fr" ? "🎯 Améliorez votre visite" : lang === "de" ? "🎯 Verbessern Sie Ihren Besuch" : lang === "es" ? "🎯 Mejora tu visita" : lang === "it" ? "🎯 Migliora la tua visita" : lang === "ar" ? "🎯 حسّن زيارتك" : lang === "zh" ? "🎯 提升您的体验" : lang === "fa" ? "🎯 بازدید خود را بهبود بخشید" : "🎯 Enhance your visit";
   const btnText = lang === "ru" ? "Добавить услуги" : lang === "hy" ? "Ծառայություններ ավելացնել" : lang === "fr" ? "Ajouter des services" : lang === "de" ? "Dienste hinzufügen" : lang === "es" ? "Añadir servicios" : lang === "it" ? "Aggiungi servizi" : lang === "ar" ? "إضافة خدمات" : lang === "zh" ? "添加服务" : lang === "fa" ? "افزودن خدمات" : "Add services";
   const totalText = lang === "ru" ? "Дополнительно" : lang === "hy" ? "Լրացուցիչ" : lang === "fr" ? "Supplément" : lang === "de" ? "Zusätzlich" : lang === "es" ? "Adicional" : lang === "it" ? "Extra" : lang === "ar" ? "إضافي" : lang === "zh" ? "额外" : lang === "fa" ? "اضافی" : "Extra";
   const noneText = lang === "ru" ? "Нет услуг в этой категории" : lang === "hy" ? "Այս կատեգորիայում ծառայություններ չկան" : lang === "fr" ? "Aucun service dans cette catégorie" : lang === "de" ? "Keine Dienste in dieser Kategorie" : lang === "es" ? "Sin servicios en esta categoría" : lang === "it" ? "Nessun servizio in questa categoria" : lang === "ar" ? "لا خدمات في هذه الفئة" : lang === "zh" ? "此类别无服务" : lang === "fa" ? "خدماتی در این دسته وجود ندارد" : "No services in this category";
   const addText = lang === "ru" ? "Добавить" : lang === "hy" ? "Ավելացնել" : lang === "fr" ? "Ajouter" : lang === "de" ? "Hinzufügen" : lang === "es" ? "Añadir" : lang === "it" ? "Aggiungi" : lang === "ar" ? "إضافة" : lang === "zh" ? "添加" : lang === "fa" ? "افزودن" : "Add";
+  const todText = lang === "ru" ? "Время дня" : lang === "hy" ? "Օրվա ժամ" : lang === "fr" ? "Moment" : lang === "de" ? "Tageszeit" : lang === "es" ? "Hora" : lang === "it" ? "Orario" : lang === "ar" ? "وقت" : lang === "zh" ? "时间" : lang === "fa" ? "زمان" : "Time of day";
+  const morningText = lang === "ru" ? "🌅 Утро" : lang === "hy" ? "🌅 Առաւոտ" : lang === "fr" ? "🌅 Matin" : lang === "de" ? "🌅 Morgen" : lang === "es" ? "🌅 Mañana" : lang === "it" ? "🌅 Mattina" : lang === "ar" ? "🌅 صباح" : lang === "zh" ? "🌅 早上" : lang === "fa" ? "🌅 صبح" : "🌅 Morning";
+  const eveningText = lang === "ru" ? "🌙 Вечер" : lang === "hy" ? "🌙 Երեկո" : lang === "fr" ? "🌙 Soir" : lang === "de" ? "🌙 Abend" : lang === "es" ? "🌙 Noche" : lang === "it" ? "🌙 Sera" : lang === "ar" ? "🌙 مساء" : lang === "zh" ? "🌙 晚上" : lang === "fa" ? "🌙 عصر" : "🌙 Evening";
+  const customTimeText = lang === "ru" ? "🕐 Другое" : lang === "hy" ? "🕐 Այլ" : lang === "fr" ? "🕐 Autre" : lang === "de" ? "🕐 Andere" : lang === "es" ? "🕐 Otro" : lang === "it" ? "🕐 Altro" : lang === "ar" ? "🕐 آخر" : lang === "zh" ? "🕐 其他" : lang === "fa" ? "🕐 دیگر" : "🕐 Custom";
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-5">
@@ -657,15 +715,43 @@ function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang
 
           {/* Selected services */}
           {selected.length > 0 && (
-            <div className="border-t border-gray-100 pt-3 space-y-2">
+            <div className="border-t border-gray-100 pt-3 space-y-3">
               {selected.map((s, idx) => (
-                <div key={idx} className="flex items-center justify-between bg-orange-50/50 rounded-lg px-3 py-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{s.service.title}</p>
-                    <p className="text-xs text-gray-500">${calcTotal(s.service)} · {s.date}</p>
+                <div key={idx} className="bg-orange-50/50 rounded-lg px-3 py-2.5">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {todLabel(s.timeOfDay)} {s.service.title}
+                      </p>
+                      <p className="text-xs text-gray-500">${calcTotal(s.service)} · {s.date}</p>
+                    </div>
+                    <button onClick={() => removeFromSelected(idx)}
+                      className="text-red-400 hover:text-red-600 text-xs ml-2 flex-shrink-0">✕</button>
                   </div>
-                  <button onClick={() => removeFromSelected(idx)}
-                    className="text-red-400 hover:text-red-600 text-xs ml-2 flex-shrink-0">✕</button>
+                  {/* Time-of-day selector */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] text-gray-400 font-medium">{todText}:</span>
+                    {(["morning", "evening", "custom"] as TimeOfDay[]).map((td) => (
+                      <button key={td} type="button" onClick={() => updateTod(idx, td)}
+                        className={`px-2 py-1 rounded-full text-[10px] font-medium transition ${
+                          s.timeOfDay === td
+                            ? "text-white"
+                            : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50"
+                        }`}
+                        style={s.timeOfDay === td ? { background: "linear-gradient(135deg, #C45D3E, #D4A04A)" } : {}}
+                      >
+                        {td === "morning" ? morningText : td === "evening" ? eveningText : customTimeText}
+                      </button>
+                    ))}
+                    {s.timeOfDay === "custom" && (
+                      <input
+                        type="time"
+                        value={s.customTime}
+                        onChange={(e) => updateCustomTime(idx, e.target.value)}
+                        className="px-2 py-1 rounded-lg border border-gray-200 text-[10px] outline-none focus:border-orange-400"
+                      />
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

@@ -133,6 +133,8 @@ export interface Service {
   created_at: string;
 }
 
+export type TimeOfDay = "morning" | "evening" | "custom";
+
 export interface ServiceBooking {
   id: string;
   booking_id: string;
@@ -144,5 +146,7 @@ export interface ServiceBooking {
   status: "requested" | "confirmed" | "cancelled" | "completed";
   total_price: number;
   client_note: string;
+  time_of_day?: TimeOfDay;
+  custom_time?: string;
   created_at: string;
 }

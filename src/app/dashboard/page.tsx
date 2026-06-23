@@ -645,6 +645,12 @@ function ServiceBookingsList({ bookingId, lang }: { bookingId: string; lang: str
           <div key={sb.id} className="flex items-center gap-2 text-xs text-gray-600 py-0.5">
             <span>{catIcon[svcCat] || "✨"}</span>
             <span className="font-medium">{svcTitle}</span>
+            {sb.time_of_day && (
+              <span className="text-orange-600">
+                {sb.time_of_day === "morning" ? "🌅" : sb.time_of_day === "evening" ? "🌙" : "🕐"}
+                {sb.time_of_day === "custom" && sb.custom_time ? ` ${sb.custom_time}` : ""}
+              </span>
+            )}
             <span className="text-gray-400">— {sb.date} {sb.start_time}</span>
             <span className="font-semibold text-gray-700">${sb.total_price}</span>
             <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium ${

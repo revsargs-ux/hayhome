@@ -38,6 +38,13 @@ const STATUS_LABELS: Record<string, Record<string, string>> = {
   completed: { ru: "Завершён", en: "Completed" },
 };
 
+// Time-of-day display per lang
+const TOD_DISPLAY: Record<string, Record<string, string>> = {
+  morning: { ru: "🌅 Утренний приём", en: "🌅 Morning reception", hy: "🌅 Առաւոտյան", fr: "🌅 Matin", de: "🌅 Morgen", es: "🌅 Mañana", it: "🌅 Mattina", ar: "🌅 صباح", zh: "🌅 早上", fa: "🌅 صبح" },
+  evening: { ru: "🌙 Вечерний приём", en: "🌙 Evening reception", hy: "🌙 Երեկոյան", fr: "🌙 Soir", de: "🌙 Abend", es: "🌙 Noche", it: "🌙 Sera", ar: "🌙 مساء", zh: "🌙 晚上", fa: "🌙 عصر" },
+  custom: { ru: "🕐 Свое время", en: "🕐 Custom time", hy: "🕐 Այլ", fr: "🕐 Personnalisé", de: "🕐 Benutzerdefiniert", es: "🕐 Personalizado", it: "🕐 Personalizzato", ar: "🕐 مخصص", zh: "🕐 自定义", fa: "🕐 سفارشی" },
+};
+
 export default function ProviderDashboardPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
@@ -377,6 +384,11 @@ export default function ProviderDashboardPage() {
                           <p className="text-xs text-gray-500">
                             📅 {ord.date} · ⏰ {ord.start_time}–{ord.end_time} · ${ord.total_price}
                           </p>
+                          {ord.time_of_day && (
+                            <p className="text-xs text-orange-600 font-medium mt-0.5">
+                              {(TOD_DISPLAY[ord.time_of_day] || TOD_DISPLAY.morning)[lang] || TOD_DISPLAY[ord.time_of_day]?.en || ""}{ord.time_of_day === "custom" && ord.custom_time ? ` — ${ord.custom_time}` : ""}
+                            </p>
+                          )}
                           {ord.client_note && (
                             <p className="text-xs text-gray-400 italic mt-0.5">"{ord.client_note}"</p>
                           )}

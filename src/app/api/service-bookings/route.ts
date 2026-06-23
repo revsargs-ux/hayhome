@@ -138,6 +138,14 @@ export async function POST(req: NextRequest) {
     client_note: typeof body.client_note === "string" ? body.client_note.slice(0, 1000) : "",
   };
 
+  // time_of_day: "morning" | "evening" | "custom"
+  if (body.time_of_day && ["morning", "evening", "custom"].includes(body.time_of_day)) {
+    insertData.time_of_day = body.time_of_day;
+    if (body.time_of_day === "custom" && typeof body.custom_time === "string") {
+      insertData.custom_time = body.custom_time.slice(0, 100);
+    }
+  }
+
   const { data, error } = await supabase
     .from("hayhome_service_bookings")
     .insert(insertData)

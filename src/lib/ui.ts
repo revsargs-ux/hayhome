@@ -165,6 +165,15 @@ export interface UI {
   noEmailUsers: string;
   idram: string;
   crypto: string;
+  // Time of day
+  morning: string;
+  evening: string;
+  customTime: string;
+  yourCity: string;
+  detectedCity: string;
+  timeOfDay: string;
+  morningReception: string;
+  eveningReception: string;
 }
 
 type Rec = Record<string, string>;
@@ -319,6 +328,14 @@ const translations: Record<LangCode, UI> = {
     noEmailUsers: "Все",
     idram: "Idram",
     crypto: "Крипта",
+    morning: "🌅 Утро",
+    evening: "🌙 Вечер",
+    customTime: "Другое время",
+    yourCity: "Ваш город",
+    detectedCity: "Определённый город",
+    timeOfDay: "Время дня",
+    morningReception: "🌅 Утренний приём",
+    eveningReception: "🌙 Вечерний приём",
     months: ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"],
   },
 
@@ -471,6 +488,14 @@ const translations: Record<LangCode, UI> = {
     noEmailUsers: "All",
     idram: "Idram",
     crypto: "Crypto",
+    morning: "🌅 Morning",
+    evening: "🌙 Evening",
+    customTime: "Custom time",
+    yourCity: "Your city",
+    detectedCity: "Detected city",
+    timeOfDay: "Time of day",
+    morningReception: "🌅 Morning reception",
+    eveningReception: "🌙 Evening reception",
     months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
   },
 
@@ -623,6 +648,14 @@ const translations: Record<LangCode, UI> = {
     noEmailUsers: "Բոլորը",
     idram: "Idram",
     crypto: "Կրիպտո",
+    morning: "🌅 Առավոտ",
+    evening: "🌙 Երեկո",
+    customTime: "Այլ ժամ",
+    yourCity: "Ձեր քաղաքը",
+    detectedCity: "Հայտնաբերված քաղաքը",
+    timeOfDay: "Օրվա ժամ",
+    morningReception: "🌅 Առավոտյան ընդունելություն",
+    eveningReception: "🌙 Երեկոյան ընդունելություն",
     months: ["Հունվար","Փետրվար","Մարտ","Ապրիլ","Մայիս","Հունիս","Հուլիս","Օգոստոս","Սեպտեմբեր","Հոկտեմբեր","Նոյեմբեր","Դեկտեմբեր"],
   },
 
@@ -775,6 +808,14 @@ const translations: Record<LangCode, UI> = {
     noEmailUsers: "Tous",
     idram: "Idram",
     crypto: "Crypto",
+    morning: "🌅 Matin",
+    evening: "🌙 Soir",
+    customTime: "Heure personnalisée",
+    yourCity: "Votre ville",
+    detectedCity: "Ville détectée",
+    timeOfDay: "Moment de la journée",
+    morningReception: "🌅 Réception du matin",
+    eveningReception: "🌙 Réception du soir",
     months: ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],
   },
 
@@ -927,6 +968,14 @@ const translations: Record<LangCode, UI> = {
     noEmailUsers: "Alle",
     idram: "Idram",
     crypto: "Krypto",
+    morning: "🌅 Morgen",
+    evening: "🌙 Abend",
+    customTime: "Andere Zeit",
+    yourCity: "Ihre Stadt",
+    detectedCity: "Erkannte Stadt",
+    timeOfDay: "Tageszeit",
+    morningReception: "🌅 Morgen-Empfang",
+    eveningReception: "🌙 Abend-Empfang",
     months: ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],
   },
 
@@ -1079,6 +1128,14 @@ const translations: Record<LangCode, UI> = {
     noEmailUsers: "Todos",
     idram: "Idram",
     crypto: "Cripto",
+    morning: "🌅 Mañana",
+    evening: "🌙 Noche",
+    customTime: "Hora personalizada",
+    yourCity: "Tu ciudad",
+    detectedCity: "Ciudad detectada",
+    timeOfDay: "Hora del día",
+    morningReception: "🌅 Recepción matutina",
+    eveningReception: "🌙 Recepción nocturna",
     months: ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],
   },
 
@@ -1231,6 +1288,14 @@ const translations: Record<LangCode, UI> = {
     noEmailUsers: "Tutti",
     idram: "Idram",
     crypto: "Cripto",
+    morning: "🌅 Mattina",
+    evening: "🌙 Sera",
+    customTime: "Orario personalizzato",
+    yourCity: "La tua città",
+    detectedCity: "Città rilevata",
+    timeOfDay: "Ora del giorno",
+    morningReception: "🌅 Ricevimento mattutino",
+    eveningReception: "🌙 Ricevimento serale",
     months: ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"],
   },
 
@@ -1383,6 +1448,14 @@ const translations: Record<LangCode, UI> = {
     noEmailUsers: "الكل",
     idram: "Idram",
     crypto: "عملة رقمية",
+    morning: "🌅 صباح",
+    evening: "🌙 مساء",
+    customTime: "وقت مخصص",
+    yourCity: "مدينتك",
+    detectedCity: "المدينة المكتشفة",
+    timeOfDay: "وقت اليوم",
+    morningReception: "🌅 استقبال صباحي",
+    eveningReception: "🌙 استقبال مسائي",
     months: ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"],
   },
 
@@ -1535,6 +1608,14 @@ const translations: Record<LangCode, UI> = {
     noEmailUsers: "全部",
     idram: "Idram",
     crypto: "加密货币",
+    morning: "🌅 早上",
+    evening: "🌙 晚上",
+    customTime: "自定义时间",
+    yourCity: "您的城市",
+    detectedCity: "检测到的城市",
+    timeOfDay: "时间段",
+    morningReception: "🌅 早上接待",
+    eveningReception: "🌙 晚上接待",
     months: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
   },
 
@@ -1687,6 +1768,14 @@ const translations: Record<LangCode, UI> = {
     noEmailUsers: "همه",
     idram: "Idram",
     crypto: "کریپتو",
+    morning: "🌅 صبح",
+    evening: "🌙 عصر",
+    customTime: "زمان سفارشی",
+    yourCity: "شهر شما",
+    detectedCity: "شهر شناسایی‌شده",
+    timeOfDay: "زمان روز",
+    morningReception: "🌅 پذیرش صبحگاهی",
+    eveningReception: "🌙 پذیرش عصرانه",
     months: ["ژانویه","فوریه","مارس","آوریل","مه","ژوئن","ژوئیه","اوت","سپتامبر","اکتبر","نوامبر","دسامبر"],
   },
 };

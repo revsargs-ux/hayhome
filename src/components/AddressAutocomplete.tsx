@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { reverseGeocode } from "@/lib/geo";
 
 export interface NominatimResult {
   place_id: number;
@@ -24,9 +25,10 @@ interface AddressAutocompleteProps {
   onChange: (value: string) => void;
   placeholder?: string;
   onSelect?: (result: NominatimResult) => void;
+  onCityDetected?: (city: string, region: string, country: string) => void;
 }
 
-export default function AddressAutocomplete({ value, onChange, placeholder, onSelect }: AddressAutocompleteProps) {
+export default function AddressAutocomplete({ value, onChange, placeholder, onSelect, onCityDetected }: AddressAutocompleteProps) {
   const [query, setQuery] = useState(value);
   const [results, setResults] = useState<NominatimResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -38,7 +40,7 @@ export default function AddressAutocomplete({ value, onChange, placeholder, onSe
     setQuery(value);
   }, [value]);
 
-  // Debounced search
+  // Debounced search — triggers at 3+ characters
   const search = useCallback((q: string) => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (q.trim().length < 3) {
@@ -50,8 +52,8 @@ export default function AddressAutocomplete({ value, onChange, placeholder, onSe
     debounceRef.current = setTimeout(async () => {
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&accept-language=ru,en`,
-          { headers: { "Accept-Language": "ru,en" } }
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&accept-language=ru,en,hy&addressdetails=1`,
+          { headers: { "Accept-Language": "ru,en,hy" } }
         );
         const data: NominatimResult[] = await res.json();
         setResults(data);
@@ -88,6 +90,37 @@ export default function AddressAutocomplete({ value, onChange, placeholder, onSe
     onChange(short);
     setOpen(false);
     onSelect?.(result);
+
+    // Extract and propagate city info
+    const addr = result.address;
+    if (addr && onCityDetected) {
+      const city = addr.city || addr.town || addr.village || "";
+      const region = addr.state || "";
+      const country = addr.country || "";
+      if (city) onCityDetected(city, region, country);
+    }
+  };
+
+  // Reverse geocode from GPS coordinates
+  const handleGeolocate = () => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const geo = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+          if (geo.city) {
+            const displayVal = [geo.city, geo.region, geo.country].filter(Boolean).join(", ");
+            setQuery(displayVal);
+            onChange(displayVal);
+            onCityDetected?.(geo.city, geo.region, geo.country);
+          }
+        } catch {
+          // silently fail
+        }
+      },
+      () => {},
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
   };
 
   const formatResult = (result: NominatimResult): { address: string; city: string; country: string } => {
@@ -101,17 +134,27 @@ export default function AddressAutocomplete({ value, onChange, placeholder, onSe
 
   return (
     <div ref={containerRef} className="relative">
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => handleInput(e.target.value)}
-        onFocus={() => { if (results.length > 0) setOpen(true); }}
-        placeholder={placeholder || ""}
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900"
-        autoComplete="off"
-      />
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => handleInput(e.target.value)}
+          onFocus={() => { if (results.length > 0) setOpen(true); }}
+          placeholder={placeholder || ""}
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900"
+          autoComplete="off"
+        />
+        <button
+          type="button"
+          onClick={handleGeolocate}
+          className="flex-shrink-0 px-3 py-3 rounded-xl border border-gray-200 text-gray-500 hover:text-red-600 hover:border-red-300 transition"
+          title="GPS"
+        >
+          📍
+        </button>
+      </div>
       {loading && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+        <div className="absolute right-12 top-1/2 -translate-y-1/2">
           <div className="w-4 h-4 border-2 border-red-200 border-t-red-600 rounded-full animate-spin" />
         </div>
       )}
