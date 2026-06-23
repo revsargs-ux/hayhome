@@ -25,6 +25,7 @@ export default function BookPage() {
     guestName: "", guestEmail: "", guestPhone: "",
     guestCountry: "", checkIn: "", checkOut: "", guests: 1, message: "",
   });
+  const [draftRestored, setDraftRestored] = useState(false);
 
   // Mini calendar state
   const [calendarData, setCalendarData] = useState<Map<string, string>>(new Map());
@@ -45,6 +46,51 @@ export default function BookPage() {
   }, [id, calYear, calMonth]);
 
   useEffect(() => { fetch(`/api/hosts/${id}`).then(r => r.json()).then(setHost); }, [id]);
+
+  // Restore draft from localStorage (after redirect from login)
+  useEffect(() => {
+    if (!id) return;
+    const draftKey = `hayhome_booking_draft_${id}`;
+    try {
+      const draft = localStorage.getItem(draftKey);
+      if (draft) {
+        const saved = JSON.parse(draft);
+        setForm(f => ({
+          ...f,
+          guestName: saved.guestName || f.guestName,
+          guestEmail: saved.guestEmail || f.guestEmail,
+          guestCountry: saved.guestCountry || f.guestCountry,
+          guestPhone: saved.guestPhone || f.guestPhone,
+          checkIn: saved.checkIn || f.checkIn,
+          checkOut: saved.checkOut || f.checkOut,
+          guests: saved.guests || f.guests,
+          message: saved.message || f.message,
+        }));
+        setDraftRestored(true);
+      }
+    } catch {}
+  }, [id]);
+
+  // Save draft to localStorage on form change
+  useEffect(() => {
+    if (!id) return;
+    const draftKey = `hayhome_booking_draft_${id}`;
+    // Only save if there's meaningful data
+    if (form.checkIn || form.checkOut || form.guestName || form.guestEmail) {
+      try {
+        localStorage.setItem(draftKey, JSON.stringify({
+          guestName: form.guestName,
+          guestEmail: form.guestEmail,
+          guestPhone: form.guestPhone,
+          guestCountry: form.guestCountry,
+          checkIn: form.checkIn,
+          checkOut: form.checkOut,
+          guests: form.guests,
+          message: form.message,
+        }));
+      } catch {}
+    }
+  }, [id, form]);
 
   // Автозаполнение данных из профиля
   useEffect(() => {
@@ -82,6 +128,8 @@ export default function BookPage() {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.error || "Error");
       }
+      // Clear draft on successful booking
+      try { localStorage.removeItem(`hayhome_booking_draft_${id}`); } catch {}
       setSuccess(true);
     } catch (e) {
       const msg = e instanceof Error ? e.message : undefined;
@@ -194,6 +242,11 @@ export default function BookPage() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-sm p-6">
               <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("title")}</h1>
+              {draftRestored && (
+                <div className="mb-4 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700 flex items-center gap-2">
+                  <span>💾</span> {lang === "ru" ? "Восстановлены данные предыдущего бронирования" : "Previous booking data restored"}
+                </div>
+              )}
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>

@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import HostCard from "@/components/HostCard";
+import dynamic from "next/dynamic";
+const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 import { Host } from "@/lib/types";
 import { Search, SlidersHorizontal, MapPin } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
@@ -23,6 +25,7 @@ function HostsContent() {
   const [experience, setExperience] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<"rating" | "price_asc" | "price_desc">("rating");
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
 
   useEffect(() => {
     fetch("/api/hosts")
@@ -136,11 +139,31 @@ function HostsContent() {
           <h1 className="text-2xl font-bold text-gray-900">
             {loading ? tr.common.loading : `${filtered.length} ${h.pageTitle}`}
           </h1>
-          {filtered.length > 0 && (
-            <div className="flex items-center gap-1 text-gray-500 text-sm">
-              <MapPin size={14} /> <span>🇦🇲 Armenia</span>
-            </div>
-          )}
+          <div className="flex items-center gap-3">
+            {filtered.length > 0 && (
+              <div className="flex items-center gap-1 text-gray-500 text-sm">
+                <MapPin size={14} /> <span>🇦🇲 Armenia</span>
+              </div>
+            )}
+            {filtered.length > 0 && (
+              <div className="flex bg-white rounded-full border border-gray-200 p-1 shadow-sm">
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${viewMode === "list" ? "text-white" : "text-gray-600 hover:text-gray-900"}`}
+                  style={viewMode === "list" ? { background: "linear-gradient(135deg, #D4001A, #F2A900)" } : {}}
+                >
+                  {h.listView}
+                </button>
+                <button
+                  onClick={() => setViewMode("map")}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${viewMode === "map" ? "text-white" : "text-gray-600 hover:text-gray-900"}`}
+                  style={viewMode === "map" ? { background: "linear-gradient(135deg, #D4001A, #F2A900)" } : {}}
+                >
+                  {h.mapView}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {loading ? (
@@ -156,6 +179,8 @@ function HostsContent() {
               </div>
             ))}
           </div>
+        ) : viewMode === "map" && filtered.length > 0 ? (
+          <Map hosts={filtered} />
         ) : filtered.length === 0 ? (
           <div className="text-center py-24">
             <div className="text-5xl mb-4">🔍</div>
