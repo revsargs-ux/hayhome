@@ -4,6 +4,7 @@ import Image from "next/image";
 import { MapPin, Users, Star } from "lucide-react";
 import { Host } from "@/lib/types";
 import { useLang } from "@/contexts/LanguageContext";
+import { useLightbox } from "@/contexts/LightboxContext";
 import { translateLang, translateBadge, getLocalizedField } from "@/lib/i18n-utils";
 
 interface Props { host: Host; }
@@ -11,6 +12,7 @@ interface Props { host: Host; }
 export default function HostCard({ host }: Props) {
   const { tr, lang } = useLang();
   const h = tr.hosts;
+  const lightbox = useLightbox();
 
   const familyName = getLocalizedField(host.familyName, host.i18n, "familyName", lang);
   const description = getLocalizedField(host.description, host.i18n, "description", lang);
@@ -19,9 +21,18 @@ export default function HostCard({ host }: Props) {
     <Link href={`/hosts/${host.id}`} className="block">
       <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 card-hover cursor-pointer h-full flex flex-col">
         <div className="relative h-52 overflow-hidden bg-gray-200 flex-shrink-0">
-          <Image src={host.coverPhoto} alt={familyName} fill
-            className="object-cover transition-transform duration-500 hover:scale-105"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+          <div
+            className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity"
+            onClick={(e) => {
+              e.preventDefault();
+              const imgs = [host.coverPhoto, ...host.photos.filter(p => p !== host.coverPhoto)];
+              lightbox.open(imgs, 0);
+            }}
+          >
+            <Image src={host.coverPhoto} alt={familyName} fill
+              className="object-cover transition-transform duration-500 hover:scale-105"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+          </div>
           <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1 shadow-sm">
             <span className="text-yellow-400 text-xs leading-none">{"★".repeat(host.stars)}</span>
           </div>

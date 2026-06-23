@@ -7,6 +7,7 @@ import { MapPin, Users, Globe, Star, Phone, Mail, Check, ChevronLeft } from "luc
 import { Host, Review, Booking } from "@/lib/types";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLightbox } from "@/contexts/LightboxContext";
 import { translateLang, translateBadge, translateAmenity, translateExperience, getLocalizedField } from "@/lib/i18n-utils";
 
 export default function HostProfilePage() {
@@ -14,6 +15,7 @@ export default function HostProfilePage() {
   const { tr, lang } = useLang();
   const h = tr.hosts;
   const { user } = useAuth();
+  const lightbox = useLightbox();
 
   const [host, setHost] = useState<Host | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -117,7 +119,13 @@ export default function HostProfilePage() {
           <div className="lg:col-span-2 space-y-6">
             {/* Gallery */}
             <div className="space-y-2">
-              <div className="relative rounded-2xl overflow-hidden h-72 md:h-96 bg-gray-200">
+              <div
+                className="relative rounded-2xl overflow-hidden h-72 md:h-96 bg-gray-200 cursor-pointer hover:opacity-95 transition-opacity"
+                onClick={() => {
+                  const imgs = [host.coverPhoto, ...host.photos.filter(p => p !== host.coverPhoto)];
+                  lightbox.open(imgs, 0);
+                }}
+              >
                 <Image src={host.coverPhoto} alt={familyName} fill className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 66vw" priority />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
@@ -131,7 +139,16 @@ export default function HostProfilePage() {
               {host.photos.length > 0 && (
                 <div className="grid grid-cols-4 gap-2">
                   {host.photos.slice(0, 4).map((photo, idx) => (
-                    <div key={idx} className="relative rounded-xl overflow-hidden aspect-square bg-gray-200">
+                    <div
+                      key={idx}
+                      className="relative rounded-xl overflow-hidden aspect-square bg-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                      onClick={() => {
+                        const imgs = [host.coverPhoto, ...host.photos.filter(p => p !== host.coverPhoto)];
+                        // idx maps into imgs starting at 1 (0 = cover)
+                        const targetIdx = Math.min(idx + 1, imgs.length - 1);
+                        lightbox.open(imgs, targetIdx);
+                      }}
+                    >
                       <Image src={photo} alt={`${host.familyName} ${idx + 2}`} fill
                         className="object-cover hover:scale-105 transition-transform duration-300"
                         sizes="(max-width: 640px) 25vw, 15vw" />

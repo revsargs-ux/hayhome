@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import LightboxWrapper from "@/components/LightboxWrapper";
 
 export const metadata: Metadata = {
   title: "HayHome — Armenian Hospitality",
@@ -17,9 +18,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-full flex flex-col">
         <AuthProvider>
           <LanguageProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
+            <LightboxWrapper>
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </LightboxWrapper>
           </LanguageProvider>
         </AuthProvider>
       </body>

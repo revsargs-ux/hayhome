@@ -52,7 +52,7 @@ export default function Header() {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition text-sm font-medium text-gray-700"
                 >
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
                     style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
                     {user.name[0]}
                   </div>
@@ -102,6 +102,12 @@ export default function Header() {
           {/* Mobile */}
           <div className="md:hidden flex items-center gap-2">
             <LanguageSwitcher />
+            {user && (
+              <Link href="/dashboard" className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
+                {user.name[0]}
+              </Link>
+            )}
             <button className="p-2 rounded-lg text-gray-600 hover:bg-gray-100" onClick={() => setOpen(!open)}>
               {open ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -112,6 +118,18 @@ export default function Header() {
       {/* Mobile menu */}
       {open && (
         <div className="md:hidden bg-white border-t border-gray-100 px-4 py-4 space-y-3">
+          {user && (
+            <div className="flex items-center gap-3 pb-3 border-b border-gray-100">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
+                {user.name[0]}
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">{user.name}</p>
+                <p className="text-xs text-gray-400">{user.email}</p>
+              </div>
+            </div>
+          )}
           <Link href="/hosts" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
             <Search size={18} /> {n.findFamily}
           </Link>

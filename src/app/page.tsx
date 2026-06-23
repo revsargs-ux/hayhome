@@ -3,11 +3,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useLang } from "@/contexts/LanguageContext";
+import { useLightbox } from "@/contexts/LightboxContext";
 import { Host, Review } from "@/lib/types";
 
 export default function HomePage() {
   const { lang, tr } = useLang();
   const h = tr.home;
+  const lightbox = useLightbox();
   const [hosts, setHosts] = useState<Host[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,7 +111,14 @@ export default function HomePage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {hosts.map((host) => (
                   <Link key={host.id} href={`/hosts/${host.id}`} className="group block rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition bg-white">
-                    <div className="relative h-56 overflow-hidden">
+                    <div
+                      className="relative h-56 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const imgs = [host.coverPhoto, ...host.photos.filter(p => p !== host.coverPhoto)];
+                        lightbox.open(imgs, 0);
+                      }}
+                    >
                       <Image src={host.coverPhoto} alt={host.familyName} fill className="object-cover group-hover:scale-105 transition duration-300" />
                       {host.verified && (
                         <span className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold text-white" style={{ background: "#0033A0" }}>
