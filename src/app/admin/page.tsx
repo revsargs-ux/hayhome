@@ -2,9 +2,10 @@
 import { useState, useEffect } from "react";
 import { Host, Booking } from "@/lib/types";
 import { Check, X, Star, Users, DollarSign, Home, RefreshCw } from "lucide-react";
+import AdminCalendarView from "@/components/AdminCalendarView";
 import { useLang } from "@/contexts/LanguageContext";
 
-type Tab = "hosts" | "bookings" | "stats" | "payouts";
+type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar";
 
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>("hosts");
@@ -14,6 +15,9 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
   const [payoutLoading, setPayoutLoading] = useState(false);
+  const [calHostId, setCalHostId] = useState("");
+  const [calYear, setCalYear] = useState(new Date().getFullYear());
+  const [calMonth, setCalMonth] = useState(new Date().getMonth());
 
   const { lang } = useLang();
 
@@ -81,6 +85,7 @@ export default function AdminPage() {
     { key: "bookings", label: a("Бронирования", "Bookings"), badge: pendingBookings.length },
     { key: "payouts", label: a("Выплаты", "Payouts"), badge: payouts.filter(p => p.status === "pending").length || undefined },
     { key: "stats", label: a("Статистика", "Statistics") },
+    { key: "calendar", label: a("Календарь", "Calendar") },
   ];
 
   return (
@@ -297,6 +302,21 @@ export default function AdminPage() {
                   ))}
                 </div>
               </div>
+            )}
+            {/* Calendar tab */}
+            {tab === "calendar" && calHostId && (
+              <AdminCalendarView
+                hosts={hosts.filter((h) => h.status === "active")}
+                calHostId={calHostId}
+                setCalHostId={setCalHostId}
+                calYear={calYear}
+                setCalYear={setCalYear}
+                calMonth={calMonth}
+                setCalMonth={setCalMonth}
+                bookings={bookings}
+                lang={lang}
+                a={a}
+              />
             )}
           </>
         )}

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { Host } from "@/lib/types";
-import { ChevronLeft, Star, Check } from "lucide-react";
+import { ChevronLeft, Star, Check, ChevronRight } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { getLocalizedField } from "@/lib/i18n-utils";
@@ -25,6 +25,24 @@ export default function BookPage() {
     guestName: "", guestEmail: "", guestPhone: "",
     guestCountry: "", checkIn: "", checkOut: "", guests: 1, message: "",
   });
+
+  // Mini calendar state
+  const [calendarData, setCalendarData] = useState<Map<string, string>>(new Map());
+  const [calYear, setCalYear] = useState(new Date().getFullYear());
+  const [calMonth, setCalMonth] = useState(new Date().getMonth());
+
+  useEffect(() => {
+    if (!id) return;
+    const monthStr = `${calYear}-${String(calMonth + 1).padStart(2, "0")}`;
+    fetch(`/api/calendar?hostId=${id}&month=${monthStr}`)
+      .then(r => r.json())
+      .then(data => {
+        const m = new Map<string, string>();
+        (Array.isArray(data) ? data : []).forEach((e: any) => m.set(e.date, e.status));
+        setCalendarData(m);
+      })
+      .catch(() => {});
+  }, [id, calYear, calMonth]);
 
   useEffect(() => { fetch(`/api/hosts/${id}`).then(r => r.json()).then(setHost); }, [id]);
 
@@ -60,10 +78,18 @@ export default function BookPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, hostId: id, hostName: host.familyName, totalPrice: total }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Error");
+      }
       setSuccess(true);
-    } catch {
-      setError(lang === "ru" ? "Ошибка отправки. Попробуйте ещё раз." : "Submission error. Please try again.");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : undefined;
+      if (msg === "Some dates are not available") {
+        setError(lang === "ru" ? "Выбранные даты недоступны. Пожалуйста, выберите другие даты." : "Selected dates are not available. Please choose different dates.");
+      } else {
+        setError(lang === "ru" ? "Ошибка отправки. Попробуйте ещё раз." : "Submission error. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -209,6 +235,37 @@ export default function BookPage() {
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
                   </div>
                 </div>
+
+                {/* Mini Calendar */}
+                <div className="col-span-1 sm:col-span-2">
+                  <MiniCalendar
+                    year={calYear}
+                    month={calMonth}
+                    calendarData={calendarData}
+                    checkIn={form.checkIn}
+                    checkOut={form.checkOut}
+                    lang={lang}
+                    dayLabels={[tr.hosts.mon, tr.hosts.tue, tr.hosts.wed, tr.hosts.thu, tr.hosts.fri, tr.hosts.sat, tr.hosts.sun]}
+                    onDateClick={(dateStr) => {
+                      if (!form.checkIn || (form.checkIn && form.checkOut)) {
+                        setForm(f => ({ ...f, checkIn: dateStr, checkOut: "" }));
+                      } else {
+                        if (dateStr > form.checkIn) {
+                          setForm(f => ({ ...f, checkOut: dateStr }));
+                        }
+                      }
+                    }}
+                    onPrevMonth={() => {
+                      if (calMonth === 0) { setCalMonth(11); setCalYear(calYear - 1); }
+                      else setCalMonth(calMonth - 1);
+                    }}
+                    onNextMonth={() => {
+                      if (calMonth === 11) { setCalMonth(0); setCalYear(calYear + 1); }
+                      else setCalMonth(calMonth + 1);
+                    }}
+                  />
+                </div>
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("guests")}</label>
                   <input type="number" min={1} max={host.maxGuests} value={form.guests}
@@ -275,6 +332,88 @@ export default function BookPage() {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Mini Calendar Component ──
+function MiniCalendar({ year, month, calendarData, checkIn, checkOut, lang, dayLabels, onDateClick, onPrevMonth, onNextMonth }: {
+  year: number; month: number; calendarData: Map<string, string>;
+  checkIn: string; checkOut: string; lang: string;
+  dayLabels: string[];
+  onDateClick: (dateStr: string) => void;
+  onPrevMonth: () => void; onNextMonth: () => void;
+}) {
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+  const monthNames = lang === "ru"
+    ? ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
+    : ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const firstDayIdx = (firstDay.getDay() + 6) % 7;
+  const totalDays = lastDay.getDate();
+
+  const cells: (Date | null)[] = [];
+  for (let i = 0; i < firstDayIdx; i++) cells.push(null);
+  for (let d = 1; d <= totalDays; d++) cells.push(new Date(year, month, d));
+  while (cells.length % 7 !== 0) cells.push(null);
+  const weeks: (Date | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+
+  function getCellClass(date: Date): string {
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    const status = calendarData.get(dateStr);
+    const isPast = dateStr < todayStr;
+    const isSelected = dateStr === checkIn || dateStr === checkOut;
+    const isInRange = checkIn && checkOut && dateStr > checkIn && dateStr < checkOut;
+
+    if (isPast) return "bg-gray-50 text-gray-300";
+    if (status === "booked" || status === "blocked") return "bg-gray-200 text-gray-400 cursor-not-allowed";
+    if (isSelected) return "bg-yellow-200 text-yellow-900 ring-2 ring-yellow-400 cursor-pointer";
+    if (isInRange) return "bg-yellow-100 text-yellow-800 cursor-pointer";
+    return "bg-green-100 text-green-800 hover:ring-2 hover:ring-green-300 cursor-pointer";
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="flex items-center justify-between mb-3">
+        <button onClick={onPrevMonth} className="p-1 rounded hover:bg-gray-100"><ChevronRight size={16} /></button>
+        <span className="text-sm font-bold text-gray-900">{monthNames[month]} {year}</span>
+        <button onClick={onNextMonth} className="p-1 rounded hover:bg-gray-100"><ChevronLeft size={16} /></button>
+      </div>
+      <div className="grid grid-cols-7 gap-1 mb-1">
+        {dayLabels.map((d) => (
+          <div key={d} className="text-center text-[10px] font-semibold text-gray-400">{d}</div>
+        ))}
+      </div>
+      {weeks.map((week, wi) => (
+        <div key={wi} className="grid grid-cols-7 gap-1 mb-1">
+          {week.map((date, di) => {
+            if (!date) return <div key={di} className="h-8" />;
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+            const status = calendarData.get(dateStr);
+            const isPast = dateStr < todayStr;
+            const isUnavailable = status === "booked" || status === "blocked";
+            return (
+              <div
+                key={di}
+                onClick={() => !isPast && !isUnavailable && onDateClick(dateStr)}
+                className={`h-8 rounded-lg flex items-center justify-center text-xs font-medium transition-all ${getCellClass(date)}`}
+              >
+                {date.getDate()}
+              </div>
+            );
+          })}
+        </div>
+      ))}
+      <div className="flex items-center justify-center gap-3 mt-2 text-[10px] text-gray-400">
+        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-green-100" /> {lang === "ru" ? "Свободно" : "Available"}</div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-gray-200" /> {lang === "ru" ? "Занято" : "Taken"}</div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-yellow-200" /> {lang === "ru" ? "Выбрано" : "Selected"}</div>
       </div>
     </div>
   );

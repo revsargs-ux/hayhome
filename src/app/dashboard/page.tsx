@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Booking, Host } from "@/lib/types";
-import { Calendar, DollarSign, Users, Star, Edit2, Save, X, RefreshCw, LogOut, Shield, Share2 } from "lucide-react";
+import { Calendar, DollarSign, Users, Star, Edit2, Save, X, RefreshCw, LogOut, Shield, Share2, ChevronLeft, ChevronRight } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,7 +29,7 @@ export default function DashboardPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [myProfile, setMyProfile] = useState<Host | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"bookings" | "profile">("bookings");
+  const [tab, setTab] = useState<"bookings" | "profile" | "calendar">("bookings");
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editForm, setEditForm] = useState({ description: "", phone: "", pricePerNight: 30 });
@@ -151,7 +151,8 @@ export default function DashboardPage() {
           {([
             { key: "bookings", label: lang === "ru" ? "Бронирования" : lang === "fr" ? "Réservations" : lang === "de" ? "Buchungen" : lang === "ar" ? "الحجوزات" : lang === "zh" ? "预订" : "Bookings" },
             ...(myProfile ? [{ key: "profile", label: lang === "ru" ? "Мой профиль" : lang === "fr" ? "Mon profil" : lang === "de" ? "Mein Profil" : lang === "ar" ? "ملفي" : lang === "zh" ? "我的资料" : "My Profile" }] : []),
-          ] as { key: "bookings" | "profile"; label: string }[]).map(t => (
+            ...(myProfile ? [{ key: "calendar", label: lang === "ru" ? "Календарь" : lang === "fr" ? "Calendrier" : lang === "de" ? "Kalender" : lang === "ar" ? "التقويم" : lang === "zh" ? "日历" : "Calendar" }] : []),
+          ] as { key: "bookings" | "profile" | "calendar"; label: string }[]).map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === t.key ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
               {t.label}
@@ -322,6 +323,148 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Calendar tab */}
+        {tab === "calendar" && myProfile && (
+          <CalendarTabContent hostId={myProfile.id} lang={lang} tr={tr} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Calendar Tab Content ──
+function CalendarTabContent({ hostId, lang, tr }: { hostId: string; lang: string; tr: any }) {
+  const h = tr.hosts;
+  const today = new Date();
+  const [viewYear, setViewYear] = useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(today.getMonth());
+  const [entries, setEntries] = useState<Map<string, any>>(new Map());
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState<string | null>(null);
+
+  useEffect(() => {
+    const monthStr = `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}`;
+    fetch(`/api/calendar?hostId=${hostId}&month=${monthStr}`)
+      .then(r => r.json())
+      .then(data => {
+        const m = new Map<string, any>();
+        (Array.isArray(data) ? data : []).forEach((e: any) => m.set(e.date, e));
+        setEntries(m);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [hostId, viewYear, viewMonth]);
+
+  const toggleDate = async (dateStr: string, currentStatus: string) => {
+    if (currentStatus === "booked") return;
+    setUpdating(dateStr);
+    const newStatus = currentStatus === "blocked" ? "available" : "blocked";
+    await fetch("/api/calendar", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ hostId, date: dateStr, status: newStatus }),
+    });
+    // Update local
+    const m = new Map(entries);
+    m.set(dateStr, { ...m.get(dateStr), date: dateStr, status: newStatus, host_id: hostId });
+    setEntries(m);
+    setUpdating(null);
+  };
+
+  const prevMonth = () => {
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
+    else setViewMonth(viewMonth - 1);
+  };
+  const nextMonth = () => {
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
+    else setViewMonth(viewMonth + 1);
+  };
+
+  const monthNames = lang === "ru"
+    ? ["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"]
+    : ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  const dayLabels = [h.mon, h.tue, h.wed, h.thu, h.fri, h.sat, h.sun];
+
+  // Build grid
+  const firstDay = new Date(viewYear, viewMonth, 1);
+  const lastDay = new Date(viewYear, viewMonth + 1, 0);
+  const firstDayIdx = (firstDay.getDay() + 6) % 7;
+  const totalDays = lastDay.getDate();
+  const cells: (Date | null)[] = [];
+  for (let i = 0; i < firstDayIdx; i++) cells.push(null);
+  for (let d = 1; d <= totalDays; d++) cells.push(new Date(viewYear, viewMonth, d));
+  while (cells.length % 7 !== 0) cells.push(null);
+  const weeks: (Date | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+
+  const getCellStatus = (date: Date): string => {
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+    const entry = entries.get(dateStr);
+    return entry ? entry.status : "available";
+  };
+
+  const cellBg = (status: string, isPast: boolean): string => {
+    if (isPast) return "bg-gray-50 text-gray-300";
+    if (status === "booked") return "bg-red-100 text-red-800";
+    if (status === "blocked") return "bg-gray-200 text-gray-500 hover:ring-2 hover:ring-gray-400 cursor-pointer";
+    return "bg-green-100 text-green-800 hover:ring-2 hover:ring-green-300 cursor-pointer";
+  };
+
+  return (
+    <div>
+      {/* Legend */}
+      <div className="flex flex-wrap gap-3 mb-4">
+        <div className="flex items-center gap-2 text-sm"><div className="w-4 h-4 rounded bg-green-100" /> <span className="text-gray-600">{h.available}</span></div>
+        <div className="flex items-center gap-2 text-sm"><div className="w-4 h-4 rounded bg-red-100" /> <span className="text-gray-600">{h.booked}</span></div>
+        <div className="flex items-center gap-2 text-sm"><div className="w-4 h-4 rounded bg-gray-200" /> <span className="text-gray-600">{h.blocked}</span></div>
+      </div>
+
+      {/* Month nav */}
+      <div className="flex items-center justify-between mb-4">
+        <button onClick={prevMonth} className="p-2 rounded-lg hover:bg-gray-100"><ChevronLeft size={18} /></button>
+        <h3 className="font-bold text-gray-900 capitalize">{monthNames[viewMonth]} {viewYear}</h3>
+        <button onClick={nextMonth} className="p-2 rounded-lg hover:bg-gray-100"><ChevronRight size={18} /></button>
+      </div>
+
+      {/* Grid */}
+      <div className="grid grid-cols-7 gap-1.5 mb-2">
+        {dayLabels.map((d: string) => (
+          <div key={d} className="text-center text-xs font-semibold text-gray-500 py-1">{d}</div>
+        ))}
+      </div>
+      {loading ? (
+        <div className="text-center py-8 text-gray-400">{tr.common.loading}</div>
+      ) : weeks.map((week, wi) => (
+        <div key={wi} className="grid grid-cols-7 gap-1.5 mb-1.5">
+          {week.map((date, di) => {
+            if (!date) return <div key={di} className="min-h-[52px]" />;
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+            const status = getCellStatus(date);
+            const isPast = dateStr < todayStr;
+            return (
+              <div
+                key={di}
+                onClick={() => !isPast && status !== "booked" && toggleDate(dateStr, status)}
+                className={`min-h-[52px] rounded-lg p-1.5 text-sm font-semibold transition-all ${cellBg(status, isPast)} ${updating === dateStr ? "opacity-50" : ""}`}
+              >
+                {date.getDate()}
+              </div>
+            );
+          })}
+        </div>
+      ))}
+      <div className="mt-4 flex items-center justify-between">
+        <p className="text-xs text-gray-400">
+          {lang === "ru" ? "Нажмите на дату, чтобы заблокировать/разблокировать" : "Click a date to toggle blocked/available"}
+        </p>
+        <a href="/dashboard/calendar" className="text-xs font-medium" style={{ color: "#D4001A" }}>
+          {lang === "ru" ? "Открыть полный календарь →" : "Open full calendar →"}
+        </a>
       </div>
     </div>
   );

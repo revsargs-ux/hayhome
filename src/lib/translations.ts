@@ -109,6 +109,11 @@ export interface Translations {
     submitReview: string;
     reviewSuccess: string;
     mustBeGuest: string;
+    // Calendar
+    calendarTitle: string;
+    mon: string; tue: string; wed: string; thu: string; fri: string; sat: string; sun: string;
+    available: string; booked: string; blocked: string;
+    noCalendar: string;
   };
   home: {
     whyTitle: string;
@@ -216,6 +221,10 @@ const t: Record<LangCode, Translations> = {
       submitReview: "Отправить отзыв",
       reviewSuccess: "Спасибо за отзыв!",
       mustBeGuest: "Только гости с завершённым бронированием могут оставить отзыв",
+      calendarTitle: "Календарь доступности",
+      mon: "Пн", tue: "Вт", wed: "Ср", thu: "Чт", fri: "Пт", sat: "Сб", sun: "Вс",
+      available: "Свободно", booked: "Забронировано", blocked: "Заблокировано",
+      noCalendar: "У вас нет календаря. Станьте хозяином, чтобы управлять датами.",
     },
     home: {
       whyTitle: "Почему HayHome?",
@@ -289,6 +298,10 @@ const t: Record<LangCode, Translations> = {
       submitReview: "Submit Review",
       reviewSuccess: "Thank you for your review!",
       mustBeGuest: "Only guests with a completed booking can leave a review",
+      calendarTitle: "Availability Calendar",
+      mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun",
+      available: "Available", booked: "Booked", blocked: "Blocked",
+      noCalendar: "You don't have a calendar. Become a host to manage dates.",
     },
     home: {
       whyTitle: "Why HayHome?",
@@ -358,6 +371,10 @@ const t: Record<LangCode, Translations> = {
       submitReview: "Ուղարկել կարծիքը",
       reviewSuccess: "Շնորհակալություն ձեր կարծիքի համար!",
       mustBeGuest: "Միայն ավարտված ամրագրմամբ հյուրերը կարող են կարծիք թողնել",
+      calendarTitle: "Հասանելիության օրացույց",
+      mon: "Երկ", tue: "Երք", wed: "Չրք", thu: "Հնգ", fri: "Ուր", sat: "Շբթ", sun: "Կիր",
+      available: "Հասանելի", booked: "Ամրագրված", blocked: "Արգելափակված",
+      noCalendar: "Դուք չունեք օրացույց: Դառմավ տանտեր՝ ամսաթիվները կառավարելու համար:",
     },
     home: {
       whyTitle: "Ինչու՞ HayHome?",
@@ -427,6 +444,10 @@ const t: Record<LangCode, Translations> = {
       submitReview: "Envoyer l'avis",
       reviewSuccess: "Merci pour votre avis!",
       mustBeGuest: "Seuls les hôtes avec une réservation terminée peuvent laisser un avis",
+      calendarTitle: "Calendrier de disponibilité",
+      mon: "Lun", tue: "Mar", wed: "Mer", thu: "Jeu", fri: "Ven", sat: "Sam", sun: "Dim",
+      available: "Disponible", booked: "Réservé", blocked: "Bloqué",
+      noCalendar: "Vous n'avez pas de calendrier. Devenez hôte pour gérer les dates.",
     },
     home: {
       whyTitle: "Pourquoi HayHome?",
@@ -496,6 +517,10 @@ const t: Record<LangCode, Translations> = {
       submitReview: "Bewertung senden",
       reviewSuccess: "Danke für Ihre Bewertung!",
       mustBeGuest: "Nur Gäste mit abgeschlossener Buchung können bewerten",
+      calendarTitle: "Verfügbarkeitskalender",
+      mon: "Mo", tue: "Di", wed: "Mi", thu: "Do", fri: "Fr", sat: "Sa", sun: "So",
+      available: "Verfügbar", booked: "Gebucht", blocked: "Gesperrt",
+      noCalendar: "Sie haben keinen Kalender. Werden Sie Gastgeber, um Daten zu verwalten.",
     },
     home: {
       whyTitle: "Warum HayHome?",
@@ -565,6 +590,10 @@ const t: Record<LangCode, Translations> = {
       submitReview: "Enviar reseña",
       reviewSuccess: "¡Gracias por su reseña!",
       mustBeGuest: "Solo huéspedes con reserva completada pueden dejar reseña",
+      calendarTitle: "Calendario de disponibilidad",
+      mon: "Lun", tue: "Mar", wed: "Mié", thu: "Jue", fri: "Vie", sat: "Sáb", sun: "Dom",
+      available: "Disponible", booked: "Reservado", blocked: "Bloqueado",
+      noCalendar: "No tienes calendario. Conviértete en anfitrión para gestionar fechas.",
     },
     home: {
       whyTitle: "¿Por qué HayHome?",
@@ -634,6 +663,10 @@ const t: Record<LangCode, Translations> = {
       submitReview: "Invia recensione",
       reviewSuccess: "Grazie per la recensione!",
       mustBeGuest: "Solo ospiti con prenotazione completata possono lasciare recensione",
+      calendarTitle: "Calendario disponibilità",
+      mon: "Lun", tue: "Mar", wed: "Mer", thu: "Gio", fri: "Ven", sat: "Sab", sun: "Dom",
+      available: "Disponibile", booked: "Prenotato", blocked: "Bloccato",
+      noCalendar: "Non hai un calendario. Diventa host per gestire le date.",
     },
     home: {
       whyTitle: "Perché HayHome?",
@@ -702,6 +735,10 @@ const t: Record<LangCode, Translations> = {
       submitReview: "إرسال التقييم",
       reviewSuccess: "شكراً لتقييمك!",
       mustBeGuest: "فقط الضيوف الذين أكملوا الحجز يمكنهم ترك تقييم",
+      calendarTitle: "تقويم التوفر",
+      mon: "إثن", tue: "ثلا", wed: "أرب", thu: "خمي", fri: "جمع", sat: "سبت", sun: "أحد",
+      available: "متاح", booked: "محجوز", blocked: "محظور",
+      noCalendar: "ليس لديك تقويم. كن مضيفاً لإدارة التواريخ.",
     },
     home: {
       whyTitle: "لماذا HayHome؟",
@@ -770,6 +807,10 @@ const t: Record<LangCode, Translations> = {
       submitReview: "提交评价",
       reviewSuccess: "感谢您的评价！",
       mustBeGuest: "只有完成预订的客人才能留下评价",
+      calendarTitle: "可用性日历",
+      mon: "一", tue: "二", wed: "三", thu: "四", fri: "五", sat: "六", sun: "日",
+      available: "可预订", booked: "已预订", blocked: "已屏蔽",
+      noCalendar: "您没有日历。成为房东以管理日期。",
     },
     home: {
       whyTitle: "为什么选择HayHome？",
@@ -837,7 +878,11 @@ const t: Record<LangCode, Translations> = {
       reviewPlaceholder: "تجربه خود را بیان کنید... (حداقل ۱۰ کاراکتر)",
       submitReview: "ارسال نظر",
       reviewSuccess: "از نظر شما سپاسگزاریم!",
-      mustBeGuest: "فقط مهمانانی که رزرو را تکمیل کرده‌اند می‌توانند نظر بدهند",
+      mustBeGuest: "فقط مهمانانی که رزرو را تکمیل کردهاند میتوانند نظر بدهند",
+      calendarTitle: "تقویم در دسترس",
+      mon: "دوش", tue: "سه‌", wed: "چهار", thu: "پنج", fri: "جمع", sat: "شنب", sun: "یک",
+      available: "در دسترس", booked: "رزرو شده", blocked: "مسدود شده",
+      noCalendar: "شما تقویم ندارید. برای مدیریت تاریخ‌ها میزبان شوید.",
     },
     home: {
       whyTitle: "چرا HayHome؟",
