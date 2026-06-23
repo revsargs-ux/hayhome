@@ -5,7 +5,7 @@ import { Check, X, Star, Users, DollarSign, Home, RefreshCw } from "lucide-react
 import AdminCalendarView from "@/components/AdminCalendarView";
 import { useLang } from "@/contexts/LanguageContext";
 
-type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar";
+type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar" | "users";
 
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>("hosts");
@@ -15,6 +15,17 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
   const [payoutLoading, setPayoutLoading] = useState(false);
+  const [users, setUsers] = useState<any[]>([]);
+  const [userFilter, setUserFilter] = useState("all");
+  const [userSearch, setUserSearch] = useState("");
+  const filteredUsers = users.filter((u: any) => {
+    if (userFilter !== "all" && u.role !== userFilter) return false;
+    if (userSearch) {
+      const q = userSearch.toLowerCase();
+      return (u.name || "").toLowerCase().includes(q) || (u.email || "").toLowerCase().includes(q);
+    }
+    return true;
+  });
   const [calHostId, setCalHostId] = useState("");
   const [calYear, setCalYear] = useState(new Date().getFullYear());
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
@@ -25,14 +36,16 @@ export default function AdminPage() {
 
   const load = async () => {
     setLoading(true);
-    const [h, b, p] = await Promise.all([
+    const [h, b, p, u] = await Promise.all([
       fetch("/api/hosts?all=1", { credentials: "include" }).then((r) => r.json()),
       fetch("/api/bookings", { credentials: "include" }).then((r) => r.json()),
       fetch("/api/partners/payout/", { credentials: "include" }).then((r) => r.json()).catch(() => []),
+      fetch("/api/auth/users", { credentials: "include" }).then((r) => r.json()).catch(() => []),
     ]);
     setHosts(h);
     setBookings(b);
     setPayouts(Array.isArray(p) ? p : []);
+    setUsers(Array.isArray(u) ? u : []);
     setLoading(false);
   };
 
@@ -86,6 +99,7 @@ export default function AdminPage() {
     { key: "payouts", label: a("Выплаты", "Payouts"), badge: payouts.filter(p => p.status === "pending").length || undefined },
     { key: "stats", label: a("Статистика", "Statistics") },
     { key: "calendar", label: a("Календарь", "Calendar") },
+    { key: "users", label: a("Пользователи", "Users"), badge: users.length || undefined },
   ];
 
   return (
@@ -273,6 +287,51 @@ export default function AdminPage() {
                       </div>
                     );
                   })
+                )}
+              </div>
+            )}
+            {tab === "users" && (
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex gap-2 flex-wrap">
+                    <select value={userFilter} onChange={(e) => setUserFilter(e.target.value)}
+                      className="px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none">
+                      <option value="all">{a("Все", "All")} ({users.length})</option>
+                      <option value="guest">{a("Гости", "Guests")} ({users.filter(u => u.role === "guest").length})</option>
+                      <option value="host">{a("Хозяева", "Hosts")} ({users.filter(u => u.role === "host").length})</option>
+                      <option value="admin">Admin ({users.filter(u => u.role === "admin").length})</option>
+                    </select>
+                    <input value={userSearch} onChange={(e) => setUserSearch(e.target.value)} placeholder={a("Поиск по имени или email...", "Search by name or email...")}
+                      className="px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none flex-1 min-w-0" />
+                  </div>
+                </div>
+                {filteredUsers.length === 0 ? (
+                  <div className="text-center py-20 text-gray-400">{a("Нет пользователей", "No users")}</div>
+                ) : (
+                  <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead><tr className="bg-gray-50 text-left">
+                          <th className="px-4 py-3 font-medium text-gray-600">{a("Имя", "Name")}</th>
+                          <th className="px-4 py-3 font-medium text-gray-600">Email</th>
+                          <th className="px-4 py-3 font-medium text-gray-600">{a("Роль", "Role")}</th>
+                          <th className="px-4 py-3 font-medium text-gray-600">{a("Реферал", "Referral")}</th>
+                          <th className="px-4 py-3 font-medium text-gray-600">{a("Дата", "Date")}</th>
+                        </tr></thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {filteredUsers.map((u: any) => (
+                            <tr key={u.id} className="hover:bg-gray-50">
+                              <td className="px-4 py-3 font-medium text-gray-900">{u.name}</td>
+                              <td className="px-4 py-3 text-gray-500">{u.email}</td>
+                              <td className="px-4 py-3"><span className={"text-xs rounded-full px-2 py-0.5 font-medium " + (u.role === "admin" ? "bg-purple-100 text-purple-700" : u.role === "host" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600")}>{u.role}</span></td>
+                              <td className="px-4 py-3 text-gray-400 text-xs">{u.referred_by_code || "—"}</td>
+                              <td className="px-4 py-3 text-gray-400 text-xs">{u.created_at?.slice(0, 10)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 )}
               </div>
             )}
