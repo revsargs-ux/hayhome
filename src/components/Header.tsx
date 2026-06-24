@@ -103,7 +103,7 @@ export default function Header() {
                     <Link href="/partner"
                       className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
                       onClick={() => setUserMenuOpen(false)}>
-                      🤝 {n.partner || "Партнёры"}
+                      🤝 {n.partner}
                     </Link>
                     {user.role === "provider" && (
                       <Link href="/provider/dashboard"
@@ -197,7 +197,7 @@ export default function Header() {
           )}
           {user && (
             <Link href="/partner" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
-              🤝 {n.partner || "Партнёры"}
+              🤝 {n.partner}
             </Link>
           )}
           <div className="pt-2 flex flex-col gap-2">

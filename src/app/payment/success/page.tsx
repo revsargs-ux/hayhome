@@ -20,11 +20,11 @@ function SuccessContent() {
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-3">{u.paymentSuccess}</h1>
         <p className="text-gray-500 mb-2">
-          {lang === "ru" ? "Ваше бронирование подтверждено и оплачено." : "Your booking is confirmed and paid."}
+          {lang === "ru" ? "Ваше бронирование подтверждено и оплачено." : lang === "hy" ? "Ձեր ամրագրումը հաստատված է և վճարված:" : lang === "fr" ? "Votre réservation est confirmée et payée." : lang === "de" ? "Ihre Buchung ist bestätigt und bezahlt." : lang === "es" ? "Su reserva está confirmada y pagada." : lang === "it" ? "La tua prenotazione è confermata e pagata." : lang === "ar" ? "تم تأكيد ودفع حجزك." : lang === "zh" ? "您的预订已确认并付款。" : lang === "fa" ? "رزرو شما تأیید و پرداخت شد." : "Your booking is confirmed and paid."}
         </p>
         {paymentId && (
           <p className="text-gray-400 text-sm mb-6">
-            {lang === "ru" ? "ID платежа" : "Payment ID"}: {paymentId}
+            {lang === "ru" ? "ID платежа" : lang === "hy" ? "Վճարման ID" : "Payment ID"}: {paymentId}
           </p>
         )}
         <div className="flex flex-col gap-3 mt-6">
@@ -33,7 +33,7 @@ function SuccessContent() {
             {u.dashboard}
           </Link>
           <Link href="/hosts" className="block w-full py-3 rounded-full border-2 border-gray-200 text-gray-700 font-semibold text-center hover:bg-gray-50 transition">
-            {lang === "ru" ? "Найти ещё семьи" : "Find more families"}
+            {lang === "ru" ? "Найти ещё семьи" : lang === "hy" ? "Գտնել ավելին" : lang === "fr" ? "Trouver d'autres familles" : lang === "de" ? "Mehr Familien finden" : lang === "es" ? "Encontrar más familias" : lang === "it" ? "Trova altre famiglie" : lang === "ar" ? "ابحث عن المزيد من العائلات" : lang === "zh" ? "查找更多家庭" : lang === "fa" ? "خانواده‌های بیشتری پیدا کنید" : "Find more families"}
           </Link>
         </div>
       </div>

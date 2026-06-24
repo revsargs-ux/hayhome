@@ -6,13 +6,17 @@ const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 import { Host } from "@/lib/types";
 import { Search, SlidersHorizontal, MapPin } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
+import getUI from "@/lib/ui";
 import { useSearchParams } from "next/navigation";
+
+import { regionName } from "@/lib/i18n-utils";
 
 const REGIONS_LIST = ["Ереван", "Тавуш", "Ширак", "Арарат", "Гегаркуник", "Лори", "Вайоц Дзор", "Арагацотн", "Котайк", "Сюник"];
 
 function HostsContent() {
   const { tr, lang } = useLang();
   const h = tr.hosts;
+  const u = getUI(lang);
   const searchParams = useSearchParams();
 
   const [hosts, setHosts] = useState<Host[]>([]);
@@ -98,7 +102,7 @@ function HostsContent() {
               className="hidden sm:block px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 bg-white outline-none cursor-pointer"
             >
               <option value="rating">{h.byRating}</option>
-              <option value="value">🏆 {lang === "ru" ? "Лучшее соотношение цена/качество" : "Best value for money"}</option>
+              <option value="value">🏆 {u.bestValue}</option>
               <option value="price_asc">{h.byPriceAsc}</option>
               <option value="price_desc">{h.byPriceDesc}</option>
             </select>
@@ -111,7 +115,7 @@ function HostsContent() {
                 <select value={region} onChange={(e) => setRegion(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none bg-white">
                   <option value="">{h.allRegions}</option>
-                  {REGIONS_LIST.map((r) => <option key={r} value={r}>{r}</option>)}
+                  {REGIONS_LIST.map((r) => <option key={r} value={r}>{regionName(r, lang)}</option>)}
                 </select>
               </div>
               <div>
@@ -138,11 +142,11 @@ function HostsContent() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
-                  {lang === "ru" ? "Опыт / Впечатление" : lang === "hy" ? "Փորձ / Տպավորություն" : lang === "fr" ? "Expérience" : lang === "de" ? "Erlebnis" : lang === "es" ? "Experiencia" : lang === "it" ? "Esperienza" : lang === "ar" ? "تجربة" : lang === "zh" ? "体验" : lang === "fa" ? "تجربه" : "Experience"}
+                  {u.experience}
                 </label>
                 <input type="text" value={experience}
                   onChange={(e) => setExperience(e.target.value)}
-                  placeholder="Wine, excursion..."
+                  placeholder={u.searchText}
                   className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-red-400" />
               </div>
             </div>
@@ -159,7 +163,7 @@ function HostsContent() {
           <div className="flex items-center gap-3">
             {filtered.length > 0 && (
               <div className="flex items-center gap-1 text-gray-500 text-sm">
-                <MapPin size={14} /> <span>🇦🇲 Armenia</span>
+                <MapPin size={14} /> <span>🇦🇲</span>
               </div>
             )}
             {filtered.length > 0 && (

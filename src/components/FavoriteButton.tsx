@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLang } from "@/contexts/LanguageContext";
+import getUI from "@/lib/ui";
 import { Heart } from "lucide-react";
 
 interface Props {
@@ -11,6 +13,8 @@ interface Props {
 
 export default function FavoriteButton({ hostId, size = 20, className = "" }: Props) {
   const { user } = useAuth();
+  const { lang } = useLang();
+  const u = getUI(lang);
   const [favorited, setFavorited] = useState(false);
   const [loading, setLoading] = useState(true);
   const [bouncing, setBouncing] = useState(false);
@@ -60,7 +64,7 @@ export default function FavoriteButton({ hostId, size = 20, className = "" }: Pr
       onClick={toggle}
       className={`transition-all ${bouncing ? "scale-125" : "scale-100"} ${className}`}
       style={{ transition: "transform 0.2s ease" }}
-      aria-label="Toggle favorite"
+      aria-label={favorited ? u.removeFromFavorites : u.addToFavorites}
     >
       <Heart
         size={size}

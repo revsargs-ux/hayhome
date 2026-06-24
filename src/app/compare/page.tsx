@@ -136,7 +136,7 @@ function CompareContent() {
             ))}
           </Row>
 
-          <Row label={u.compareFamilies === "Сравнение семей" ? "Цена" : "Price"}>
+          <Row label={u.priceLabel}>
             {hosts.map((h) => (
               <Cell key={h.id} highlight={h.pricePerNight === bestPrice}>
                 <span className="text-lg font-bold">${h.pricePerNight}</span>
@@ -207,7 +207,7 @@ function CompareContent() {
             ))}
           </Row>
 
-          <Row label={u.select === "Выбрать" ? "Бейджи" : "Badges"}>
+          <Row label={u.activeStatus}>
             {hosts.map((h) => (
               <Cell key={h.id}>
                 <div className="flex flex-wrap justify-center gap-1">
@@ -227,7 +227,7 @@ function CompareContent() {
             ))}
           </Row>
 
-          <Row label={u.select === "Выбрать" ? "Описание" : "Description"}>
+          <Row label={u.descriptionLabel}>
             {hosts.map((h) => (
               <Cell key={h.id}>
                 <p className="text-xs text-gray-500 line-clamp-3">

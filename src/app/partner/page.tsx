@@ -27,12 +27,12 @@ function PartnerContent() {
     scoutTitle: { ru: "Агент", en: "Agent", hy: "Սկաուտ", fr: "Agent", de: "Agent", es: "Agent" },
     scoutDesc: { ru: "Находите семьи и мастеров, помогаете им зарегистрироваться на платформе. 5% от бронирований — 2 года.", en: "Find families and artisans, help them register. 5% from bookings — 2 years.", hy: "Գտեք ընտանիքներ և վարպետներ, օգնեք նրանց գրանցվել։ 5% ամրագրումներից — 2 տարի.", fr: "Trouvez des familles et artisans. 5% des réservations — 2 ans.", de: "Finden Sie Familien und Handwerker. 5% von Buchungen — 2 Jahre.", es: "Encuentre familias y artesanos. 5% de reservas — 2 años." },
     cta: { ru: "Стать партнёром", en: "Become a Partner", hy: "Դարձել գործընկեր", fr: "Devenir partenaire", de: "Partner werden", es: "Hacerse socio" },
-    faq1q: { ru: "Когда я получу первую выплату?", en: "When do I get my first payout?" },
-    faq1a: { ru: "После первого бронирования от вашего реферала. Выплаты раз в месяц при накоплении от $30.", en: "After the first booking by your referral. Payouts monthly from $30." },
-    faq2q: { ru: "Как долго длится программа?", en: "How long does the program last?" },
-    faq2a: { ru: "2 года с момента первого бронирования реферала. После — комиссия прекращается.", en: "2 years from the referral's first booking. After that, commission stops." },
-    faq3q: { ru: "Как я получаю деньги?", en: "How do I receive money?" },
-    faq3a: { ru: "Через Idram, банковский перевод или криптовалюту. Вывод раз в месяц.", en: "Via Idram, bank transfer, or crypto. Monthly payouts." },
+    faq1q: { ru: "Когда я получу первую выплату?", en: "When do I get my first payout?", hy: "Երբ կստանամ առաջին վճարումը?", fr: "Quand recevrai-ji mon premier paiement?", de: "Wann erhalte ich die erste Auszahlung?", es: "¿Cuándo recibiré mi primer pago?", it: "Quando ricevo il primo pagamento?", ar: "متى أحصل على أول دفعة؟", zh: "我什么时候能收到第一笔付款？", fa: "کی اولین پرداخت را دریافت کنم؟" },
+    faq1a: { ru: "После первого бронирования от вашего реферала. Выплаты раз в месяц при накоплении от $30.", en: "After the first booking by your referral. Payouts monthly from $30.", hy: "Ձեր referral-ի առաջին ամրագրումից հետո: Ամսական վճարումներ $30-ից:", fr: "Après la première réservation de votre filleul. Paiements mensuels à partir de 30 $.", de: "Nach der ersten Buchung Ihres Geworbenen. Monatliche Auszahlungen ab 30 $.", es: "Después de la primera reserva de tu referido. Pagos mensuales desde $30.", it: "Dopo la prima prenotazione del tuo referral. Pagamenti mensili da $30.", ar: "بعد أول حجز من المُحال إليه. مدفوعات شهرية من 30 $.", zh: "在您的推荐人首次预订后。每月付款从30美元起。", fa: "پس از اولین رزرو معرف شما. پرداخت‌های ماهانه از 30 دلار." },
+    faq2q: { ru: "Как долго длится программа?", en: "How long does the program last?", hy: "Որքա՞ն է տևում ծրագիրը:", fr: "Combien de temps dure le programme?", de: "Wie lange dauert das Programm?", es: "¿Cuánto dura el programa?", it: "Quanto dura il programma?", ar: "كم مدة البرنامج؟", zh: "项目持续多久？", fa: "این برنامه چقدر طول می‌کشد؟" },
+    faq2a: { ru: "2 года с момента первого бронирования реферала. После — комиссия прекращается.", en: "2 years from the referral's first booking. After that, commission stops.", hy: "2 տարի referral-ի առաջին ամրագրումից: Դրանից հետո — պրովիզիան դադարում է:", fr: "2 ans après la première réservation du filleul. Ensuite, la commission s'arrête.", de: "2 Jahre ab der ersten Buchung des Geworbenen. Danach endet die Provision.", es: "2 años desde la primera reserva del referido. Después, la comisión se detiene.", it: "2 anni dalla prima prenotazione del referral. Poi, la commissione si ferma.", ar: "سنتان من أول حجز للمُحال إليه. بعد ذلك، تتوقف العمولة.", zh: "从推荐人首次预订起2年。之后佣金停止。", fa: "۲ سال از اولین رزرو معرف. پس از آن، کمیسیون متوقف می‌شود." },
+    faq3q: { ru: "Как я получаю деньги?", en: "How do I receive money?", hy: "Ինչպե՞ս եմ ստանում գումարը:", fr: "Comment reçois-je l'argent?", de: "Wie erhalte ich Geld?", es: "¿Cómo recibo el dinero?", it: "Come ricevo i soldi?", ar: "كيف أستلم الأموال؟", zh: "我如何收到钱？", fa: "چگونه پول دریافت می‌کنم؟" },
+    faq3a: { ru: "Через Idram, банковский перевод или криптовалюту. Вывод раз в месяц.", en: "Via Idram, bank transfer, or crypto. Monthly payouts.", hy: "Idram-ով, բանկային փոխանցումով կամ կրիպտոարժույթով: Ամսական վճարումներ:", fr: "Via Idram, virement bancaire ou crypto. Paiements mensuels.", de: "Über Idram, Banküberweisung oder Krypto. Monatliche Auszahlungen.", es: "Vía Idram, transferencia bancaria o cripto. Pagos mensuales.", it: "Tramite Idram, bonifico o crypto. Pagamenti mensili.", ar: "عبر Idram أو تحويل بنكي أو كريبتو. مدفوعات شهرية.", zh: "通过Idram、银行转账或加密货币。每月付款。", fa: "از طریق Idram، انتقال بانکی یا کریپتو. پرداخت‌های ماهانه." },
   };
 
   const t = (key: string) => (T[key]?.[lang] || T[key]?.en || key) as string;
@@ -75,23 +75,23 @@ function PartnerContent() {
         {/* Roles */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">
-            u.whatPartnersDo
+            {u.whatPartnersDo}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white rounded-2xl shadow-sm p-5 text-center">
               <Users size={28} className="text-red-600 mx-auto mb-3" />
-              <h3 className="font-bold text-gray-900 text-sm mb-1">u.invitesTourists</h3>
-              <p className="text-gray-500 text-xs">u.sharesLinkDiaspora</p>
+              <h3 className="font-bold text-gray-900 text-sm mb-1">{u.invitesTourists}</h3>
+              <p className="text-gray-500 text-xs">{u.sharesLinkDiaspora}</p>
             </div>
             <div className="bg-white rounded-2xl shadow-sm p-5 text-center">
               <MapPin size={28} className="text-red-600 mx-auto mb-3" />
-              <h3 className="font-bold text-gray-900 text-sm mb-1">u.findsFamilies</h3>
-              <p className="text-gray-500 text-xs">u.helpsRegister</p>
+              <h3 className="font-bold text-gray-900 text-sm mb-1">{u.findsFamilies}</h3>
+              <p className="text-gray-500 text-xs">{u.helpsRegister}</p>
             </div>
             <div className="bg-white rounded-2xl shadow-sm p-5 text-center">
               <DollarSign size={28} className="text-red-600 mx-auto mb-3" />
-              <h3 className="font-bold text-gray-900 text-sm mb-1">5% × 2 "u.yearsLabel"</h3>
-              <p className="text-gray-500 text-xs">u.fromFirstDeal</p>
+              <h3 className="font-bold text-gray-900 text-sm mb-1">5% × 2 {u.yearsLabel}</h3>
+              <p className="text-gray-500 text-xs">{u.fromFirstDeal}</p>
             </div>
           </div>
           </div>

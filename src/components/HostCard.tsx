@@ -7,7 +7,7 @@ import FavoriteButton from "@/components/FavoriteButton";
 import { Host } from "@/lib/types";
 import { useLang } from "@/contexts/LanguageContext";
 import { useLightbox } from "@/contexts/LightboxContext";
-import { translateLang, translateBadge, getLocalizedField } from "@/lib/i18n-utils";
+import { translateLang, translateBadge, getLocalizedField, regionName } from "@/lib/i18n-utils";
 import getUI from "@/lib/ui";
 
 const COMPARE_KEY = "hayhome_compare";
@@ -121,7 +121,7 @@ export default function HostCard({ host, valueRank }: Props) {
           <h3 className="font-extrabold text-gray-900 text-lg leading-tight mb-1">{familyName}</h3>
           <div className="flex items-center gap-1 text-gray-500 text-sm mb-2.5">
             <MapPin size={13} className="flex-shrink-0" />
-            <span>{host.city}, {host.region}</span>
+            <span>{host.city}, {regionName(host.region, lang)}</span>
           </div>
           <p className="text-gray-600 text-sm line-clamp-2 mb-3 leading-relaxed">{description}</p>
 

@@ -186,7 +186,7 @@ const t: Record<LangCode, Translations> = {
       partner: "Партнёры",
     },
     hero: {
-      greeting: "Bari Ekeq!",
+      greeting: "Բարի եկաք!",
       title1: "Войди — стань",
       title2: "частью большой",
       title3: "армянской семьи",

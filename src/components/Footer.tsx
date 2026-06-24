@@ -16,7 +16,7 @@ export default function Footer() {
         <div className="max-w-4xl mx-auto px-4 py-16 text-center">
           <div className="text-4xl mb-4">🇦🇲</div>
           <h3 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
-            Bari Ekeq!
+            Բարի եկաք!
           </h3>
           <p className="text-white/50 text-lg mb-8 max-w-xl mx-auto">
             {u.footerTagline}
@@ -77,7 +77,7 @@ export default function Footer() {
             <h4 className="text-white font-bold mb-3 text-sm uppercase tracking-wide">{n.about}</h4>
             <ul className="space-y-2 text-sm">
               <li><Link href="/about" className="hover:text-white transition-colors">{n.about}</Link></li>
-              <li><Link href="/partner" className="hover:text-white transition-colors">{n.partner || "Партнёры"}</Link></li>
+              <li><Link href="/partner" className="hover:text-white transition-colors">{n.partner}</Link></li>
               <li><Link href="/hosts" className="hover:text-white transition-colors">{n.findFamily}</Link></li>
             </ul>
           </div>
@@ -92,11 +92,11 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-3 text-sm uppercase tracking-wide">{tr.legal?.terms || "Terms"}</h4>
+            <h4 className="text-white font-bold mb-3 text-sm uppercase tracking-wide">{tr.legal?.terms}</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/terms" className="hover:text-white transition-colors">{tr.legal?.terms || "Terms"}</Link></li>
-              <li><Link href="/privacy" className="hover:text-white transition-colors">{tr.legal?.privacy || "Privacy"}</Link></li>
-              <li><Link href="/rules" className="hover:text-white transition-colors">{tr.legal?.rules || "Rules"}</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors">{tr.legal?.terms}</Link></li>
+              <li><Link href="/privacy" className="hover:text-white transition-colors">{tr.legal?.privacy}</Link></li>
+              <li><Link href="/rules" className="hover:text-white transition-colors">{tr.legal?.rules}</Link></li>
             </ul>
           </div>
         </div>
@@ -104,9 +104,9 @@ export default function Footer() {
         <div className="border-t border-white/5 mt-8 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-gray-600">© 2025 HayHome. {u.madeInArmenia}</p>
           <div className="flex items-center gap-4 text-xs text-gray-600">
-            <Link href="/terms" className="hover:text-gray-400 transition-colors">{tr.legal?.terms || "Terms"}</Link>
-            <Link href="/privacy" className="hover:text-gray-400 transition-colors">{tr.legal?.privacy || "Privacy"}</Link>
-            <Link href="/rules" className="hover:text-gray-400 transition-colors">{tr.legal?.rules || "Rules"}</Link>
+            <Link href="/terms" className="hover:text-gray-400 transition-colors">{tr.legal?.terms}</Link>
+            <Link href="/privacy" className="hover:text-gray-400 transition-colors">{tr.legal?.privacy}</Link>
+            <Link href="/rules" className="hover:text-gray-400 transition-colors">{tr.legal?.rules}</Link>
           </div>
         </div>
       </div>

@@ -785,7 +785,7 @@ function AdminServicesTab({ lang }: { lang: LangCode }) {
                 <tr>
                   <th className="text-left px-4 py-3">{u.serviceName}</th>
                   <th className="text-left px-4 py-3">{u.categoryLabel}</th>
-                  <th className="text-left px-4 py-3">Region</th>
+                  <th className="text-left px-4 py-3">{u.selectRegion}</th>
                   <th className="text-left px-4 py-3">{u.priceLabel}</th>
                   <th className="text-left px-4 py-3">{u.serviceStatusLabel}</th>
                 </tr>
@@ -822,7 +822,7 @@ function AdminServicesTab({ lang }: { lang: LangCode }) {
                 <tr>
                   <th className="text-left px-4 py-3">{u.serviceName}</th>
                   <th className="text-left px-4 py-3">{u.dateLabel}</th>
-                  <th className="text-left px-4 py-3">Time</th>
+                  <th className="text-left px-4 py-3">{u.timeOfDay}</th>
                   <th className="text-left px-4 py-3">{u.priceLabel}</th>
                   <th className="text-left px-4 py-3">{u.serviceStatusLabel}</th>
                 </tr>

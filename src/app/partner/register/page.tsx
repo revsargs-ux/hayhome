@@ -64,7 +64,7 @@ function PartnerRegisterContent() {
           <div className="space-y-6">
             <div className="text-center">
               <h1 className="text-2xl font-bold text-gray-900">{u.becomePartner}</h1>
-              <p className="text-gray-500 mt-2">""</p>
+              <p className="text-gray-500 mt-2">{u.earnWith}</p>
             </div>
 
             {/* What you do */}
@@ -92,8 +92,8 @@ function PartnerRegisterContent() {
                   <DollarSign size={20} className="text-red-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-sm">"5% × 2 " + u.yearsLabel</h3>
-                  <p className="text-gray-500 text-xs mt-1">u.fromFirstDeal</p>
+                  <h3 className="font-bold text-gray-900 text-sm">{`5% × 2 ${u.yearsLabel}`}</h3>
+                  <p className="text-gray-500 text-xs mt-1">{u.fromFirstDeal}</p>
                 </div>
               </div>
             </div>
@@ -102,15 +102,15 @@ function PartnerRegisterContent() {
               className="w-full py-4 rounded-full text-white font-bold text-lg hover:opacity-90 transition disabled:opacity-70 flex items-center justify-center gap-2"
               style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
               {loading ? <Loader2 size={20} className="animate-spin" /> : <Check size={20} />}
-              u.getPartnerCode
+              {u.getPartnerCode}
             </button>
           </div>
         ) : (
           <div className="text-center space-y-6">
             <div className="text-6xl">🎉</div>
-            <h2 className="text-2xl font-bold text-gray-900">u.youArePartner</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{u.youArePartner}</h2>
             <div className="bg-white rounded-2xl shadow-sm p-6">
-              <p className="text-sm text-gray-500 mb-2">u.yourCode</p>
+              <p className="text-sm text-gray-500 mb-2">{u.yourCode}</p>
               <div className="text-3xl font-bold font-mono" style={{ color: "#D4001A" }}>{partner.code}</div>
               <div className="mt-4 flex items-center gap-2 bg-gray-50 rounded-xl p-3">
                 <code className="text-sm text-gray-700 flex-1 text-left truncate">{refLink}</code>
@@ -118,21 +118,21 @@ function PartnerRegisterContent() {
                   {copied ? <Check size={16} className="text-green-600" /> : <Copy size={16} className="text-gray-500" />}
                 </button>
               </div>
-              <p className="text-xs text-gray-400 mt-2">u.copyAndShare</p>
+              <p className="text-xs text-gray-400 mt-2">{u.copyAndShare}</p>
             </div>
             <div className="bg-white rounded-2xl shadow-sm p-6">
               <QRCodeSVG value={refLink} size={180} level="M" bgColor="white" fgColor="#D4001A"
                 imageSettings={{ src: "", height: 0, width: 0, excavate: false }}
                 className="mx-auto" />
-              <p className="text-sm text-gray-500 mt-3">u.scanQr</p>
-              <button onClick={() => { if (navigator.share) { navigator.share({ title: "HayHome — Партнёр", url: refLink }); } else { navigator.clipboard.writeText(refLink); setCopied(true); setTimeout(() => setCopied(false), 2000); } }}
+              <p className="text-sm text-gray-500 mt-3">{u.scanQr}</p>
+              <button onClick={() => { if (navigator.share) { navigator.share({ title: "HayHome", url: refLink }); } else { navigator.clipboard.writeText(refLink); setCopied(true); setTimeout(() => setCopied(false), 2000); } }}
                 className="mt-4 w-full py-3 rounded-full font-semibold flex items-center justify-center gap-2 border-2 transition hover:bg-gray-50" style={{ borderColor: "#D4001A", color: "#D4001A" }}>
                 <Share2 size={18} /> {copied ? u.copiedText : u.shareText}
               </button>
             </div>
             <Link href="/partner/dashboard" className="block w-full py-3 rounded-full text-white font-semibold text-center"
               style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-              u.partnerDashboard
+              {u.partnerDashboard}
             </Link>
           </div>
         )}

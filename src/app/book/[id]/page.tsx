@@ -246,10 +246,10 @@ export default function BookPage() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        setError(lang === "ru" ? "Платёжная система не настроена" : "Payment system not configured");
+        setError(lang === "ru" ? "Платёжная система не настроена" : lang === "hy" ? "Վճարման համակարգը կարգավորված չէ" : lang === "fr" ? "Système de paiement non configuré" : lang === "de" ? "Zahlungssystem nicht konfiguriert" : lang === "es" ? "Sistema de pago no configurado" : lang === "it" ? "Sistema di pagamento non configurato" : lang === "ar" ? "نظام الدفع غير مهيأ" : lang === "zh" ? "支付系统未配置" : lang === "fa" ? "سیستم پرداخت پیکربندی نشده" : "Payment system not configured");
       }
     } catch {
-      setError(lang === "ru" ? "Ошибка платежа" : "Payment error");
+      setError(lang === "ru" ? "Ошибка платежа" : lang === "hy" ? "Վճարման սխալ" : lang === "fr" ? "Erreur de paiement" : lang === "de" ? "Zahlungsfehler" : lang === "es" ? "Error de pago" : lang === "it" ? "Errore di pagamento" : lang === "ar" ? "خطأ في الدفع" : lang === "zh" ? "支付错误" : lang === "fa" ? "خطای پرداخت" : "Payment error");
     } finally {
       setPaymentLoading(false);
     }
@@ -398,7 +398,7 @@ export default function BookPage() {
               <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("title")}</h1>
               {draftRestored && (
                 <div className="mb-4 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700 flex items-center gap-2">
-                  <span>💾</span> lang === "ru" ? "Восстановлены данные предыдущего бронирования" : lang === "hy" ? "Վերականգնվել են նախորդ ամրագրման տվյալները" : lang === "fr" ? "Données précédentes restaurées" : lang === "de" ? "Vorherige Buchungsdaten wiederhergestellt" : lang === "es" ? "Datos de reserva anteriores restaurados" : lang === "it" ? "Dati prenotazione precedente ripristinati" : lang === "ar" ? "تمت استعادة بيانات الحجز السابق" : lang === "zh" ? "已恢复之前的预订数据" : lang === "fa" ? "اطلاعات رزرو قبلی بازیابی شد" : "Previous booking data restored"
+                  <span>💾</span> {lang === "ru" ? "Восстановлены данные предыдущего бронирования" : lang === "hy" ? "Վերականգնվել են նախորդ ամրագրման տվյալները" : lang === "fr" ? "Données précédentes restaurées" : lang === "de" ? "Vorherige Buchungsdaten wiederhergestellt" : lang === "es" ? "Datos de reserva anteriores restaurados" : lang === "it" ? "Dati prenotazione precedente ripristinati" : lang === "ar" ? "تمت استعادة بيانات الحجز السابق" : lang === "zh" ? "已恢复之前的预订数据" : lang === "fa" ? "اطلاعات رزرو قبلی بازیابی شد" : "Previous booking data restored"}
                 </div>
               )}
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -485,7 +485,7 @@ export default function BookPage() {
                 {detectedCity && (
                   <div className="px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700 flex items-center gap-2">
                     <span>📍</span>
-                    <span>{lang === "ru" ? "Ваш город:" : lang === "hy" ? "Ձեր քաղաքը՝" : lang === "fr" ? "Votre ville:" : "Your city:"} <strong>{detectedCity}</strong>{detectedRegion ? `, ${detectedRegion}` : ""}</span>
+                    <span>{lang === "ru" ? "Ваш город:" : lang === "hy" ? "Ձեր քաղաքը՝" : lang === "fr" ? "Votre ville:" : lang === "de" ? "Ihre Stadt:" : lang === "es" ? "Tu ciudad:" : lang === "it" ? "La tua città:" : lang === "ar" ? "مدينتك:" : lang === "zh" ? "您的城市:" : lang === "fa" ? "شهر شما:" : "Your city:"} <strong>{detectedCity}</strong>{detectedRegion ? `, ${detectedRegion}` : ""}</span>
                   </div>
                 )}
                 <div>
@@ -531,7 +531,7 @@ export default function BookPage() {
                 {nights > 0 && (
                   <div className="border border-gray-200 rounded-xl p-4 space-y-3">
                     <label className="block text-sm font-semibold text-gray-700">
-                      {lang === "ru" ? "Способ оплаты" : "Payment method"}
+                      {lang === "ru" ? "Способ оплаты" : lang === "hy" ? "Վճարման եղանակ" : lang === "fr" ? "Méthode de paiement" : lang === "de" ? "Zahlungsmethode" : lang === "es" ? "Método de pago" : lang === "it" ? "Metodo di pagamento" : lang === "ar" ? "طريقة الدفع" : lang === "zh" ? "付款方式" : lang === "fa" ? "روش پرداخت" : "Payment method"}
                     </label>
                     <div className="flex gap-3">
                       <button
@@ -553,7 +553,7 @@ export default function BookPage() {
                     </div>
                     {paymentMethod === "online" && (
                       <p className="text-xs text-gray-400">
-                        {lang === "ru" ? "После отправки заявки вы будете перенаправлены на страницу оплаты." : "After submitting the request, you will be redirected to the payment page."}
+                        {lang === "ru" ? "После отправки заявки вы будете перенаправлены на страницу оплаты." : lang === "hy" ? "Դիմումը ուղարկելուց հետո դուք կուղղորդվեք վճարման էջ:" : lang === "fr" ? "Après l'envoi de la demande, vous serez redirigé vers la page de paiement." : lang === "de" ? "Nach dem Absenden werden Sie zur Zahlungsseite weitergeleitet." : lang === "es" ? "Después de enviar la solicitud, será redirigido a la página de pago." : lang === "it" ? "Dopo l'invio della richiesta, sarai reindirizzato alla pagina di pagamento." : lang === "ar" ? "بعد إرسال الطلب، سيتم توجيهك إلى صفحة الدفع." : lang === "zh" ? "提交申请后，您将被重定向到付款页面。" : lang === "fa" ? "پس از ارسال درخواست، به صفحه پرداخت هدایت خواهید شد." : "After submitting the request, you will be redirected to the payment page."}
                       </p>
                     )}
                   </div>

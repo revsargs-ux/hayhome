@@ -32,10 +32,10 @@ const PRICE_UNITS = [
 ];
 
 const STATUS_LABELS: Record<string, Record<string, string>> = {
-  requested: { ru: "Запрошен", en: "Requested" },
-  confirmed: { ru: "Подтверждён", en: "Confirmed" },
-  cancelled: { ru: "Отменён", en: "Cancelled" },
-  completed: { ru: "Завершён", en: "Completed" },
+  requested: { ru: "Запрошен", en: "Requested", hy: "Հայցված", fr: "Demandé", de: "Angefragt", es: "Solicitado", it: "Richiesto", ar: "مطلوب", zh: "已请求", fa: "درخواست شده" },
+  confirmed: { ru: "Подтверждён", en: "Confirmed", hy: "Հաստատված", fr: "Confirmé", de: "Bestätigt", es: "Confirmado", it: "Confermato", ar: "مؤكد", zh: "已确认", fa: "تأیید شده" },
+  cancelled: { ru: "Отменён", en: "Cancelled", hy: "Չեղարկված", fr: "Annulé", de: "Storniert", es: "Cancelado", it: "Annullato", ar: "ملغي", zh: "已取消", fa: "لغو شده" },
+  completed: { ru: "Завершён", en: "Completed", hy: "Ավարտված", fr: "Terminé", de: "Abgeschlossen", es: "Completado", it: "Completato", ar: "مكتمل", zh: "已完成", fa: "تکمیل شده" },
 };
 
 // Time-of-day display per lang

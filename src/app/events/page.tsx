@@ -11,11 +11,14 @@ interface EventItem {
   id: string;
   title: string;
   titleRu: string;
+  titleHy: string;
   description: string;
   descriptionRu: string;
+  descriptionHy: string;
   date: string;
   location: string;
   locationRu: string;
+  locationHy: string;
   price: number;
   host: string;
   category: "hovots" | "dance" | "music" | "wineTasting" | "pottery" | "cooking" | "art";
@@ -28,11 +31,14 @@ const EVENTS: EventItem[] = [
     id: "e1",
     title: "Khorovats in Nature with an Armenian Family",
     titleRu: "Хоровац на природе с армянской семьёй",
+    titleHy: "Խորոված բնության մեջ՝ հայ ընտանիքի հետ",
     description: "Experience authentic Armenian barbecue in the mountains. Learn the art of grilling meat over an open fire, paired with fresh herbs and homemade wine.",
     descriptionRu: "Попробуйте настоящий армянский барбекю в горах. Изучите искусство приготовления мяса на открытом огне со свежими травами и домашним вином.",
+    descriptionHy: "Վայելեք իսկական հայկական խորովածը լեռներում: Սովորեք մսի խորովման արվեստը բաց կրակի վրա՝ թարմ խոտաբույսերով և տնական գինով:",
     date: "2026-07-15",
     location: "Ashtarak gorge",
     locationRu: "Аштаракское ущелье",
+    locationHy: "Աշտարակի կիրճ",
     price: 45,
     host: "Sargsyan Family",
     category: "hovots",
@@ -43,11 +49,14 @@ const EVENTS: EventItem[] = [
     id: "e2",
     title: "Lavash Master Class",
     titleRu: "Мастер-класс лаваша",
+    titleHy: "Լավաշի վարպետության դաս",
     description: "Learn to bake traditional Armenian lavash in a tonir (clay oven). From dough to the final bread — a hands-on cultural experience.",
     descriptionRu: "Научитесь печь традиционный армянский лаваш в тонире (глиняной печи). От теста до готового хлеба — практическое культурное погружение.",
+    descriptionHy: "Սովորեք թխել ավանդական հայկական լավաշը թոնիրում (կավե վառարանում): Խմորից մինչև պատրաստի հացը՝ գործնական մշակութային փորձառություն:",
     date: "2026-07-20",
     location: "Yerevan",
     locationRu: "Ереван",
+    locationHy: "Երևան",
     price: 30,
     host: "Grandma Anahit",
     category: "cooking",
@@ -58,11 +67,14 @@ const EVENTS: EventItem[] = [
     id: "e3",
     title: "Wine Tasting in Areni",
     titleRu: "Винная дегустация в Арени",
+    titleHy: "Գինու համտեսում Արենիում",
     description: "Discover Armenia's 6000-year wine heritage. Visit local wineries in Areni, taste indigenous grape varieties and learn from winemakers.",
     descriptionRu: "Откройте 6000-летнее винное наследие Армении. Посетите местные винодельни в Арени, продегустируйте местные сорта винограда и пообщайтесь с виноделами.",
+    descriptionHy: "Բացահայտեք Հայաստանի 6000-ամյա գինու ժառանգությունը: Այցելեք Արենիի տեղական գորղարանները, համտեսեք տեղական խաղողի տեսակները և շփվեք գինեգործների հետ:",
     date: "2026-08-05",
     location: "Areni",
     locationRu: "Арени",
+    locationHy: "Արենի",
     price: 60,
     host: "Areni Wine Cellars",
     category: "wineTasting",
@@ -73,11 +85,14 @@ const EVENTS: EventItem[] = [
     id: "e4",
     title: "Armenian Dance Under the Open Sky",
     titleRu: "Армянские танцы под открытым небом",
+    titleHy: "Հայկական պարեր բաց երկնքի տակ",
     description: "Join a vibrant evening of traditional Armenian circle dances (Kochari). No experience needed — just bring your energy and joy!",
     descriptionRu: "Присоединяйтесь к яркому вечеру традиционных армянских хороводных танцев (Кочари). Опыт не нужен — только энергия и радость!",
+    descriptionHy: "Միացեք ավանդական հայկական շրջապարերի (Քոչարի) վառ երեկոյին: Փորձ չի պահանջվում — միայն էներգիա և ուրախություն!",
     date: "2026-07-28",
     location: "Republic Square, Yerevan",
     locationRu: "Площадь Республики, Ереван",
+    locationHy: "Հանրապետության հրապարակ, Երևան",
     price: 25,
     host: "Yerevan Dance Collective",
     category: "dance",
@@ -88,11 +103,14 @@ const EVENTS: EventItem[] = [
     id: "e5",
     title: "Pottery Workshop in Dilijan",
     titleRu: "Керамическая мастерская в Дилижане",
+    titleHy: "Խեցեգործության արհեստանոց Դիլիջանում",
     description: "Get your hands dirty in a traditional pottery studio surrounded by the lush forests of Dilijan. Create your own ceramic souvenir.",
     descriptionRu: "Погрузите руки в глину в традиционной керамической мастерской в окружении лесов Дилижана. Создайте свой собственный керамический сувенир.",
+    descriptionHy: "Թաթախեք ձեռքերը կավի մեջ ավանդական խեցեգործության արհեստանոցում՝ շրջապատված Դիլիջանի անտառներով: Ստեղծեք ձեր սեփական կերամիկական հուշանվերը:",
     date: "2026-08-12",
     location: "Dilijan",
     locationRu: "Дилижан",
+    locationHy: "Դիլիջան",
     price: 35,
     host: "Dilijan Crafts Center",
     category: "pottery",
@@ -103,11 +121,14 @@ const EVENTS: EventItem[] = [
     id: "e6",
     title: "Culinary Evening — Cooking Dolma",
     titleRu: "Кулинарный вечер — готовим долму",
+    titleHy: "Խոհարարական երեկո — տոլմա պատրաստել",
     description: "Learn to wrap perfect dolma — grape leaves stuffed with spiced rice and meat. A communal cooking experience ending with a feast.",
     descriptionRu: "Научитесь заворачивать идеальную долму — виноградные листья с пряным рисом и мясом. Совместное приготовление заканчивается пиршеством.",
+    descriptionHy: "Սովորեք փաթաթել կատարյալ տոլմա՝ խաղողի տերևներով և համեմված բրնձով ու մսով: Համատեղ խոհարարությունը ավարտվում է խնջույքով:",
     date: "2026-08-18",
     location: "Gyumri",
     locationRu: "Гюмри",
+    locationHy: "Գյումրի",
     price: 40,
     host: "Karapetyan Kitchen",
     category: "cooking",
@@ -126,6 +147,7 @@ export default function EventsPage() {
   const [showMap, setShowMap] = useState(false);
 
   const isRu = lang === "ru";
+  const isHy = lang === "hy";
 
   const filtered = useMemo(() => {
     if (activeCategory === "all") return EVENTS;
@@ -148,8 +170,8 @@ export default function EventsPage() {
   // Adapt events for Map component (expects Host-like objects)
   const mapHosts = filtered.map((e) => ({
     id: e.id,
-    familyName: isRu ? e.titleRu : e.title,
-    city: isRu ? e.locationRu : e.location,
+    familyName: isHy ? e.titleHy : isRu ? e.titleRu : e.title,
+    city: isHy ? e.locationHy : isRu ? e.locationRu : e.location,
     region: "Yerevan",
     coverPhoto: "",
     pricePerNight: e.price,
@@ -210,7 +232,7 @@ export default function EventsPage() {
             onClick={() => setShowMap(!showMap)}
             className="px-4 py-2 rounded-full text-sm font-medium bg-white border border-gray-200 hover:bg-gray-50 transition text-gray-700"
           >
-            {showMap ? "📋 List" : "🗺️ Map"}
+            {showMap ? `📋 ${u.events}` : `🗺️ ${u.route}`}
           </button>
         </div>
 
@@ -253,10 +275,10 @@ export default function EventsPage() {
                 {/* Content */}
                 <div className="p-5">
                   <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
-                    {isRu ? event.titleRu : event.title}
+                    {isHy ? event.titleHy : isRu ? event.titleRu : event.title}
                   </h3>
                   <p className="text-sm text-gray-500 line-clamp-2 mb-3">
-                    {isRu ? event.descriptionRu : event.description}
+                    {isHy ? event.descriptionHy : isRu ? event.descriptionRu : event.description}
                   </p>
 
                   <div className="space-y-1.5 text-xs text-gray-500 mb-4">
@@ -266,7 +288,7 @@ export default function EventsPage() {
                     </div>
                     <div className="flex items-center gap-1.5">
                       <MapPin size={13} className="text-[#C45D3E]" />
-                      {isRu ? event.locationRu : event.location}
+                      {isHy ? event.locationHy : isRu ? event.locationRu : event.location}
                     </div>
                     <div className="flex items-center gap-1.5">
                       <User size={13} className="text-[#C45D3E]" />
@@ -329,10 +351,10 @@ export default function EventsPage() {
               </div>
 
               <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                {isRu ? selectedEvent.titleRu : selectedEvent.title}
+                {isHy ? selectedEvent.titleHy : isRu ? selectedEvent.titleRu : selectedEvent.title}
               </h2>
               <p className="text-gray-600 mb-4">
-                {isRu ? selectedEvent.descriptionRu : selectedEvent.description}
+                {isHy ? selectedEvent.descriptionHy : isRu ? selectedEvent.descriptionRu : selectedEvent.description}
               </p>
 
               <div className="grid grid-cols-2 gap-3 text-sm">
@@ -342,7 +364,7 @@ export default function EventsPage() {
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
                   <MapPin size={16} className="text-[#C45D3E]" />
-                  {isRu ? selectedEvent.locationRu : selectedEvent.location}
+                  {isHy ? selectedEvent.locationHy : isRu ? selectedEvent.locationRu : selectedEvent.location}
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
                   <User size={16} className="text-[#C45D3E]" />

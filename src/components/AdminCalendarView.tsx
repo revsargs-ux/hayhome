@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { Host, Booking } from "@/lib/types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import getUI from "@/lib/ui";
+import type { LangCode } from "@/lib/translations";
 
 interface AdminCalendarViewProps {
   hosts: Host[];
@@ -17,8 +19,9 @@ interface AdminCalendarViewProps {
 }
 
 export default function AdminCalendarView({
-  hosts, calHostId, setCalHostId, calYear, setCalYear, calMonth, setCalMonth, bookings, lang, a,
+  hosts, calHostId, setCalHostId, calYear, setCalYear, calMonth, setCalMonth, bookings, lang,
 }: AdminCalendarViewProps) {
+  const u = getUI(lang as LangCode);
   const [calEntries, setCalEntries] = useState<Map<string, any>>(new Map());
 
   useEffect(() => {
@@ -36,10 +39,8 @@ export default function AdminCalendarView({
 
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-  const monthNames = lang === "ru"
-    ? ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
-    : ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const dayLabels = [a("Пн","Mon"), a("Вт","Tue"), a("Ср","Wed"), a("Чт","Thu"), a("Пт","Fri"), a("Сб","Sat"), a("Вс","Sun")];
+  const monthNames = u.months;
+  const dayLabels = u.months.length >= 12 ? u.months : ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
 
   const firstDay = new Date(calYear, calMonth, 1);
   const lastDay = new Date(calYear, calMonth + 1, 0);
@@ -71,7 +72,7 @@ export default function AdminCalendarView({
     <div>
       {/* Host filter */}
       <div className="flex items-center gap-4 mb-6">
-        <label className="text-sm font-semibold text-gray-700">{a("Семья","Host")}:</label>
+        <label className="text-sm font-semibold text-gray-700">{u.hostsTab}:</label>
         <select value={calHostId} onChange={e => setCalHostId(e.target.value)}
           className="px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-red-400">
           {hosts.map(h => <option key={h.id} value={h.id}>{h.familyName} ({h.city})</option>)}
@@ -122,9 +123,9 @@ export default function AdminCalendarView({
 
       {/* Legend */}
       <div className="flex gap-4 mt-4 text-sm">
-        <div className="flex items-center gap-1"><div className="w-4 h-4 rounded bg-green-100" /> {a("Свободно","Available")}</div>
-        <div className="flex items-center gap-1"><div className="w-4 h-4 rounded bg-red-100" /> {a("Забронировано","Booked")}</div>
-        <div className="flex items-center gap-1"><div className="w-4 h-4 rounded bg-gray-200" /> {a("Заблокировано","Blocked")}</div>
+        <div className="flex items-center gap-1"><div className="w-4 h-4 rounded bg-green-100" /> {u.availableLabel}</div>
+        <div className="flex items-center gap-1"><div className="w-4 h-4 rounded bg-red-100" /> {u.confirmedStatus}</div>
+        <div className="flex items-center gap-1"><div className="w-4 h-4 rounded bg-gray-200" /> {u.cancelledStatus}</div>
       </div>
     </div>
   );

@@ -83,9 +83,9 @@ function PartnerDashboardContent() {
   }
 
   const statusMap: Record<string, Record<string, string>> = {
-    pending: { ru: "Ожидает", en: "Pending" },
-    completed: { ru: "Выплачен", en: "Completed" },
-    rejected: { ru: "Отклонён", en: "Rejected" },
+    pending: { ru: "Ожидает", en: "Pending", hy: "Սպասում", fr: "En attente", de: "Ausstehend", es: "Pendiente", it: "In attesa", ar: "قيد الانتظار", zh: "待处理", fa: "در انتظار" },
+    completed: { ru: "Выплачен", en: "Completed", hy: "Վճարված", fr: "Payé", de: "Abgeschlossen", es: "Completado", it: "Completato", ar: "مكتمل", zh: "已完成", fa: "تکمیل شده" },
+    rejected: { ru: "Отклонён", en: "Rejected", hy: "Մերժված", fr: "Rejeté", de: "Abgelehnt", es: "Rechazado", it: "Rifiutato", ar: "مرفوض", zh: "已拒绝", fa: "رد شده" },
   };
 
   const refLink = `https://hay-home.com/register?ref=${partner.code}`;
@@ -155,7 +155,7 @@ function PartnerDashboardContent() {
                 onChange={e => setPayoutForm(f => ({ ...f, amount: e.target.value }))}
                 placeholder="30"
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400" />
-              <p className="text-xs text-gray-400 mt-1">"Min $30." ${(partner.balance || 0).toFixed(2)}</p>
+              <p className="text-xs text-gray-400 mt-1">{`${u.amountLabel}: $30. ${u.balance}: $${(partner.balance || 0).toFixed(2)}`}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{u.methodLabel}</label>
@@ -163,7 +163,7 @@ function PartnerDashboardContent() {
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400">
                 <option value="idram">Idram</option>
                 <option value="bank_transfer">{u.bankTransfer}</option>
-                <option value="crypto">Crypto</option>
+                <option value="crypto">{u.crypto}</option>
               </select>
             </div>
             <div>

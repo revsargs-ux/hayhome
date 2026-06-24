@@ -20,17 +20,17 @@ function CancelContent() {
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-3">{u.paymentCancelled}</h1>
         <p className="text-gray-500 mb-6">
-          {lang === "ru" ? "Платёж не был завершён. Вы можете попробовать снова." : "Payment was not completed. You can try again."}
+          {lang === "ru" ? "Платёж не был завершён. Вы можете попробовать снова." : lang === "hy" ? "Վճարումը չի ավարտվել: Կարող եք կրկին փորձել." : lang === "fr" ? "Le paiement n'a pas été complété. Vous pouvez réessayer." : lang === "de" ? "Die Zahlung wurde nicht abgeschlossen. Sie können es erneut versuchen." : lang === "es" ? "El pago no se completó. Puede intentarlo de nuevo." : lang === "it" ? "Il pagamento non è stato completato. Puoi riprovare." : lang === "ar" ? "لم يكتمل الدفع. يمكنك المحاولة مرة أخرى." : lang === "zh" ? "付款未完成。您可以再试一次。" : lang === "fa" ? "پرداخت تکمیل نشد. می‌توانید دوباره امتحان کنید." : "Payment was not completed. You can try again."}
         </p>
         <div className="flex flex-col gap-3">
           {paymentId && (
             <Link href={`/dashboard`} className="block w-full py-3 rounded-full text-white font-semibold text-center"
               style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-              {lang === "ru" ? "Повторить оплату" : "Retry payment"}
+              {lang === "ru" ? "Повторить оплату" : lang === "hy" ? "Կրկին վճարել" : lang === "fr" ? "Réessayer" : lang === "de" ? "Erneut versuchen" : lang === "es" ? "Reintentar" : lang === "it" ? "Riprova" : lang === "ar" ? "إعادة المحاولة" : lang === "zh" ? "重试" : lang === "fa" ? "تلاش مجدد" : "Retry payment"}
             </Link>
           )}
           <Link href="/hosts" className="block w-full py-3 rounded-full border-2 border-gray-200 text-gray-700 font-semibold text-center hover:bg-gray-50 transition">
-            {lang === "ru" ? "К семьям" : "Back to hosts"}
+            {lang === "ru" ? "К семьям" : lang === "hy" ? "Ընտանիքներ" : lang === "fr" ? "Aux familles" : lang === "de" ? "Zu Familien" : lang === "es" ? "A familias" : lang === "it" ? "Alle famiglie" : lang === "ar" ? "إلى العائلات" : lang === "zh" ? "到家庭" : lang === "fa" ? "خانواده‌ها" : "Back to hosts"}
           </Link>
         </div>
       </div>

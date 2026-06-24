@@ -260,6 +260,7 @@ export interface UI {
   art: string;
   learnMore: string;
   perPerson: string;
+  experience: string;
 }
 
 type Rec = Record<string, string>;
@@ -497,6 +498,7 @@ const translations: Record<LangCode, UI> = {
     cooking: "🥘 Кулинарные курсы",
     art: "🎨 Искусство",
     learnMore: "Узнать больше",
+    experience: "Опыт / Впечатление",
     perPerson: "$/чел",
     months: ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"],
   },
@@ -733,6 +735,7 @@ const translations: Record<LangCode, UI> = {
     cooking: "🥘 Cooking class",
     art: "🎨 Art",
     learnMore: "Learn more",
+    experience: "Experience",
     perPerson: "$/person",
     months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
   },
@@ -969,6 +972,7 @@ const translations: Record<LangCode, UI> = {
     cooking: "🥘 Խոհարարական դաս",
     art: "🎨 Արվեստ",
     learnMore: "Իմանալ ավելին",
+    experience: "Փորձ / Տպավորություն",
     perPerson: "$֊/մարդ",
     months: ["Հունվար","Փետրվար","Մարտ","Ապրիլ","Մայիս","Հունիս","Հուլիս","Օգոստոս","Սեպտեմբեր","Հոկտեմբեր","Նոյեմբեր","Դեկտեմբեր"],
   },
@@ -1205,6 +1209,7 @@ const translations: Record<LangCode, UI> = {
     cooking: "🥘 Cours de cuisine",
     art: "🎨 Art",
     learnMore: "En savoir plus",
+    experience: "Expérience",
     perPerson: "$/personne",
     months: ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],
   },
@@ -1441,6 +1446,7 @@ const translations: Record<LangCode, UI> = {
     cooking: "🥘 Kochkurs",
     art: "🎨 Kunst",
     learnMore: "Mehr erfahren",
+    experience: "Erlebnis",
     perPerson: "$/Person",
     months: ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],
   },
@@ -1677,6 +1683,7 @@ const translations: Record<LangCode, UI> = {
     cooking: "🥘 Clase de cocina",
     art: "🎨 Arte",
     learnMore: "Saber más",
+    experience: "Experiencia",
     perPerson: "$/persona",
     months: ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],
   },
@@ -1913,6 +1920,7 @@ const translations: Record<LangCode, UI> = {
     cooking: "🥘 Corso di cucina",
     art: "🎨 Arte",
     learnMore: "Scopri di più",
+    experience: "Esperienza",
     perPerson: "$/persona",
     months: ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"],
   },
@@ -2149,6 +2157,7 @@ const translations: Record<LangCode, UI> = {
     cooking: "🥘 درس طبخ",
     art: "🎨 فن",
     learnMore: "اعرف المزيد",
+    experience: "تجربة",
     perPerson: "$/شخص",
     months: ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"],
   },
@@ -2385,6 +2394,7 @@ const translations: Record<LangCode, UI> = {
     cooking: "🥘 烹饪课",
     art: "🎨 艺术",
     learnMore: "了解更多",
+    experience: "体验",
     perPerson: "$/人",
     months: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
   },
@@ -2621,6 +2631,7 @@ const translations: Record<LangCode, UI> = {
     cooking: "🥘 کلاس آشپزی",
     art: "🎨 هنر",
     learnMore: "بیشتر بدانید",
+    experience: "تجربه",
     perPerson: "$/نفر",
     months: ["ژانویه","فوریه","مارس","آوریل","مه","ژوئن","ژوئیه","اوت","سپتامبر","اکتبر","نوامبر","دسامبر"],
   },
