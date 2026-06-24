@@ -51,27 +51,40 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(data ?? []);
 }
 
-// POST /api/service-bookings — create (auth required)
+// POST /api/service-bookings — create
+// Two modes:
+//   1) Host-tied: requires auth + booking_id
+//   2) Standalone: requires guest_name + guest_phone (auth optional)
 export async function POST(req: NextRequest) {
   const blocked = rateLimit(req);
   if (blocked) return blocked;
 
   const user = await getAuthUser(req);
-  if (!user) {
-    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-  }
-
   const body = await req.json();
 
   // Validate
   if (!body.service_id || typeof body.service_id !== "string") {
     return NextResponse.json({ error: "service_id required" }, { status: 400 });
   }
-  if (!body.booking_id || typeof body.booking_id !== "string") {
-    return NextResponse.json({ error: "booking_id required" }, { status: 400 });
-  }
   if (!body.date || typeof body.date !== "string") {
     return NextResponse.json({ error: "date required" }, { status: 400 });
+  }
+
+  const isStandalone = !body.booking_id;
+
+  // For standalone bookings: require guest_name + guest_phone
+  // For host-tied bookings: require auth
+  if (isStandalone) {
+    if (!body.guest_name || typeof body.guest_name !== "string" || body.guest_name.trim().length === 0) {
+      return NextResponse.json({ error: "guest_name required for standalone booking" }, { status: 400 });
+    }
+    if (!body.guest_phone || typeof body.guest_phone !== "string" || body.guest_phone.trim().length === 0) {
+      return NextResponse.json({ error: "guest_phone required for standalone booking" }, { status: 400 });
+    }
+  } else {
+    if (!user) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    }
   }
 
   // Verify service exists and get price
@@ -88,60 +101,100 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Service not available" }, { status: 400 });
   }
 
-  // Verify booking exists
-  const { data: booking } = await supabase
-    .from("hayhome_bookings")
-    .select("id, checkIn, checkOut, guestEmail, hostId")
-    .eq("id", body.booking_id)
-    .single();
+  // For host-tied bookings: verify booking exists and user owns it
+  let booking: { id: string; checkIn: string; checkOut: string; guestEmail: string; hostId: string } | null = null;
+  if (!isStandalone) {
+    const { data: b } = await supabase
+      .from("hayhome_bookings")
+      .select("id, checkIn, checkOut, guestEmail, hostId")
+      .eq("id", body.booking_id)
+      .single();
+    booking = b;
 
-  if (!booking) {
-    return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    if (!booking) {
+      return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
+
+    // Verify user owns this booking (or is admin)
+    if (booking.guestEmail !== user!.email && user!.role !== "admin") {
+      return NextResponse.json({ error: "Not your booking" }, { status: 403 });
+    }
+
+    // Validate date is within booking range
+    if (body.date < booking.checkIn || body.date >= booking.checkOut) {
+      return NextResponse.json({ error: "Date must be within booking range" }, { status: 400 });
+    }
   }
 
-  // Verify user owns this booking (or is admin)
-  if (booking.guestEmail !== user.email && user.role !== "admin") {
-    return NextResponse.json({ error: "Not your booking" }, { status: 403 });
-  }
-
-  // Validate date is within booking range
-  if (body.date < booking.checkIn || body.date >= booking.checkOut) {
-    return NextResponse.json({ error: "Date must be within booking range" }, { status: 400 });
-  }
-
-  // Calculate total_price based on price_unit and duration
-  const startTime = body.start_time || "10:00";
-  const endTime = body.end_time || "12:00";
-  let durationHours = 2;
-  try {
-    const [sh, sm] = startTime.split(":").map(Number);
-    const [eh, em] = endTime.split(":").map(Number);
-    durationHours = Math.max(0.5, (eh * 60 + em - sh * 60 - sm) / 60);
-  } catch { /* default */ }
-
+  // Calculate total_price based on price_unit
+  const guestsCount = typeof body.guests === "number" ? body.guests : (typeof body.guests_count === "number" ? body.guests_count : 1);
   let totalPrice = service.price;
+  if (service.price_unit === "per_person") {
+    totalPrice = service.price * guestsCount;
+  }
+
+  // Determine start/end time from time_of_day or direct values
+  let startTime = body.start_time || "10:00";
+  let endTime = body.end_time || "12:00";
+  const tod = body.time_of_day;
+  if (tod === "morning") {
+    startTime = "09:00";
+    endTime = "12:00";
+  } else if (tod === "evening") {
+    startTime = "17:00";
+    endTime = "20:00";
+  } else if (tod === "custom" && typeof body.custom_time === "string") {
+    // Try to parse custom_time like "14:00" or "14:00-16:00"
+    const parts = body.custom_time.split("-");
+    if (parts.length === 2) {
+      startTime = parts[0].trim();
+      endTime = parts[1].trim();
+    } else {
+      startTime = body.custom_time.trim();
+    }
+  }
+
+  // For per_hour, calculate based on duration
   if (service.price_unit === "per_hour") {
-    totalPrice = service.price * durationHours;
-  } else if (service.price_unit === "per_person") {
-    totalPrice = service.price * (body.guests_count || 1);
+    try {
+      const [sh, sm] = startTime.split(":").map(Number);
+      const [eh, em] = endTime.split(":").map(Number);
+      const durationHours = Math.max(0.5, (eh * 60 + em - sh * 60 - sm) / 60);
+      totalPrice = service.price * durationHours;
+    } catch { /* keep default */ }
   }
 
   const insertData: Record<string, unknown> = {
-    booking_id: body.booking_id,
     service_id: body.service_id,
     date: body.date,
     start_time: startTime,
     end_time: endTime,
-    guests_count: typeof body.guests_count === "number" ? body.guests_count : 1,
+    guests_count: guestsCount,
     status: "requested",
     total_price: Math.round(totalPrice * 100) / 100,
-    client_note: typeof body.client_note === "string" ? body.client_note.slice(0, 1000) : "",
+    client_note: typeof body.message === "string" ? body.message.slice(0, 1000)
+               : typeof body.client_note === "string" ? body.client_note.slice(0, 1000)
+               : "",
   };
 
-  // time_of_day: "morning" | "evening" | "custom"
-  if (body.time_of_day && ["morning", "evening", "custom"].includes(body.time_of_day)) {
-    insertData.time_of_day = body.time_of_day;
-    if (body.time_of_day === "custom" && typeof body.custom_time === "string") {
+  // booking_id (nullable for standalone)
+  if (!isStandalone) {
+    insertData.booking_id = body.booking_id;
+  }
+
+  // Standalone-specific fields
+  if (isStandalone) {
+    insertData.guest_name = String(body.guest_name).slice(0, 200);
+    insertData.guest_phone = String(body.guest_phone).slice(0, 50);
+    if (body.payment_method && ["onsite", "transfer"].includes(body.payment_method)) {
+      insertData.payment_method = body.payment_method;
+    }
+  }
+
+  // time_of_day
+  if (tod && ["morning", "evening", "custom"].includes(tod)) {
+    insertData.time_of_day = tod;
+    if (tod === "custom" && typeof body.custom_time === "string") {
       insertData.custom_time = body.custom_time.slice(0, 100);
     }
   }
@@ -153,7 +206,7 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: "Failed to create service booking" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to create service booking: " + error.message }, { status: 500 });
   }
 
   return NextResponse.json(data, { status: 201 });

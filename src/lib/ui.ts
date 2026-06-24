@@ -275,6 +275,15 @@ export interface UI {
   catGuide: string;
   catChef: string;
   catCustom: string;
+  // Standalone service booking
+  bookService: string;
+  serviceBooking: string;
+  selectDate: string;
+  numberOfPeople: string;
+  messageToProvider: string;
+  orderSent: string;
+  providerWillContact: string;
+  backToServices: string;
 }
 
 type Rec = Record<string, string>;
@@ -528,6 +537,14 @@ const translations: Record<LangCode, UI> = {
     catChef: "👨‍🍳 Повар",
     catCustom: "✨ Другое",
     months: ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"],
+    bookService: "Заказать услугу",
+    serviceBooking: "Заказ услуги",
+    selectDate: "Выберите дату",
+    numberOfPeople: "Количество человек",
+    messageToProvider: "Сообщение провайдеру",
+    orderSent: "Заказ отправлен!",
+    providerWillContact: "Провайдер свяжется с вами",
+    backToServices: "Назад к услугам",
   },
 
   en: {
@@ -778,6 +795,14 @@ const translations: Record<LangCode, UI> = {
     catChef: "👨‍🍳 Chef",
     catCustom: "✨ Custom",
     months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+    bookService: "Book Service",
+    serviceBooking: "Service Booking",
+    selectDate: "Select date",
+    numberOfPeople: "Number of people",
+    messageToProvider: "Message to provider",
+    orderSent: "Order sent!",
+    providerWillContact: "Provider will contact you",
+    backToServices: "Back to services",
   },
 
   hy: {
@@ -1028,6 +1053,14 @@ const translations: Record<LangCode, UI> = {
     catChef: "👨‍🍳 Խոհարար",
     catCustom: "✨ Այլ",
     months: ["Հունվար","Փետրվար","Մարտ","Ապրիլ","Մայիս","Հունիս","Հուլիս","Օգոստոս","Սեպտեմբեր","Հոկտեմբեր","Նոյեմբեր","Դեկտեմբեր"],
+    bookService: "Պահանջել ծառայություն",
+    serviceBooking: "Ծառայության պահանգ",
+    selectDate: "Ընտրեք ամսաթիվը",
+    numberOfPeople: "Մարդկանց քանակը",
+    messageToProvider: "Նամակ մատակարարին",
+    orderSent: "Պահանգը ուղարկված է՜",
+    providerWillContact: "Մատակարարը կկապվի ձեզ հետ",
+    backToServices: "Վերադարձ ծառայություններին",
   },
 
   fr: {
@@ -1278,6 +1311,14 @@ const translations: Record<LangCode, UI> = {
     catChef: "👨‍🍳 Chef",
     catCustom: "✨ Autre",
     months: ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],
+    bookService: "Réserver le service",
+    serviceBooking: "Réservation de service",
+    selectDate: "Choisir une date",
+    numberOfPeople: "Nombre de personnes",
+    messageToProvider: "Message au prestataire",
+    orderSent: "Commande envoyée !",
+    providerWillContact: "Le prestataire vous contactera",
+    backToServices: "Retour aux services",
   },
 
   de: {
@@ -1528,6 +1569,14 @@ const translations: Record<LangCode, UI> = {
     catChef: "👨‍🍳 Koch",
     catCustom: "✨ Sonstiges",
     months: ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],
+    bookService: "Service buchen",
+    serviceBooking: "Servicebuchung",
+    selectDate: "Datum wählen",
+    numberOfPeople: "Anzahl Personen",
+    messageToProvider: "Nachricht an Anbieter",
+    orderSent: "Bestellung gesendet!",
+    providerWillContact: "Anbieter wird Sie kontaktieren",
+    backToServices: "Zurück zu Services",
   },
 
   es: {
@@ -1778,6 +1827,14 @@ const translations: Record<LangCode, UI> = {
     catChef: "👨‍🍳 Chef",
     catCustom: "✨ Otro",
     months: ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],
+    bookService: "Reservar servicio",
+    serviceBooking: "Reserva de servicio",
+    selectDate: "Seleccionar fecha",
+    numberOfPeople: "Número de personas",
+    messageToProvider: "Mensaje al proveedor",
+    orderSent: "¡Pedido enviado!",
+    providerWillContact: "El proveedor se pondrá en contacto",
+    backToServices: "Volver a servicios",
   },
 
   it: {
@@ -2028,6 +2085,14 @@ const translations: Record<LangCode, UI> = {
     catChef: "👨‍🍳 Cuoco",
     catCustom: "✨ Altro",
     months: ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"],
+    bookService: "Prenota servizio",
+    serviceBooking: "Prenotazione servizio",
+    selectDate: "Seleziona data",
+    numberOfPeople: "Numero di persone",
+    messageToProvider: "Messaggio al fornitore",
+    orderSent: "Ordine inviato!",
+    providerWillContact: "Il fornitore vi contatterà",
+    backToServices: "Torna ai servizi",
   },
 
   ar: {
@@ -2278,6 +2343,14 @@ const translations: Record<LangCode, UI> = {
     catChef: "👨‍🍳 طاهي",
     catCustom: "✨ أخرى",
     months: ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"],
+    bookService: "احجز الخدمة",
+    serviceBooking: "حجز الخدمة",
+    selectDate: "اختر التاريخ",
+    numberOfPeople: "عدد الأشخاص",
+    messageToProvider: "رسالة إلى مقدم الخدمة",
+    orderSent: "تم إرسال الطلب!",
+    providerWillContact: "سيتواصل معك مقدم الخدمة",
+    backToServices: "العودة إلى الخدمات",
   },
 
   zh: {
@@ -2528,6 +2601,14 @@ const translations: Record<LangCode, UI> = {
     catChef: "👨‍🍳 厨师",
     catCustom: "✨ 其他",
     months: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
+    bookService: "预订服务",
+    serviceBooking: "服务预订",
+    selectDate: "选择日期",
+    numberOfPeople: "人数",
+    messageToProvider: "给提供商的留言",
+    orderSent: "订单已发送！",
+    providerWillContact: "提供商将与您联系",
+    backToServices: "返回服务",
   },
 
   fa: {
@@ -2778,6 +2859,14 @@ const translations: Record<LangCode, UI> = {
     catChef: "👨‍🍳 آشپز",
     catCustom: "✨ سایر",
     months: ["ژانویه","فوریه","مارس","آوریل","مه","ژوئن","ژوئیه","اوت","سپتامبر","اکتبر","نوامبر","دسامبر"],
+    bookService: "رزرو خدمات",
+    serviceBooking: "رزرو خدمات",
+    selectDate: "انتخاب تاریخ",
+    numberOfPeople: "تعداد افراد",
+    messageToProvider: "پیام به تأمین‌کننده",
+    orderSent: "سفارش ارسال شد!",
+    providerWillContact: "تأمین‌کننده با شما تماس خواهد گرفت",
+    backToServices: "بازگشت به خدمات",
   },
 };
 

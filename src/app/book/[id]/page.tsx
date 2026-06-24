@@ -36,7 +36,7 @@ export default function BookPage() {
 
   const [form, setForm] = useState({
     guestName: "", guestEmail: "", guestPhone: "",
-    guestCountry: "", checkIn: "", checkOut: "", guests: 1, message: "",
+    guestCountry: "", checkIn: "", checkOut: "", checkInTime: "14:00", checkOutTime: "12:00", guests: 1, message: "",
   });
   const [draftRestored, setDraftRestored] = useState(false);
 
@@ -123,6 +123,8 @@ export default function BookPage() {
           guestPhone: saved.guestPhone || f.guestPhone,
           checkIn: saved.checkIn || f.checkIn,
           checkOut: saved.checkOut || f.checkOut,
+          checkInTime: saved.checkInTime || f.checkInTime,
+          checkOutTime: saved.checkOutTime || f.checkOutTime,
           guests: saved.guests || f.guests,
           message: saved.message || f.message,
         }));
@@ -145,6 +147,8 @@ export default function BookPage() {
           guestCountry: form.guestCountry,
           checkIn: form.checkIn,
           checkOut: form.checkOut,
+          checkInTime: form.checkInTime,
+          checkOutTime: form.checkOutTime,
           guests: form.guests,
           message: form.message,
         }));
@@ -295,7 +299,7 @@ export default function BookPage() {
         </p>
         <div className="bg-orange-50 rounded-xl p-4 mb-6 text-left text-sm">
           <p className="font-semibold text-gray-800 mb-2">{t("details")}:</p>
-          <p>📅 {form.checkIn} → {form.checkOut} ({nights} {t("nights")})</p>
+          <p>📅 {form.checkIn}{form.checkInTime ? " " + form.checkInTime : ""} → {form.checkOut}{form.checkOutTime ? " " + form.checkOutTime : ""} ({nights} {t("nights")})</p>
           <p>👥 {form.guests} {tr.hosts.guests}</p>
           <p>💵 {t("total")}: ${finalTotal}</p>
         </div>
@@ -361,6 +365,9 @@ export default function BookPage() {
                       min={new Date().toISOString().split("T")[0]}
                       onChange={e => setForm(f => ({ ...f, checkIn: e.target.value }))}
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
+                    <input type="time" value={form.checkInTime}
+                      onChange={e => setForm(f => ({ ...f, checkInTime: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900 mt-1.5" />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("checkOut")} *</label>
@@ -368,6 +375,9 @@ export default function BookPage() {
                       min={form.checkIn || new Date().toISOString().split("T")[0]}
                       onChange={e => setForm(f => ({ ...f, checkOut: e.target.value }))}
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
+                    <input type="time" value={form.checkOutTime}
+                      onChange={e => setForm(f => ({ ...f, checkOutTime: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900 mt-1.5" />
                   </div>
                 </div>
 

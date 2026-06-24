@@ -311,7 +311,7 @@ function ServiceCard({ service, catLabel, unitLabel, providerName, orderText, ra
             <span className="text-xs text-gray-400 ml-1">{unitLabel}</span>
           </div>
           <Link
-            href={`/provider/register?service=${service.id}`}
+            href={`/services/book/${service.id}`}
             className="px-4 py-2 rounded-full text-white text-xs font-semibold transition hover:opacity-90"
             style={{ background: "linear-gradient(135deg, #C45D3E, #D4A04A)" }}
           >

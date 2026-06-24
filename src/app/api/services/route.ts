@@ -8,12 +8,27 @@ const VALID_UNITS = ["per_hour", "per_event", "per_person"];
 
 // GET /api/services?category=X&region=Y  — public list
 // GET /api/services?provider=X           — list by provider
+// GET /api/services?id=ID                 — single service by id
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
   const category = sp.get("category");
   const region = sp.get("region");
   const provider = sp.get("provider");
   const search = sp.get("search");
+  const serviceId = sp.get("id");
+
+  // Single service by id
+  if (serviceId) {
+    const { data, error } = await supabase
+      .from("hayhome_services")
+      .select("*")
+      .eq("id", serviceId)
+      .single();
+    if (error || !data) {
+      return NextResponse.json({ error: "Service not found" }, { status: 404 });
+    }
+    return NextResponse.json(data);
+  }
 
   let query = supabase
     .from("hayhome_services")
