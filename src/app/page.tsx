@@ -150,7 +150,7 @@ export default function HomePage() {
                         <span className="text-lg font-bold" style={{ color: "#D4001A" }}>${host.pricePerNight}</span>
                       </div>
                       <p className="text-gray-500 text-sm mb-3">
-                        📍 {host.city}, {host.region} · ⭐ {host.rating} ({host.reviewCount})
+                        📍 {host.city}, {host.region} · ⭐ {Number(host.rating || 0).toFixed(1)} ({host.reviewCount || 0})
                       </p>
                       <p className="text-gray-600 text-sm line-clamp-2">
                         {(host.i18n?.[lang]?.description) || host.description}
@@ -224,7 +224,7 @@ export default function HomePage() {
                       <div className="flex items-center gap-1">
                         <Star size={12} fill="#F2A900" color="#F2A900" />
                         <span className="text-xs font-semibold text-gray-700">
-                          {host.rating > 0 ? host.rating.toFixed(1) : "New"}
+                          {host.rating > 0 ? Number(host.rating).toFixed(1) : "New"}
                         </span>
                       </div>
                       <span className="text-sm font-bold" style={{ color: "#D4001A" }}>${host.pricePerNight}</span>

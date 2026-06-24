@@ -150,9 +150,9 @@ export default function HostCard({ host, valueRank }: Props) {
             <div className="flex items-center gap-1">
               <Star size={14} fill="#F2A900" color="#F2A900" />
               <span className="text-sm font-bold text-gray-900">
-                {host.rating > 0 ? host.rating.toFixed(1) : tr.common.newHost}
+                {host.rating > 0 ? Number(host.rating).toFixed(1) : tr.common.newHost}
               </span>
-              {host.reviewCount > 0 && <span className="text-sm text-gray-400">({host.reviewCount})</span>}
+              {(host.reviewCount || 0) > 0 && <span className="text-sm text-gray-400">({host.reviewCount})</span>}
             </div>
             <div className="flex items-center gap-1 text-gray-500 text-sm">
               <Users size={13} />

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Star, Trash2, Edit2, Plus, Check, X, RefreshCw } from "lucide-react";
+import { Star, Trash2, Edit2, Plus, Check, X, RefreshCw, Camera } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";
@@ -59,6 +59,69 @@ export default function ProviderDashboardPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [customCat, setCustomCat] = useState("");
   const [saving, setSaving] = useState(false);
+  const [svcPhotoUploading, setSvcPhotoUploading] = useState<string | null>(null); // service id being uploaded to
+
+  const handleSvcPhotoUpload = async (svcId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setSvcPhotoUploading(svcId);
+
+    try {
+      const fd = new FormData();
+      Array.from(files).forEach((f) => fd.append("files", f));
+
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
+      if (!uploadRes.ok) { setSvcPhotoUploading(null); return; }
+
+      const { urls } = await uploadRes.json();
+      const svc = services.find((s) => s.id === svcId);
+      if (!svc) { setSvcPhotoUploading(null); return; }
+
+      const newPhotos = [...(svc.photos || []), ...urls];
+
+      const patchRes = await fetch("/api/services", {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: svcId, photos: newPhotos }),
+      });
+
+      if (patchRes.ok) {
+        const updated = await patchRes.json();
+        setServices((prev) => prev.map((s) => (s.id === svcId ? updated : s)));
+      }
+    } catch {
+      // ignore
+    } finally {
+      setSvcPhotoUploading(null);
+      if (e.target) e.target.value = "";
+    }
+  };
+
+  const handleSvcPhotoDelete = async (svcId: string, photoUrl: string) => {
+    const svc = services.find((s) => s.id === svcId);
+    if (!svc) return;
+    if (!confirm("Удалить это фото?")) return;
+
+    const newPhotos = svc.photos.filter((p) => p !== photoUrl);
+
+    try {
+      const patchRes = await fetch("/api/services", {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: svcId, photos: newPhotos }),
+      });
+
+      if (patchRes.ok) {
+        const updated = await patchRes.json();
+        setServices((prev) => prev.map((s) => (s.id === svcId ? updated : s)));
+      }
+    } catch {
+      // ignore
+    }
+  };
 
   const [form, setForm] = useState({
     category: "",
@@ -343,6 +406,41 @@ export default function ProviderDashboardPage() {
                         <span>·</span>
                         <span>{svc.region}</span>
                       </div>
+
+                      {/* Service photos */}
+                      {svc.photos && svc.photos.length > 0 && (
+                        <div className="grid grid-cols-3 gap-1.5 mb-3">
+                          {svc.photos.map((photo, pi) => (
+                            <div key={pi} className="relative group rounded-lg overflow-hidden aspect-square bg-gray-100">
+                              <img src={photo} alt={`svc-photo-${pi}`} className="w-full h-full object-cover" />
+                              <button
+                                onClick={() => handleSvcPhotoDelete(svc.id, photo)}
+                                className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-md hover:scale-110"
+                              >
+                                <Trash2 size={11} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Upload button */}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) => handleSvcPhotoUpload(svc.id, e)}
+                        className="hidden"
+                        id={`svc-photo-${svc.id}`}
+                      />
+                      <button
+                        onClick={() => document.getElementById(`svc-photo-${svc.id}`)?.click()}
+                        disabled={svcPhotoUploading === svc.id}
+                        className="w-full py-1.5 rounded-lg bg-amber-50 text-amber-700 text-xs font-medium hover:bg-amber-100 transition flex items-center justify-center gap-1 disabled:opacity-50 mb-2"
+                      >
+                        <Camera size={12} /> {svcPhotoUploading === svc.id ? "..." : "Фото"}
+                      </button>
+
                       <div className="flex gap-2">
                         <button onClick={() => startEdit(svc)}
                           className="flex-1 py-2 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 flex items-center justify-center gap-1">

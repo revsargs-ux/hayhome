@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Booking, Host } from "@/lib/types";
-import { Calendar, DollarSign, Users, Star, Edit2, Save, X, RefreshCw, LogOut, Shield, Share2, ChevronLeft, ChevronRight, Navigation, Heart, MessageCircle } from "lucide-react";
+import { Calendar, DollarSign, Users, Star, Edit2, Save, X, RefreshCw, LogOut, Shield, Share2, ChevronLeft, ChevronRight, Navigation, Heart, MessageCircle, Camera, Trash2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -56,6 +56,10 @@ export default function DashboardPage() {
   const [showChatWidget, setShowChatWidget] = useState(false);
   const [chatWithUser, setChatWithUser] = useState<string | null>(null);
 
+  // Photo management state
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoError, setPhotoError] = useState("");
+
   const statusLabels = STATUS_LABELS[lang] ?? STATUS_LABELS.en;
 
   useEffect(() => {
@@ -101,6 +105,69 @@ export default function DashboardPage() {
     await loadData();
     setEditing(false);
     setSaving(false);
+  };
+
+  const handleDashboardPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !myProfile) return;
+
+    setPhotoUploading(true);
+    setPhotoError("");
+
+    try {
+      const fd = new FormData();
+      Array.from(files).forEach((f) => fd.append("files", f));
+
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
+      if (!uploadRes.ok) {
+        const errData = await uploadRes.json().catch(() => ({}));
+        setPhotoError(errData.error || "Upload failed");
+        setPhotoUploading(false);
+        return;
+      }
+
+      const { urls } = await uploadRes.json();
+      const newPhotos = [...(myProfile.photos || []), ...urls];
+
+      const patchRes = await fetch(`/api/hosts/${myProfile.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photos: newPhotos }),
+      });
+
+      if (patchRes.ok) {
+        const updated = await patchRes.json();
+        setMyProfile(updated);
+      }
+    } catch {
+      setPhotoError("Network error");
+    } finally {
+      setPhotoUploading(false);
+      if (e.target) e.target.value = "";
+    }
+  };
+
+  const handleDashboardPhotoDelete = async (photoUrl: string) => {
+    if (!myProfile) return;
+    if (!confirm("Удалить это фото?")) return;
+
+    const newPhotos = myProfile.photos.filter((p) => p !== photoUrl);
+    const newCover = myProfile.coverPhoto === photoUrl ? (newPhotos[0] || "") : myProfile.coverPhoto;
+
+    try {
+      const patchRes = await fetch(`/api/hosts/${myProfile.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photos: newPhotos, coverPhoto: newCover }),
+      });
+
+      if (patchRes.ok) {
+        const updated = await patchRes.json();
+        setMyProfile(updated);
+      }
+    } catch {
+      // ignore
+    }
   };
 
   const myBookings = user?.role === "admin"
@@ -284,6 +351,7 @@ export default function DashboardPage() {
 
         {/* Profile tab */}
         {tab === "profile" && myProfile && (
+          <div className="space-y-4">
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900">{myProfile.familyName}</h2>
@@ -360,9 +428,55 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
-        )}
 
-        {/* Guest profile tab (no host profile) */}
+          {/* Photo Management Section */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">📷 Управление фото</h3>
+
+            <div className="mb-4">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Загрузить новые фото</label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleDashboardPhotoUpload}
+                className="hidden"
+                id="dashboard-photo-input"
+              />
+              <button
+                onClick={() => document.getElementById("dashboard-photo-input")?.click()}
+                disabled={photoUploading}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
+                style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
+              >
+                <Camera size={16} /> {photoUploading ? "Загрузка..." : "Добавить фото"}
+              </button>
+              {photoError && <p className="text-red-500 text-xs mt-2">{photoError}</p>}
+            </div>
+
+            {myProfile.photos && myProfile.photos.length > 0 ? (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                {myProfile.photos.map((photo, idx) => (
+                  <div key={idx} className="relative group rounded-xl overflow-hidden aspect-square bg-gray-100">
+                    <img src={photo} alt={`photo-${idx}`} className="w-full h-full object-cover" />
+                    <button
+                      onClick={() => handleDashboardPhotoDelete(photo)}
+                      className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-md hover:scale-110"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                    {photo === myProfile.coverPhoto && (
+                      <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium">Обложка</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-400 text-sm text-center py-6">Фото пока не загружены</p>
+            )}
+          </div>
+          </div>
+        )}
         {tab === "profile" && !myProfile && (
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">

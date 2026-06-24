@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Users, Globe, Star, Phone, Mail, Check, ChevronLeft, X } from "lucide-react";
+import { MapPin, Users, Globe, Star, Phone, Mail, Check, ChevronLeft, X, Camera, Trash2 } from "lucide-react";
 import { Host, Review, Booking } from "@/lib/types";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,6 +38,13 @@ export default function HostProfilePage() {
   const [reviewMedia, setReviewMedia] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [mediaError, setMediaError] = useState("");
+
+  // Host photo upload state
+  const [hostPhotoInput, setHostPhotoInput] = useState<HTMLInputElement | null>(null);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const [photoError, setPhotoError] = useState("");
+
+  const isHostOwner = user && host && (user.id === host.user_id || user.role === "admin");
 
   useEffect(() => {
     Promise.all([
@@ -93,6 +100,70 @@ export default function HostProfilePage() {
 
   const removeMedia = (index: number) => {
     setReviewMedia((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Handle host photo upload
+  const handleHostPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !host) return;
+
+    setUploadingPhotos(true);
+    setPhotoError("");
+
+    try {
+      const fd = new FormData();
+      Array.from(files).forEach((f) => fd.append("files", f));
+
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
+      if (!uploadRes.ok) {
+        const errData = await uploadRes.json().catch(() => ({}));
+        setPhotoError(errData.error || "Upload failed");
+        setUploadingPhotos(false);
+        return;
+      }
+
+      const { urls } = await uploadRes.json();
+      const newPhotos = [...(host.photos || []), ...urls];
+
+      const patchRes = await fetch(`/api/hosts/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photos: newPhotos }),
+      });
+
+      if (patchRes.ok) {
+        const updated = await patchRes.json();
+        setHost(updated);
+      }
+    } catch {
+      setPhotoError("Network error");
+    } finally {
+      setUploadingPhotos(false);
+      if (e.target) e.target.value = "";
+    }
+  };
+
+  const handleDeletePhoto = async (photoUrl: string) => {
+    if (!host || !isHostOwner) return;
+    if (!confirm("Удалить это фото?")) return;
+
+    const newPhotos = host.photos.filter((p) => p !== photoUrl);
+    const newCover = host.coverPhoto === photoUrl ? (newPhotos[0] || "") : host.coverPhoto;
+
+    try {
+      const patchRes = await fetch(`/api/hosts/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photos: newPhotos, coverPhoto: newCover }),
+      });
+
+      if (patchRes.ok) {
+        const updated = await patchRes.json();
+        setHost(updated);
+      }
+    } catch {
+      // ignore
+    }
   };
 
   const getMediaType = (url: string): "image" | "audio" | "video" => {
@@ -207,7 +278,7 @@ export default function HostProfilePage() {
                   {host.photos.slice(0, 4).map((photo, idx) => (
                     <div
                       key={idx}
-                      className="relative rounded-xl overflow-hidden aspect-square bg-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                      className="relative rounded-xl overflow-hidden aspect-square bg-gray-200 cursor-pointer hover:opacity-90 transition-opacity group"
                       onClick={() => {
                         const imgs = [host.coverPhoto, ...host.photos.filter(p => p !== host.coverPhoto)];
                         const targetIdx = Math.min(idx + 1, imgs.length - 1);
@@ -217,8 +288,39 @@ export default function HostProfilePage() {
                       <Image src={photo} alt={`${host.familyName} ${idx + 2}`} fill
                         className="object-cover hover:scale-105 transition-transform duration-300"
                         sizes="(max-width: 640px) 25vw, 15vw" />
+                      {isHostOwner && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo); }}
+                          className="absolute top-1 right-1 w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-md hover:scale-110"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      )}
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Upload button for host/admin */}
+              {isHostOwner && (
+                <div className="flex items-center gap-2 mt-2">
+                  <input
+                    ref={setHostPhotoInput}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleHostPhotoUpload}
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => hostPhotoInput?.click()}
+                    disabled={uploadingPhotos}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
+                    style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
+                  >
+                    <Camera size={16} /> {uploadingPhotos ? "..." : "Добавить фото"}
+                  </button>
+                  {photoError && <span className="text-red-500 text-xs">{photoError}</span>}
                 </div>
               )}
             </div>
