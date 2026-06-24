@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://hay-home.com/sitemap.xml

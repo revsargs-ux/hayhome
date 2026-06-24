@@ -246,6 +246,20 @@ export interface UI {
   // Misc
   remove: string;
   select: string;
+  // Events
+  eventsTitle: string;
+  eventsSubtitle: string;
+  events: string;
+  allCategories: string;
+  hovots: string;
+  dance: string;
+  music: string;
+  wineTasting: string;
+  pottery: string;
+  cooking: string;
+  art: string;
+  learnMore: string;
+  perPerson: string;
 }
 
 type Rec = Record<string, string>;
@@ -470,6 +484,20 @@ const translations: Record<LangCode, UI> = {
     noHistory: "История пуста",
     remove: "Удалить",
     select: "Выбрать",
+    // Events
+    eventsTitle: "Мероприятия",
+    eventsSubtitle: "Армянские культурные события и впечатления",
+    events: "Мероприятия",
+    allCategories: "Все категории",
+    hovots: "🍇 Хоровац",
+    dance: "💃 Танцы",
+    music: "🎵 Музыка",
+    wineTasting: "🍷 Дегустация вина",
+    pottery: "🏺 Керамика",
+    cooking: "🥘 Кулинарные курсы",
+    art: "🎨 Искусство",
+    learnMore: "Узнать больше",
+    perPerson: "$/чел",
     months: ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"],
   },
 
@@ -692,6 +720,20 @@ const translations: Record<LangCode, UI> = {
     noHistory: "No history yet",
     remove: "Remove",
     select: "Select",
+    // Events
+    eventsTitle: "Events",
+    eventsSubtitle: "Armenian cultural events and experiences",
+    events: "Events",
+    allCategories: "All categories",
+    hovots: "🍇 Barbecue",
+    dance: "💃 Dance",
+    music: "🎵 Music",
+    wineTasting: "🍷 Wine tasting",
+    pottery: "🏺 Pottery",
+    cooking: "🥘 Cooking class",
+    art: "🎨 Art",
+    learnMore: "Learn more",
+    perPerson: "$/person",
     months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
   },
 
@@ -914,6 +956,20 @@ const translations: Record<LangCode, UI> = {
     noHistory: "Պատմությունը դատարկ է",
     remove: "Հանել",
     select: "Ընտրել",
+    // Events
+    eventsTitle: "Միջոցառումներ",
+    eventsSubtitle: "Հայկական մշակութային միջոցառումներ և փորձառություններ",
+    events: "Միջոցառումներ",
+    allCategories: "Բոլոր կատեգորիաները",
+    hovots: "🍇 Խորոված",
+    dance: "💃 Պար",
+    music: "🎵 Երաժշտություն",
+    wineTasting: "🍷 Գինու համտեսում",
+    pottery: "🏺 Կավագործություն",
+    cooking: "🥘 Խոհարարական դաս",
+    art: "🎨 Արվեստ",
+    learnMore: "Իմանալ ավելին",
+    perPerson: "$֊/մարդ",
     months: ["Հունվար","Փետրվար","Մարտ","Ապրիլ","Մայիս","Հունիս","Հուլիս","Օգոստոս","Սեպտեմբեր","Հոկտեմբեր","Նոյեմբեր","Դեկտեմբեր"],
   },
 
@@ -1136,6 +1192,20 @@ const translations: Record<LangCode, UI> = {
     noHistory: "Pas d'historique",
     remove: "Retirer",
     select: "Choisir",
+    // Events
+    eventsTitle: "Événements",
+    eventsSubtitle: "Événements culturels et expériences arméniens",
+    events: "Événements",
+    allCategories: "Toutes les catégories",
+    hovots: "🍇 Barbecue",
+    dance: "💃 Danse",
+    music: "🎵 Musique",
+    wineTasting: "🍷 Dégustation de vin",
+    pottery: "🏺 Poterie",
+    cooking: "🥘 Cours de cuisine",
+    art: "🎨 Art",
+    learnMore: "En savoir plus",
+    perPerson: "$/personne",
     months: ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],
   },
 
@@ -1358,6 +1428,20 @@ const translations: Record<LangCode, UI> = {
     noHistory: "Kein Verlauf",
     remove: "Entfernen",
     select: "Auswählen",
+    // Events
+    eventsTitle: "Veranstaltungen",
+    eventsSubtitle: "Armenische kulturelle Veranstaltungen und Erlebnisse",
+    events: "Veranstaltungen",
+    allCategories: "Alle Kategorien",
+    hovots: "🍇 Grillen",
+    dance: "💃 Tanz",
+    music: "🎵 Musik",
+    wineTasting: "🍷 Weinverkostung",
+    pottery: "🏺 Töpferei",
+    cooking: "🥘 Kochkurs",
+    art: "🎨 Kunst",
+    learnMore: "Mehr erfahren",
+    perPerson: "$/Person",
     months: ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],
   },
 
@@ -1580,6 +1664,20 @@ const translations: Record<LangCode, UI> = {
     noHistory: "Sin historial",
     remove: "Quitar",
     select: "Seleccionar",
+    // Events
+    eventsTitle: "Eventos",
+    eventsSubtitle: "Eventos culturales y experiencias armenias",
+    events: "Eventos",
+    allCategories: "Todas las categorías",
+    hovots: "🍇 Barbacoa",
+    dance: "💃 Baile",
+    music: "🎵 Música",
+    wineTasting: "🍷 Degustación de vino",
+    pottery: "🏺 Cerámica",
+    cooking: "🥘 Clase de cocina",
+    art: "🎨 Arte",
+    learnMore: "Saber más",
+    perPerson: "$/persona",
     months: ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],
   },
 
@@ -1802,6 +1900,20 @@ const translations: Record<LangCode, UI> = {
     noHistory: "Nessuna cronologia",
     remove: "Rimuovi",
     select: "Seleziona",
+    // Events
+    eventsTitle: "Eventi",
+    eventsSubtitle: "Eventi culturali ed esperienze armene",
+    events: "Eventi",
+    allCategories: "Tutte le categorie",
+    hovots: "🍇 Grigliata",
+    dance: "💃 Danza",
+    music: "🎵 Musica",
+    wineTasting: "🍷 Degustazione di vino",
+    pottery: "🏺 Ceramica",
+    cooking: "🥘 Corso di cucina",
+    art: "🎨 Arte",
+    learnMore: "Scopri di più",
+    perPerson: "$/persona",
     months: ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"],
   },
 
@@ -2024,6 +2136,20 @@ const translations: Record<LangCode, UI> = {
     expiresAt: "ينتهي في",
     usedCount: "مستخدم",
     noPromocodes: "لا توجد رموز ترويجية بعد",
+    // Events
+    eventsTitle: "الفعاليات",
+    eventsSubtitle: "الأحداث الثقافية والتجارب الأرمنية",
+    events: "الفعاليات",
+    allCategories: "جميع الفئات",
+    hovots: "🍇 مشاوي",
+    dance: "💃 رقص",
+    music: "🎵 موسيقى",
+    wineTasting: "🍷 تذوق النبيذ",
+    pottery: "🏺 الفخار",
+    cooking: "🥘 درس طبخ",
+    art: "🎨 فن",
+    learnMore: "اعرف المزيد",
+    perPerson: "$/شخص",
     months: ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"],
   },
 
@@ -2246,6 +2372,20 @@ const translations: Record<LangCode, UI> = {
     expiresAt: "到期日",
     usedCount: "已使用",
     noPromocodes: "暂无促销码",
+    // Events
+    eventsTitle: "活动",
+    eventsSubtitle: "亚美尼亚文化活动和体验",
+    events: "活动",
+    allCategories: "所有类别",
+    hovots: "🍇 烧烤",
+    dance: "💃 舞蹈",
+    music: "🎵 音乐",
+    wineTasting: "🍷 品酒",
+    pottery: "🏺 陶艺",
+    cooking: "🥘 烹饪课",
+    art: "🎨 艺术",
+    learnMore: "了解更多",
+    perPerson: "$/人",
     months: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
   },
 
@@ -2468,6 +2608,20 @@ const translations: Record<LangCode, UI> = {
     expiresAt: "انقضا",
     usedCount: "استفاده شده",
     noPromocodes: "هنوز کد تخفیفی وجود ندارد",
+    // Events
+    eventsTitle: "رویدادها",
+    eventsSubtitle: "رویدادهای فرهنگی و تجربیات ارمنی",
+    events: "رویدادها",
+    allCategories: "همه دسته‌ها",
+    hovots: "🍇 کباب",
+    dance: "💃 رقص",
+    music: "🎵 موسیقی",
+    wineTasting: "🍷 شراب‌چشانی",
+    pottery: "🏺 سفالگری",
+    cooking: "🥘 کلاس آشپزی",
+    art: "🎨 هنر",
+    learnMore: "بیشتر بدانید",
+    perPerson: "$/نفر",
     months: ["ژانویه","فوریه","مارس","آوریل","مه","ژوئن","ژوئیه","اوت","سپتامبر","اکتبر","نوامبر","دسامبر"],
   },
 };

@@ -57,6 +57,9 @@ export default function Header() {
             <Link href="/services" className="flex items-center gap-1.5 text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
               ✨ {u.services}
             </Link>
+            <Link href="/events" className="flex items-center gap-1.5 text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
+              🎉 {u.events}
+            </Link>
             {compareCount > 0 && (
               <Link href="/compare" className="flex items-center gap-1.5 text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
                 <span className="relative">
@@ -180,6 +183,9 @@ export default function Header() {
           </Link>
           <Link href="/services" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
             ✨ {u.services}
+          </Link>
+          <Link href="/events" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
+            🎉 {u.events}
           </Link>
           {compareCount > 0 && (
             <Link href="/compare" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
