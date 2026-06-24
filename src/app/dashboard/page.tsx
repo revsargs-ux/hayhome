@@ -50,6 +50,7 @@ export default function DashboardPage() {
   const [editForm, setEditForm] = useState({ description: "", phone: "", pricePerNight: 30 });
   const [partnerCode, setPartnerCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
   const [favHosts, setFavHosts] = useState<Host[]>([]);
   const [favLoading, setFavLoading] = useState(false);
   const [showChatWidget, setShowChatWidget] = useState(false);
@@ -194,20 +195,30 @@ export default function DashboardPage() {
           </div>
         )}
         {partnerCode && (
-          <div className="mt-4 rounded-xl p-4 bg-white shadow-sm">
-            <p className="text-xs text-gray-500 mb-2">{u.partnerLink}</p>
-            <div className="flex items-center gap-2 mb-3">
-              <code className="flex-1 text-sm bg-gray-50 rounded-lg px-3 py-2 truncate">https://hay-home.com/register?ref={partnerCode}</code>
-              <button onClick={() => { navigator.clipboard.writeText("https://hay-home.com/register?ref=" + partnerCode); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="px-3 py-2 rounded-lg text-sm font-medium transition" style={{ background: copied ? "#16a34a" : "#D4001A", color: "white" }}>
-                {copied ? "✓" : u.copyText}
-              </button>
-              <button onClick={() => { if (navigator.share) navigator.share({ title: "HayHome", url: "https://hay-home.com/register?ref=" + partnerCode }); else { navigator.clipboard.writeText("https://hay-home.com/register?ref=" + partnerCode); setCopied(true); setTimeout(() => setCopied(false), 2000); } }} className="px-3 py-2 rounded-lg text-sm font-medium border transition hover:bg-gray-50" style={{ borderColor: "#D4001A", color: "#D4001A" }}>
-                <Share2 size={16} /> {u.shareText}
-              </button>
-            </div>
-            <div className="flex justify-center">
-              <QRCodeSVG value={"https://hay-home.com/register?ref=" + partnerCode} size={120} level="M" fgColor="#D4001A" bgColor="white" />
-            </div>
+          <div className="mt-4 rounded-xl overflow-hidden bg-white shadow-sm">
+            <button onClick={() => setShowInvite(!showInvite)} className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🔗</span>
+                <span className="font-semibold text-gray-900 text-sm">{u.inviteFriends}</span>
+              </div>
+              <span className={"text-gray-400 text-sm " + (showInvite ? "rotate-180" : "")}>▼</span>
+            </button>
+            {showInvite && (
+              <div className="px-4 pb-4 border-t border-gray-100">
+                <div className="flex items-center gap-2 mt-3">
+                  <code className="flex-1 text-sm bg-gray-50 rounded-lg px-3 py-2 truncate">https://hay-home.com/register?ref={partnerCode}</code>
+                  <button onClick={() => { navigator.clipboard.writeText("https://hay-home.com/register?ref=" + partnerCode); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="px-3 py-2 rounded-lg text-sm font-medium transition" style={{ background: copied ? "#16a34a" : "#D4001A", color: "white" }}>
+                    {copied ? "✓" : u.copyText}
+                  </button>
+                  <button onClick={() => { if (navigator.share) navigator.share({ title: "HayHome", url: "https://hay-home.com/register?ref=" + partnerCode }); else { navigator.clipboard.writeText("https://hay-home.com/register?ref=" + partnerCode); setCopied(true); setTimeout(() => setCopied(false), 2000); } }} className="px-3 py-2 rounded-lg text-sm font-medium border transition hover:bg-gray-50" style={{ borderColor: "#D4001A", color: "#D4001A" }}>
+                    <Share2 size={16} /> {u.shareText}
+                  </button>
+                </div>
+                <div className="flex justify-center mt-3">
+                  <QRCodeSVG value={"https://hay-home.com/register?ref=" + partnerCode} size={120} level="M" fgColor="#D4001A" bgColor="white" />
+                </div>
+              </div>
+            )}
           </div>
         )}
 

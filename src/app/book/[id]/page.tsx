@@ -31,15 +31,8 @@ export default function BookPage() {
   const [error, setError] = useState("");
   const [authRequired, setAuthRequired] = useState(false);
 
-  // Promocode state
-  const [promoCode, setPromoCode] = useState("");
-  const [promoApplied, setPromoApplied] = useState<{ code: string; discount_amount: number; final_amount: number } | null>(null);
-  const [promoError, setPromoError] = useState("");
-  const [promoLoading, setPromoLoading] = useState(false);
-
   // Payment state
-  const [paymentMethod, setPaymentMethod] = useState<"online" | "onsite">("onsite");
-  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"onsite" | "transfer">("onsite");
 
   const [form, setForm] = useState({
     guestName: "", guestEmail: "", guestPhone: "",
@@ -194,66 +187,7 @@ export default function BookPage() {
   })();
 
   const total = host ? nights * host.pricePerNight : 0;
-  const finalTotal = promoApplied ? promoApplied.final_amount : total;
-  const discountAmount = promoApplied ? promoApplied.discount_amount : 0;
-
-  // Check if online payment is available
-  const onlinePaymentEnabled = !!(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_YOOKASSA_ENABLED);
-
-  const handleApplyPromo = async () => {
-    if (!promoCode.trim() || total <= 0) return;
-    setPromoLoading(true);
-    setPromoError("");
-    try {
-      const res = await fetch("/api/promocodes/validate", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: promoCode.trim(), amount: total }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.valid) {
-        setPromoError(data.error || u.invalidPromo);
-        setPromoApplied(null);
-      } else {
-        setPromoApplied(data);
-        setPromoError("");
-      }
-    } catch {
-      setPromoError(u.invalidPromo);
-      setPromoApplied(null);
-    } finally {
-      setPromoLoading(false);
-    }
-  };
-
-  const handlePayment = async (bookingId: string) => {
-    setPaymentLoading(true);
-    try {
-      const method = lang === "ru" ? "yookassa" : "stripe";
-      const res = await fetch("/api/payments/create", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: finalTotal,
-          booking_id: bookingId,
-          method,
-          currency: method === "stripe" ? "USD" : "RUB",
-        }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        setError(lang === "ru" ? "Платёжная система не настроена" : lang === "hy" ? "Վճարման համակարգը կարգավորված չէ" : lang === "fr" ? "Système de paiement non configuré" : lang === "de" ? "Zahlungssystem nicht konfiguriert" : lang === "es" ? "Sistema de pago no configurado" : lang === "it" ? "Sistema di pagamento non configurato" : lang === "ar" ? "نظام الدفع غير مهيأ" : lang === "zh" ? "支付系统未配置" : lang === "fa" ? "سیستم پرداخت پیکربندی نشده" : "Payment system not configured");
-      }
-    } catch {
-      setError(lang === "ru" ? "Ошибка платежа" : lang === "hy" ? "Վճարման սխալ" : lang === "fr" ? "Erreur de paiement" : lang === "de" ? "Zahlungsfehler" : lang === "es" ? "Error de pago" : lang === "it" ? "Errore di pagamento" : lang === "ar" ? "خطأ في الدفع" : lang === "zh" ? "支付错误" : lang === "fa" ? "خطای پرداخت" : "Payment error");
-    } finally {
-      setPaymentLoading(false);
-    }
-  };
+  const finalTotal = total;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -267,7 +201,7 @@ export default function BookPage() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, hostId: id, hostName: host.familyName, totalPrice: finalTotal, promoCode: promoApplied?.code || null, discountAmount }),
+        body: JSON.stringify({ ...form, hostId: id, hostName: host.familyName, totalPrice: finalTotal }),
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
@@ -277,12 +211,6 @@ export default function BookPage() {
       const bookingId = bookingResult?.id || bookingResult?.[0]?.id;
       // Clear draft on successful booking
       try { localStorage.removeItem(`hayhome_booking_draft_${id}`); } catch {}
-
-      // If online payment selected, redirect to payment
-      if (paymentMethod === "online" && bookingId) {
-        await handlePayment(bookingId);
-        return;
-      }
 
       setSuccess(true);
     } catch (e) {
@@ -300,25 +228,25 @@ export default function BookPage() {
   const familyName = host ? getLocalizedField(host.familyName, host.i18n, "familyName", lang) : "";
 
   const T = {
-    title: { ru: "Бронирование визита", en: "Book a Visit", hy: "Ama rezervim", fr: "Réserver une visite", de: "Besuch buchen", es: "Reservar visita", it: "Prenota una visita", ar: "حجز زيارة", zh: "预订参观", fa: "رزرو بازدید" },
-    name: { ru: "Ваше имя", en: "Your name", hy: "Ձеr anun", fr: "Votre nom", de: "Ihr Name", es: "Tu nombre", it: "Il tuo nome", ar: "اسمك", zh: "您的姓名", fa: "نام شما" },
-    country: { ru: "Страна", en: "Country", hy: "Erkir", fr: "Pays", de: "Land", es: "País", it: "Paese", ar: "الدولة", zh: "国家", fa: "کشور" },
-    phone: { ru: "Телефон", en: "Phone", hy: "Hеrelakhos", fr: "Téléphone", de: "Telefon", es: "Teléfono", it: "Telefono", ar: "الهاتف", zh: "电话", fa: "تلفن" },
-    checkIn: { ru: "Дата заезда", en: "Check-in", hy: "Mutoum ov", fr: "Arrivée", de: "Anreise", es: "Llegada", it: "Arrivo", ar: "تسجيل الوصول", zh: "入住日期", fa: "تاریخ ورود" },
-    checkOut: { ru: "Дата отъезда", en: "Check-out", hy: "Ararakel", fr: "Départ", de: "Abreise", es: "Salida", it: "Partenza", ar: "تسجيل المغادرة", zh: "退房日期", fa: "تاریخ خروج" },
-    guests: { ru: "Количество гостей", en: "Number of guests", hy: "Hyurerneri kanakk", fr: "Nombre d'hôtes", de: "Anzahl der Gäste", es: "Número de huéspedes", it: "Numero di ospiti", ar: "عدد الضيوف", zh: "客人数量", fa: "تعداد مهمانان" },
-    maxGuests: { ru: "Максимум", en: "Maximum", hy: "Aravnak", fr: "Maximum", de: "Maximum", es: "Máximo", it: "Massimo", ar: "الحد الأقصى", zh: "最多", fa: "حداکثر" },
-    message: { ru: "Сообщение семье", en: "Message to family", hy: "Khavar gortsdzneri", fr: "Message à la famille", de: "Nachricht an die Familie", es: "Mensaje a la familia", it: "Messaggio alla famiglia", ar: "رسالة للعائلة", zh: "给家庭的消息", fa: "پیام به خانواده" },
+    title: { ru: "Бронирование визита", en: "Book a Visit", hy: "Այցանկարագրում", fr: "Réserver une visite", de: "Besuch buchen", es: "Reservar visita", it: "Prenota una visita", ar: "حجز زيارة", zh: "预订参观", fa: "رزرو بازدید" },
+    name: { ru: "Ваше имя", en: "Your name", hy: "Ձեր անունը", fr: "Votre nom", de: "Ihr Name", es: "Tu nombre", it: "Il tuo nome", ar: "اسمك", zh: "您的姓名", fa: "نام شما" },
+    country: { ru: "Страна", en: "Country", hy: "Երկիր", fr: "Pays", de: "Land", es: "País", it: "Paese", ar: "الدولة", zh: "国家", fa: "کشور" },
+    phone: { ru: "Телефон", en: "Phone", hy: "Հեռախոս", fr: "Téléphone", de: "Telefon", es: "Teléfono", it: "Telefono", ar: "الهاتف", zh: "电话", fa: "تلفن" },
+    checkIn: { ru: "Дата заезда", en: "Check-in", hy: "Մուտք գալու ամսաթիվ", fr: "Arrivée", de: "Anreise", es: "Llegada", it: "Arrivo", ar: "تسجيل الوصول", zh: "入住日期", fa: "تاریخ ورود" },
+    checkOut: { ru: "Дата отъезда", en: "Check-out", hy: "Մեքելու ամսաթիվ", fr: "Départ", de: "Abreise", es: "Salida", it: "Partenza", ar: "تسجيل المغادرة", zh: "退房日期", fa: "تاریخ خروج" },
+    guests: { ru: "Количество гостей", en: "Number of guests", hy: "Հյուրերի քանակը", fr: "Nombre d'hôtes", de: "Anzahl der Gäste", es: "Número de huéspedes", it: "Numero di ospiti", ar: "عدد الضيوف", zh: "客人数量", fa: "تعداد مهمانان" },
+    maxGuests: { ru: "Максимум", en: "Maximum", hy: "Առավելագույն", fr: "Maximum", de: "Maximum", es: "Máximo", it: "Massimo", ar: "الحد الأقصى", zh: "最多", fa: "حداکثر" },
+    message: { ru: "Сообщение семье", en: "Message to family", hy: "Նամակ ընտանիքին", fr: "Message à la famille", de: "Nachricht an die Familie", es: "Mensaje a la familia", it: "Messaggio alla famiglia", ar: "رسالة للعائلة", zh: "给家庭的消息", fa: "پیام به خانواده" },
     msgPlaceholder: { ru: "Расскажите о себе: откуда вы, цель визита...", en: "Tell us about yourself: where you're from, purpose of visit...", fr: "Parlez-nous de vous...", de: "Erzählen Sie uns von sich...", es: "Cuéntenos sobre usted...", it: "Raccontateci di voi...", ar: "أخبرنا عن نفسك...", zh: "告诉我们关于您自己...", fa: "درباره خودتان بنویسید..." },
-    submit: { ru: "Запросить бронирование", en: "Request booking", hy: "Khndrel rezervisyun", fr: "Demander réservation", de: "Buchung anfragen", es: "Solicitar reserva", it: "Richiedi prenotazione", ar: "طلب الحجز", zh: "申请预订", fa: "درخواست رزرو" },
-    cancel: { ru: "Бесплатная отмена за 48 часов до заезда", en: "Free cancellation 48 hours before check-in", fr: "Annulation gratuite 48h avant", de: "Kostenlose Stornierung 48h vorher", es: "Cancelación gratuita 48h antes", it: "Cancellazione gratuita 48h prima", ar: "إلغاء مجاني قبل 48 ساعة", zh: "入住前48小时免费取消", fa: "لغو رایگان ۴۸ ساعت قبل" },
-    back: { ru: "Назад к профилю", en: "Back to profile", hy: "Veradardz vkayakir", fr: "Retour au profil", de: "Zurück zum Profil", es: "Volver al perfil", it: "Torna al profilo", ar: "العودة للملف", zh: "返回资料", fa: "بازگشت به پروفایل" },
+    submit: { ru: "Запросить бронирование", en: "Request booking", hy: "Պահանջել ամրագրում", fr: "Demander réservation", de: "Buchung anfragen", es: "Solicitar reserva", it: "Richiedi prenotazione", ar: "طلب الحجز", zh: "申请预订", fa: "درخواست رزرو" },
+    cancel: { ru: "Бесплатная отмена за 48 часов до заезда", en: "Free cancellation 48 hours before check-in", hy: "Անվճար չեղարկում 48 ժամ առաջ", fr: "Annulation gratuite 48h avant", de: "Kostenlose Stornierung 48h vorher", es: "Cancelación gratuita 48h antes", it: "Cancellazione gratuita 48h prima", ar: "إلغاء مجاني قبل 48 ساعة", zh: "入住前48小时免费取消", fa: "لغو رایگان ۴۸ ساعت قبل" },
+    back: { ru: "Назад к профилю", en: "Back to profile", hy: "Վերադարձ պրոֆիլին", fr: "Retour au profil", de: "Zurück zum Profil", es: "Volver al perfil", it: "Torna al profilo", ar: "العودة للملف", zh: "返回资料", fa: "بازگشت به پروفایل" },
     nights: { ru: "ночей", en: "nights", fr: "nuits", de: "Nächte", es: "noches", it: "notti", ar: "ليالٍ", zh: "晚", fa: "شب" },
-    total: { ru: "Итого", en: "Total", hy: "Yntupaken", fr: "Total", de: "Gesamt", es: "Total", it: "Totale", ar: "الإجمالي", zh: "总计", fa: "مجموع" },
+    total: { ru: "Итого", en: "Total", hy: "Ընդհանուր", fr: "Total", de: "Gesamt", es: "Total", it: "Totale", ar: "الإجمالي", zh: "总计", fa: "مجموع" },
     free: { ru: "Бесплатно", en: "Free", fr: "Gratuit", de: "Kostenlos", es: "Gratis", it: "Gratuito", ar: "مجاني", zh: "免费", fa: "رایگان" },
     service: { ru: "Сервисный сбор", en: "Service fee", fr: "Frais de service", de: "Servicegebühr", es: "Cargo por servicio", it: "Commissione di servizio", ar: "رسوم الخدمة", zh: "服务费", fa: "هزینه خدمات" },
     sentTitle: { ru: "Заявка отправлена!", en: "Request sent!", fr: "Demande envoyée!", de: "Anfrage gesendet!", es: "¡Solicitud enviada!", it: "Richiesta inviata!", ar: "تم إرسال الطلب!", zh: "请求已发送！", fa: "درخواست ارسال شد!" },
-    sentDesc: { ru: "получила вашу заявку и свяжется с вами в течение 24 часов.", en: "received your request and will contact you within 24 hours.", fr: "a reçu votre demande et vous contactera dans 24 heures.", de: "hat Ihre Anfrage erhalten und meldet sich innerhalb von 24 Stunden.", es: "recibió su solicitud y se pondrá en contacto en 24 horas.", it: "ha ricevuto la tua richiesta e ti contatterà entro 24 ore.", ar: "استلمت طلبك وستتواصل معك خلال 24 ساعة.", zh: "已收到您的请求，将在24小时内联系您。", fa: "درخواست شما را دریافت کرد و ظرف ۲۴ ساعت با شما تماس خواهد گرفت." },
+    sentDesc: { ru: "получила вашу заявку и свяжется с вами в течение 24 часов.", en: "received your request and will contact you within 24 hours.", hy: "ստացա ձեր հայտը և կկապվի ձեզ 24 ժամի ընթացքում։", fr: "a reçu votre demande et vous contactera dans 24 heures.", de: "hat Ihre Anfrage erhalten und meldet sich innerhalb von 24 Stunden.", es: "recibió su solicitud y se pondrá en contacto en 24 horas.", it: "ha ricevuto la tua richiesta e ti contatterà entro 24 ore.", ar: "استلمت طلبك وستتواصل معك خلال 24 ساعة.", zh: "已收到您的请求，将在24小时内联系您。", fa: "درخواست شما را دریافت کرد و ظرف ۲۴ ساعت با شما تماس خواهد گرفت." },
     details: { ru: "Детали", en: "Details", fr: "Détails", de: "Details", es: "Detalles", it: "Dettagli", ar: "التفاصيل", zh: "详情", fa: "جزئیات" },
     moreFamilies: { ru: "Найти ещё семьи", en: "Find more families", fr: "Trouver plus de familles", de: "Mehr Familien finden", es: "Encontrar más familias", it: "Trova altre famiglie", ar: "إيجاد المزيد من العائلات", zh: "寻找更多家庭", fa: "یافتن خانواده‌های بیشتر" },
     selectDates: { ru: "Выберите даты для расчёта", en: "Select dates to calculate", fr: "Sélectionnez les dates", de: "Daten auswählen", es: "Seleccione fechas", it: "Seleziona le date", ar: "حدد التواريخ للحساب", zh: "选择日期计算", fa: "تاریخ‌ها را انتخاب کنید" },
@@ -337,10 +265,10 @@ export default function BookPage() {
       <div className="bg-white rounded-2xl shadow-sm p-8 max-w-sm w-full text-center">
         <div className="text-5xl mb-4">🔐</div>
         <h2 className="text-xl font-bold text-gray-900 mb-3">
-          lang === "ru" ? "Для бронирования нужно войти" : lang === "hy" ? "Ամրագրելու համար մուտք գործեք" : "Login required to book"
+          {lang === "ru" ? "Для бронирования нужно войти" : lang === "hy" ? "Ամրագրելու համար մուտք գործեք" : "Login required to book"}
         </h2>
         <p className="text-gray-500 mb-6 text-sm">
-          lang === "ru" ? "Создайте аккаунт или войдите" : lang === "hy" ? "Ստեղծեք հաշիվ կամ մուտք գործեք" : "Create an account or log in"
+          {lang === "ru" ? "Создайте аккаунт или войдите" : lang === "hy" ? "Ստեղծեք հաշիվ կամ մուտք գործեք" : "Create an account or log in"}
         </p>
         <div className="flex flex-col gap-3">
           <Link href={`/login?redirect=/book/${id}`}
@@ -475,9 +403,13 @@ export default function BookPage() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("guests")}</label>
-                  <input type="number" min={1} max={host.maxGuests} value={form.guests}
-                    onChange={e => setForm(f => ({ ...f, guests: Number(e.target.value) }))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
+                  <div className="flex items-center gap-2">
+                    <button type="button" onClick={() => setForm(f => ({ ...f, guests: Math.max(1, f.guests - 1) }))} disabled={form.guests <= 1} className="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition">−</button>
+                    <input type="text" inputMode="numeric" value={form.guests}
+                      onChange={e => { const v = parseInt(e.target.value); if (!isNaN(v) && v >= 1 && v <= (host.maxGuests || 20)) setForm(f => ({ ...f, guests: v })); else if (e.target.value === "") setForm(f => ({ ...f, guests: 1 })); }}
+                      className="flex-1 px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-center text-gray-900 font-semibold" />
+                    <button type="button" onClick={() => setForm(f => ({ ...f, guests: Math.min(host.maxGuests || 20, f.guests + 1) }))} disabled={form.guests >= (host.maxGuests || 20)} className="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition">+</button>
+                  </div>
                   <p className="text-xs text-gray-400 mt-1">{t("maxGuests")}: {host.maxGuests} {tr.hosts.guests}</p>
                 </div>
 
@@ -496,37 +428,6 @@ export default function BookPage() {
                 </div>
                 {error && <p className="text-red-600 text-sm">{error}</p>}
 
-                {/* Promocode Section */}
-                {nights > 0 && (
-                  <div className="border border-gray-200 rounded-xl p-4 space-y-3">
-                    <label className="block text-sm font-semibold text-gray-700">{u.promocode}</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={promoCode}
-                        onChange={(e) => setPromoCode(e.target.value)}
-                        placeholder="PROMO2025"
-                        className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900 uppercase"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleApplyPromo}
-                        disabled={promoLoading || !promoCode.trim()}
-                        className="px-5 py-2.5 rounded-xl text-white font-semibold text-sm disabled:opacity-50"
-                        style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
-                      >
-                        {promoLoading ? "..." : u.applyPromo}
-                      </button>
-                    </div>
-                    {promoError && <p className="text-red-600 text-xs">{promoError}</p>}
-                    {promoApplied && (
-                      <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2 text-sm text-green-700">
-                        ✓ {u.promoCodeApplied} ({promoApplied.code})
-                      </div>
-                    )}
-                  </div>
-                )}
-
                 {/* Payment Method Section */}
                 {nights > 0 && (
                   <div className="border border-gray-200 rounded-xl p-4 space-y-3">
@@ -541,28 +442,26 @@ export default function BookPage() {
                       >
                         🏠 {u.payOnSite}
                       </button>
-                      {onlinePaymentEnabled && (
-                        <button
-                          type="button"
-                          onClick={() => setPaymentMethod("online")}
-                          className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition ${paymentMethod === "online" ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
-                        >
-                          💳 {u.payOnline}
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod("transfer")}
+                        className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition ${paymentMethod === "transfer" ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+                      >
+                        🏦 {lang === "ru" ? "Переводом" : lang === "hy" ? "Փոխանցմամբ" : lang === "en" ? "By transfer" : lang === "fr" ? "Par virement" : lang === "de" ? "Per Überweisung" : lang === "es" ? "Por transferencia" : lang === "it" ? "Per bonifico" : lang === "ar" ? "بالتحويل" : lang === "zh" ? "转账" : "ترانسفر"}
+                      </button>
                     </div>
-                    {paymentMethod === "online" && (
+                    {paymentMethod === "transfer" && (
                       <p className="text-xs text-gray-400">
-                        {lang === "ru" ? "После отправки заявки вы будете перенаправлены на страницу оплаты." : lang === "hy" ? "Դիմումը ուղարկելուց հետո դուք կուղղորդվեք վճարման էջ:" : lang === "fr" ? "Après l'envoi de la demande, vous serez redirigé vers la page de paiement." : lang === "de" ? "Nach dem Absenden werden Sie zur Zahlungsseite weitergeleitet." : lang === "es" ? "Después de enviar la solicitud, será redirigido a la página de pago." : lang === "it" ? "Dopo l'invio della richiesta, sarai reindirizzato alla pagina di pagamento." : lang === "ar" ? "بعد إرسال الطلب، سيتم توجيهك إلى صفحة الدفع." : lang === "zh" ? "提交申请后，您将被重定向到付款页面。" : lang === "fa" ? "پس از ارسال درخواست، به صفحه پرداخت هدایت خواهید شد." : "After submitting the request, you will be redirected to the payment page."}
+                        {lang === "ru" ? "Реквизиты для перевода будут отправлены вам в сообщении." : lang === "hy" ? "Փոխանցման տվյալները կուղարկվեն ձեզ հաղորդագրությամբ։" : lang === "fr" ? "Les coordonnées bancaires vous seront envoyées par message." : lang === "de" ? "Bankdaten werden Ihnen per Nachricht zugesandt." : lang === "es" ? "Los datos bancarios se le enviarán por mensaje." : lang === "it" ? "I dati bancari vi saranno inviati tramite messaggio." : lang === "ar" ? "سيتم إرسال التفاصيل المصرفية لك عبر رسالة." : lang === "zh" ? "银行信息将通过消息发送给您。" : lang === "fa" ? "اطلاعات بانکی از طریق پیام برای شما ارسال خواهد شد." : "Bank details will be sent to you by message."}
                       </p>
                     )}
                   </div>
                 )}
 
-                <button type="submit" disabled={loading || paymentLoading}
+                <button type="submit" disabled={loading}
                   className="w-full py-4 rounded-xl text-white font-bold text-lg hover:opacity-90 transition disabled:opacity-70"
                   style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  {loading || paymentLoading ? u.processingPayment : `${t("submit")} · $${finalTotal}`}
+                  {loading ? (lang === "ru" ? "Отправка..." : lang === "hy" ? "Ուղարկում..." : "Sending...") : `${t("submit")} · $${finalTotal}`}
                 </button>
                 <p className="text-center text-xs text-gray-400">{t("cancel")}</p>
               </form>
@@ -590,14 +489,6 @@ export default function BookPage() {
                     <span>${host.pricePerNight} × {nights} {t("nights")}</span>
                     <span>${total}</span>
                   </div>
-                  {promoApplied && (
-                    <>
-                      <div className="flex justify-between text-green-600">
-                        <span>{u.discount} ({promoApplied.code})</span>
-                        <span>−${discountAmount}</span>
-                      </div>
-                    </>
-                  )}
                   <div className="flex justify-between text-gray-500 text-xs">
                     <span>{t("service")}</span>
                     <span className="text-green-600 font-medium">{t("free")}</span>
@@ -711,9 +602,9 @@ function MiniCalendar({ year, month, calendarData, checkIn, checkOut, lang, dayL
         </div>
       ))}
       <div className="flex items-center justify-center gap-3 mt-2 text-[10px] text-gray-400">
-        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-green-100" /> lang === "ru" ? "Свободно" : lang === "hy" ? "Հասանելի" : lang === "fr" ? "Disponible" : lang === "de" ? "Verfügbar" : lang === "es" ? "Disponible" : lang === "it" ? "Disponibile" : lang === "ar" ? "متاح" : lang === "zh" ? "可预订" : lang === "fa" ? "در دسترس" : "Available"</div>
-        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-gray-200" /> lang === "ru" ? "Занято" : lang === "hy" ? "Զբաղված" : lang === "fr" ? "Pris" : lang === "de" ? "Belegt" : lang === "es" ? "Ocupado" : lang === "it" ? "Occupato" : lang === "ar" ? "محجوز" : lang === "zh" ? "已订" : lang === "fa" ? "اشغال" : "Booked"</div>
-        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-yellow-200" /> lang === "ru" ? "Выбрано" : lang === "hy" ? "Ընտրված" : lang === "fr" ? "Sélectionné" : lang === "de" ? "Gewählt" : lang === "es" ? "Seleccionado" : lang === "it" ? "Selezionato" : lang === "ar" ? "محدد" : lang === "zh" ? "已选" : lang === "fa" ? "انتخاب شده" : "Selected"</div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-green-100" /> <span>{lang === "ru" ? "Свободно" : lang === "hy" ? "Հասանելի" : lang === "fr" ? "Disponible" : lang === "de" ? "Verfügbar" : lang === "es" ? "Disponible" : lang === "it" ? "Disponibile" : lang === "ar" ? "متاح" : lang === "zh" ? "可预订" : lang === "fa" ? "در دسترس" : "Available"}</span></div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-gray-200" /> <span>{lang === "ru" ? "Занято" : lang === "hy" ? "Զբաղված" : lang === "fr" ? "Pris" : lang === "de" ? "Belegt" : lang === "es" ? "Ocupado" : lang === "it" ? "Occupato" : lang === "ar" ? "محجوز" : lang === "zh" ? "已订" : lang === "fa" ? "اشغال" : "Booked"}</span></div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-yellow-200" /> <span>{lang === "ru" ? "Выбрано" : lang === "hy" ? "Ընտրված" : lang === "fr" ? "Sélectionné" : lang === "de" ? "Gewählt" : lang === "es" ? "Seleccionado" : lang === "it" ? "Selezionato" : lang === "ar" ? "محدد" : lang === "zh" ? "已选" : lang === "fa" ? "انتخاب شده" : "Selected"}</span></div>
       </div>
     </div>
   );
