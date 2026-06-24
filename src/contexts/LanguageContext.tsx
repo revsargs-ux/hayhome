@@ -10,14 +10,14 @@ interface LanguageContextType {
 }
 
 const LanguageContext = createContext<LanguageContextType>({
-  lang: "ru",
+  lang: "hy",
   setLang: () => {},
-  tr: t["ru"],
+  tr: t["hy"],
   isRtl: false,
 });
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<LangCode>("ru");
+  const [lang, setLangState] = useState<LangCode>("hy");
 
   useEffect(() => {
     const saved = localStorage.getItem("hayhome_lang") as LangCode | null;
