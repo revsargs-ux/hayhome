@@ -462,9 +462,16 @@ export default function BookPage() {
                       </button>
                     </div>
                     {paymentMethod === "transfer" && (
-                      <p className="text-xs text-gray-400">
-                        {u.bankDetailsSent}
-                      </p>
+                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2 text-xs text-gray-600 space-y-1">
+                        <p className="font-semibold text-gray-800">{u.bankDetails || "Реквизиты"}</p>
+                        <p className="font-semibold">ИП САРГСЯН РЕВИК СЕРГЕЕВИЧ</p>
+                        <p>ИНН: 410102126296</p>
+                        <p>ОГРНИП: 325410000011701</p>
+                        <p>Р/с: 40802810836710000838</p>
+                        <p>СБЕРБАНК, г. Магадан</p>
+                        <p>БИК: 044442607</p>
+                        <p>К/с: 30101810300000000607</p>
+                      </div>
                     )}
                   </div>
                 )}

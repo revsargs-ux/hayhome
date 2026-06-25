@@ -292,6 +292,7 @@ export interface UI {
   paymentMethodLabel: string;
   transferPayment: string;
   bankDetailsSent: string;
+  bankDetails: string;
   // Booking errors
   bookingDatesError: string;
   datesNotAvailable: string;
@@ -580,6 +581,7 @@ const translations: Record<LangCode, UI> = {
     paymentMethodLabel: "Способ оплаты",
     transferPayment: "Переводом",
     bankDetailsSent: "Реквизиты для перевода будут отправлены вам в сообщении.",
+    bankDetails: "Банковские реквизиты",
     bookingDatesError: "Выберите корректные даты",
     datesNotAvailable: "Выбранные даты недоступны.",
     submissionError: "Ошибка отправки.",
@@ -861,6 +863,7 @@ const translations: Record<LangCode, UI> = {
     paymentMethodLabel: "Payment method",
     transferPayment: "By transfer",
     bankDetailsSent: "Bank details will be sent to you by message.",
+    bankDetails: "Bank details",
     bookingDatesError: "Please select valid dates",
     datesNotAvailable: "Selected dates are not available.",
     submissionError: "Submission error.",
@@ -1142,6 +1145,7 @@ const translations: Record<LangCode, UI> = {
     paymentMethodLabel: "Վճարման եղանակ",
     transferPayment: "Փոխանցմամբ",
     bankDetailsSent: "Փոխանցման տվյալները կուղարկվեն ձեզ հաղորդագրությամբ։",
+    bankDetails: "Բանկային տվյալներ",
     bookingDatesError: "Ընտրեք ճիշտ ամսաթվեր",
     datesNotAvailable: "Ընտրված ամսաթվերը հասանելի չեն։",
     submissionError: "Ուղարկման սխալ։",
@@ -1423,6 +1427,7 @@ const translations: Record<LangCode, UI> = {
     paymentMethodLabel: "Méthode de paiement",
     transferPayment: "Par virement",
     bankDetailsSent: "Les coordonnées bancaires vous seront envoyées par message.",
+    bankDetails: "Coordonnées bancaires",
     bookingDatesError: "Veuillez sélectionner des dates valides",
     datesNotAvailable: "Les dates sélectionnées ne sont pas disponibles.",
     submissionError: "Erreur d'envoi.",
@@ -1704,6 +1709,7 @@ const translations: Record<LangCode, UI> = {
     paymentMethodLabel: "Zahlungsmethode",
     transferPayment: "Per Überweisung",
     bankDetailsSent: "Bankdaten werden Ihnen per Nachricht zugesandt.",
+    bankDetails: "Bankverbindung",
     bookingDatesError: "Bitte wählen Sie gültige Daten",
     datesNotAvailable: "Gewählte Daten sind nicht verfügbar.",
     submissionError: "Fehler beim Senden.",
@@ -1985,6 +1991,7 @@ const translations: Record<LangCode, UI> = {
     paymentMethodLabel: "Método de pago",
     transferPayment: "Por transferencia",
     bankDetailsSent: "Los datos bancarios se le enviarán por mensaje.",
+    bankDetails: "Datos bancarios",
     bookingDatesError: "Seleccione fechas válidas",
     datesNotAvailable: "Las fechas seleccionadas no están disponibles.",
     submissionError: "Error de envío.",
@@ -2266,6 +2273,7 @@ const translations: Record<LangCode, UI> = {
     paymentMethodLabel: "Metodo di pagamento",
     transferPayment: "Per bonifico",
     bankDetailsSent: "I dati bancari vi saranno inviati tramite messaggio.",
+    bankDetails: "Dati bancari",
     bookingDatesError: "Selezionare date valide",
     datesNotAvailable: "Le date selezionate non sono disponibili.",
     submissionError: "Errore di invio.",
@@ -2547,6 +2555,7 @@ const translations: Record<LangCode, UI> = {
     paymentMethodLabel: "طريقة الدفع",
     transferPayment: "بالتحويل",
     bankDetailsSent: "سيتم إرسال التفاصيل المصرفية لك عبر رسالة.",
+    bankDetails: "بيانات بنكية",
     bookingDatesError: "يرجى تحديد تواريخ صالحة",
     datesNotAvailable: "التواريخ المحددة غير متاحة.",
     submissionError: "خطأ في الإرسال.",
@@ -2828,6 +2837,7 @@ const translations: Record<LangCode, UI> = {
     paymentMethodLabel: "付款方式",
     transferPayment: "转账",
     bankDetailsSent: "银行信息将通过消息发送给您。",
+    bankDetails: "银行信息",
     bookingDatesError: "请选择有效日期",
     datesNotAvailable: "所选日期不可用。",
     submissionError: "提交错误。",
@@ -3113,6 +3123,7 @@ const translations: Record<LangCode, UI> = {
     paymentMethodLabel: "روش پرداخت",
     transferPayment: "ترانسفر",
     bankDetailsSent: "اطلاعات بانکی از طریق پیام برای شما ارسال خواهد شد.",
+    bankDetails: "اطلاعات بانکی",
     bookingDatesError: "لطفاً تاریخ‌های معتبر انتخاب کنید",
     datesNotAvailable: "تاریخ‌های انتخاب شده در دسترس نیستند.",
     submissionError: "خطا در ارسال.",
