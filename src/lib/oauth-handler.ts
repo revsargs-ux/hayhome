@@ -83,9 +83,9 @@ export async function oauthCallback(req: NextRequest, provider: OAuthProvider) {
     const res = NextResponse.redirect(dashboardUrl);
     setAuthCookie(res, token);
     // Clean up OAuth cookies
-    res.cookies.delete("oauth_state");
-    res.cookies.delete("oauth_verifier");
-    res.cookies.delete("oauth_provider");
+    res.cookies.set("oauth_state", "", { maxAge: 0, path: "/" });
+    res.cookies.set("oauth_verifier", "", { maxAge: 0, path: "/" });
+    res.cookies.set("oauth_provider", "", { maxAge: 0, path: "/" });
     return res;
   } catch (err: any) {
     console.error(`[OAuth] ${provider} callback error:`, err.message);
@@ -134,9 +134,9 @@ export async function oauthCallbackPost(req: NextRequest, provider: OAuthProvide
 
     const res = NextResponse.redirect(dashboardUrl);
     setAuthCookie(res, token);
-    res.cookies.delete("oauth_state");
-    res.cookies.delete("oauth_verifier");
-    res.cookies.delete("oauth_provider");
+    res.cookies.set("oauth_state", "", { maxAge: 0, path: "/" });
+    res.cookies.set("oauth_verifier", "", { maxAge: 0, path: "/" });
+    res.cookies.set("oauth_provider", "", { maxAge: 0, path: "/" });
     return res;
   } catch (err: any) {
     console.error(`[OAuth] ${provider} POST callback error:`, err.message);

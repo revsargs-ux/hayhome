@@ -530,8 +530,7 @@ export default function BookPage() {
         </div>
 
         {/* Additional Services Section */}
-        {form.checkIn && form.checkOut && (
-          <div className="mt-8">
+        <div className="mt-8">
             <AdditionalServicesSection
               hostRegion={host.region}
               checkIn={form.checkIn}
@@ -540,7 +539,6 @@ export default function BookPage() {
               lang={lang}
             />
           </div>
-        )}
       </div>
     </div>
   );

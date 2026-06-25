@@ -43,7 +43,7 @@ export function setAuthCookie(res: NextResponse, token: string): NextResponse {
 }
 
 export function clearAuthCookie(res: NextResponse): NextResponse {
-  res.cookies.delete("hayhome_auth");
+  res.cookies.set("hayhome_auth", "", { maxAge: 0, path: "/" });
   return res;
 }
 

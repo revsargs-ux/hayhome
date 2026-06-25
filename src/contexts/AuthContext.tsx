@@ -43,12 +43,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    setUser(null);
-    window.location.href = "/";
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      setUser(null);
+      // Используем router вместо window.location для плавного перехода
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Logout error:", error);
+      setUser(null);
+      window.location.href = "/";
+    }
   };
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => { 
+    refresh(); 
+    // Предотвращаем повторный вызов refresh при каждом рендере
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, loading, logout, refresh }}>
