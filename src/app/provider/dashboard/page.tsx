@@ -70,6 +70,7 @@ export default function ProviderDashboardPage() {
     try {
       const fd = new FormData();
       Array.from(files).forEach((f) => fd.append("files", f));
+      fd.append("folder", "providers");
 
       const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
       if (!uploadRes.ok) { setSvcPhotoUploading(null); return; }
@@ -107,6 +108,13 @@ export default function ProviderDashboardPage() {
     const newPhotos = svc.photos.filter((p) => p !== photoUrl);
 
     try {
+      // Delete from Supabase Storage
+      await fetch("/api/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: photoUrl }),
+      });
+
       const patchRes = await fetch("/api/services", {
         method: "PATCH",
         credentials: "include",

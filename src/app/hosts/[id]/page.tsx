@@ -117,6 +117,7 @@ export default function HostProfilePage() {
     try {
       const fd = new FormData();
       Array.from(files).forEach((f) => fd.append("files", f));
+      fd.append("folder", "hosts");
 
       const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
       if (!uploadRes.ok) {
@@ -155,6 +156,13 @@ export default function HostProfilePage() {
     const newCover = host.coverPhoto === photoUrl ? (newPhotos[0] || "") : host.coverPhoto;
 
     try {
+      // Delete from Supabase Storage
+      await fetch("/api/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: photoUrl }),
+      });
+
       const patchRes = await fetch(`/api/hosts/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

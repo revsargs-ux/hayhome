@@ -1,13 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
-import { promises as fs } from "fs";
-import path from "path";
+import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
+const ALLOWED_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "video/mp4",
+  "audio/mpeg",
+  "audio/wav",
+];
+const ALLOWED_EXTENSIONS = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".webp",
+  ".gif",
+  ".mp4",
+  ".mp3",
+  ".wav",
+];
+
+const BUCKET = "hayhome-media";
+const VALID_FOLDERS = ["hosts", "providers", "reviews", "avatars", "general"];
+
+// Server-side Supabase client with service_role for storage writes
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const serviceRoleKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+if (
+  !process.env.SUPABASE_SERVICE_ROLE_KEY &&
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+) {
+  console.warn(
+    "[upload] WARNING: SUPABASE_SERVICE_ROLE_KEY not set — falling back to publishable key. Uploads may fail due to RLS policies."
+  );
+}
+
+const supabaseServer = createClient(supabaseUrl, serviceRoleKey!, {
+  auth: { persistSession: false },
+});
 
 // Simple in-memory rate limiter for uploads
 const uploadRequests = new Map<string, { count: number; resetAt: number }>();
@@ -24,29 +61,36 @@ function checkRateLimit(ip: string): boolean {
   return entry.count <= UPLOAD_LIMIT.max;
 }
 
+function extractStoragePath(publicUrl: string): string | null {
+  // Supabase public URL format:
+  // https://<project>.supabase.co/storage/v1/object/public/<bucket>/<path>
+  const marker = `/storage/v1/object/public/${BUCKET}/`;
+  const idx = publicUrl.indexOf(marker);
+  if (idx === -1) return null;
+  return publicUrl.slice(idx + marker.length);
+}
+
+// ── POST: Upload files ──
 export async function POST(req: NextRequest) {
   // Auth check
   const user = await getAuthUser(req);
   if (!user) {
-    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Authentication required" },
+      { status: 401 }
+    );
   }
 
   // Rate limit
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-    || req.headers.get("x-real-ip")
-    || "unknown";
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
   if (!checkRateLimit(ip)) {
     return NextResponse.json(
       { error: "Too many uploads. Try again later." },
       { status: 429, headers: { "Retry-After": "60" } }
     );
-  }
-
-  // Ensure upload directory exists
-  try {
-    await fs.mkdir(UPLOAD_DIR, { recursive: true });
-  } catch {
-    // Directory might already exist
   }
 
   // Parse multipart form
@@ -63,8 +107,15 @@ export async function POST(req: NextRequest) {
   }
 
   if (files.length > 10) {
-    return NextResponse.json({ error: "Max 10 files per upload" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Max 10 files per upload" },
+      { status: 400 }
+    );
   }
+
+  // Get folder (default: general)
+  const folder = (formData.get("folder") as string) || "general";
+  const safeFolder = VALID_FOLDERS.includes(folder) ? folder : "general";
 
   const uploadedUrls: string[] = [];
   const errors: string[] = [];
@@ -88,24 +139,38 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate safe filename
-    const ext = path.extname(file.name).toLowerCase();
-    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+    const ext = extFromType(file.type) || extFromName(file.name);
+    if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
       errors.push(`${file.name}: invalid extension`);
       continue;
     }
 
     const hash = crypto.randomBytes(12).toString("hex");
     const timestamp = Date.now();
-    const safeName = `${timestamp}-${hash}${ext}`;
-    const filePath = path.join(UPLOAD_DIR, safeName);
+    const storagePath = `${safeFolder}/${timestamp}-${hash}${ext}`;
 
-    // Write file
     try {
       const buffer = Buffer.from(await file.arrayBuffer());
-      await fs.writeFile(filePath, buffer);
-      uploadedUrls.push(`/uploads/${safeName}`);
+      const { data, error: uploadError } = await supabaseServer.storage
+        .from(BUCKET)
+        .upload(storagePath, buffer, {
+          contentType: file.type,
+          upsert: false,
+        });
+
+      if (uploadError) {
+        errors.push(`${file.name}: ${uploadError.message}`);
+        continue;
+      }
+
+      // Get public URL
+      const { data: urlData } = supabaseServer.storage
+        .from(BUCKET)
+        .getPublicUrl(data.path);
+
+      uploadedUrls.push(urlData.publicUrl);
     } catch {
-      errors.push(`${file.name}: failed to save`);
+      errors.push(`${file.name}: failed to upload`);
     }
   }
 
@@ -120,4 +185,70 @@ export async function POST(req: NextRequest) {
     urls: uploadedUrls,
     errors: errors.length > 0 ? errors : undefined,
   });
+}
+
+// ── DELETE: Remove file from Supabase Storage ──
+export async function DELETE(req: NextRequest) {
+  // Auth check
+  const user = await getAuthUser(req);
+  if (!user) {
+    return NextResponse.json(
+      { error: "Authentication required" },
+      { status: 401 }
+    );
+  }
+
+  let body: { url?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  const { url } = body;
+  if (!url) {
+    return NextResponse.json({ error: "URL is required" }, { status: 400 });
+  }
+
+  const storagePath = extractStoragePath(url);
+  if (!storagePath) {
+    // Not a Supabase Storage URL — might be an old local upload
+    return NextResponse.json(
+      { error: "Not a Supabase Storage URL" },
+      { status: 400 }
+    );
+  }
+
+  const { error: deleteError } = await supabaseServer.storage
+    .from(BUCKET)
+    .remove([storagePath]);
+
+  if (deleteError) {
+    return NextResponse.json(
+      { error: deleteError.message },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({ success: true });
+}
+
+// ── Helpers ──
+function extFromType(type: string): string | null {
+  const map: Record<string, string> = {
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp",
+    "image/gif": ".gif",
+    "video/mp4": ".mp4",
+    "audio/mpeg": ".mp3",
+    "audio/wav": ".wav",
+  };
+  return map[type] || null;
+}
+
+function extFromName(name: string): string {
+  const idx = name.lastIndexOf(".");
+  if (idx === -1) return "";
+  return name.slice(idx).toLowerCase();
 }
