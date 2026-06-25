@@ -7,7 +7,10 @@ export async function POST(req: NextRequest) {
   const contentType = req.headers.get("content-type") || "";
 
   // ── Stripe Webhook ──
-  if (signature && process.env.STRIPE_WEBHOOK_SECRET) {
+  if (signature) {
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
+    }
     try {
       // Parse the event
       const event = JSON.parse(body);
@@ -48,7 +51,10 @@ export async function POST(req: NextRequest) {
   }
 
   // ── YooKassa Webhook ──
-  if (contentType.includes("application/json") && process.env.YOOKASSA_WEBHOOK_SECRET) {
+  if (contentType.includes("application/json")) {
+    if (!process.env.YOOKASSA_WEBHOOK_SECRET) {
+      return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
+    }
     try {
       const event = JSON.parse(body);
 

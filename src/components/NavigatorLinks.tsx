@@ -17,7 +17,7 @@ export default function NavigatorLinks({ fromLat, fromLng, toLat, toLng, toName,
       name: "Google Maps",
       icon: "🗺️",
       url: `https://www.google.com/maps/dir/${fromLat},${fromLng}/${toLat},${toLng}`,
-      color: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100",
+      color: "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100",
     },
     {
       name: "Yandex Maps",

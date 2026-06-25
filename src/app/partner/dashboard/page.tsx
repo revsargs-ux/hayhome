@@ -123,7 +123,7 @@ function PartnerDashboardContent() {
           </div>
           <div className="bg-white rounded-2xl shadow-sm p-5">
             <div className="flex items-center gap-3 mb-2">
-              <Users size={20} className="text-blue-600" />
+              <Users size={20} className="text-amber-600" />
               <span className="text-sm text-gray-500">{u.referrals}</span>
             </div>
             <div className="text-3xl font-bold text-gray-900">{stats?.totalReferrals || 0}</div>

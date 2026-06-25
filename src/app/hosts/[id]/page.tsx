@@ -37,6 +37,8 @@ export default function HostProfilePage() {
   // Review media state
   const [reviewMedia, setReviewMedia] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
   const [mediaError, setMediaError] = useState("");
 
   // Host photo upload state
@@ -96,6 +98,8 @@ export default function HostProfilePage() {
 
     // Reset input
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (audioInputRef.current) audioInputRef.current.value = "";
+    if (videoInputRef.current) videoInputRef.current.value = "";
   };
 
   const removeMedia = (index: number) => {
@@ -274,7 +278,7 @@ export default function HostProfilePage() {
                 </div>
               </div>
               {host.photos.length > 0 && (
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {host.photos.slice(0, 4).map((photo, idx) => (
                     <div
                       key={idx}
@@ -383,7 +387,7 @@ export default function HostProfilePage() {
               <h2 className="text-xl font-bold text-gray-900 mb-4">{h.languages}</h2>
               <div className="flex flex-wrap gap-2">
                 {host.languages.map((l) => (
-                  <span key={l} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-800 rounded-full text-sm font-medium border border-blue-100">
+                  <span key={l} className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-800 rounded-full text-sm font-medium border border-amber-100">
                     <Globe size={13} /> {translateLang(l, lang)}
                   </span>
                 ))}
@@ -510,14 +514,14 @@ export default function HostProfilePage() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => fileInputRef.current?.click()}
+                          onClick={() => audioInputRef.current?.click()}
                           className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition text-sm font-medium text-gray-700"
                         >
                           {ui.addAudio}
                         </button>
                         <button
                           type="button"
-                          onClick={() => fileInputRef.current?.click()}
+                          onClick={() => videoInputRef.current?.click()}
                           className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition text-sm font-medium text-gray-700"
                         >
                           {ui.addVideo}
@@ -526,7 +530,23 @@ export default function HostProfilePage() {
                       <input
                         ref={fileInputRef}
                         type="file"
-                        accept="image/*,audio/*,video/*"
+                        accept="image/*"
+                        multiple
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
+                      <input
+                        ref={audioInputRef}
+                        type="file"
+                        accept="audio/*"
+                        multiple
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
+                      <input
+                        ref={videoInputRef}
+                        type="file"
+                        accept="video/*"
                         multiple
                         onChange={handleFileSelect}
                         className="hidden"
@@ -548,7 +568,7 @@ export default function HostProfilePage() {
                                   </div>
                                 )}
                                 {type === "audio" && (
-                                  <div className="w-20 h-20 rounded-lg bg-purple-50 border border-purple-200 flex items-center justify-center">
+                                  <div className="w-20 h-20 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center">
                                     <span className="text-2xl">🎙️</span>
                                   </div>
                                 )}

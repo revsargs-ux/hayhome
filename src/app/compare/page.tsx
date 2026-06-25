@@ -1,6 +1,6 @@
 "use client";
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Star, MapPin, Globe, X, Check } from "lucide-react";
@@ -9,20 +9,35 @@ import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";
 import { translateLang, translateBadge, translateAmenity, translateExperience, getLocalizedField } from "@/lib/i18n-utils";
 
+const COMPARE_KEY = "hayhome_compare";
+
+function getCompareIds(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(COMPARE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function setCompareIds(ids: string[]): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(COMPARE_KEY, JSON.stringify(ids));
+  window.dispatchEvent(new Event("hayhome_compare_change"));
+}
+
 function CompareContent() {
-  const searchParams = useSearchParams();
   const router = useRouter();
   const { tr, lang } = useLang();
   const u = getUI(lang);
 
   const [hosts, setHosts] = useState<Host[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ids, setIds] = useState<string[]>([]);
 
-  const ids = [
-    searchParams.get("id1"),
-    searchParams.get("id2"),
-    searchParams.get("id3"),
-  ].filter(Boolean) as string[];
+  useEffect(() => {
+    const loaded = getCompareIds();
+    setIds(loaded);
+  }, []);
 
   useEffect(() => {
     if (ids.length === 0) {
@@ -36,14 +51,12 @@ function CompareContent() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ids.join(",")]);
+  }, [ids]);
 
   const removeHost = (id: string) => {
     const remaining = ids.filter((x) => x !== id);
-    const params = new URLSearchParams();
-    remaining.forEach((rid, i) => params.set(`id${i + 1}`, rid));
-    router.push(remaining.length > 0 ? `/compare?${params.toString()}` : "/compare");
+    setIds(remaining);
+    setCompareIds(remaining);
   };
 
   if (loading) {
@@ -170,7 +183,7 @@ function CompareContent() {
               <Cell key={h.id}>
                 <div className="flex flex-wrap justify-center gap-1">
                   {h.languages.map((l) => (
-                    <span key={l} className="text-xs bg-blue-50 text-blue-700 rounded-full px-2 py-0.5">
+                    <span key={l} className="text-xs bg-amber-50 text-amber-700 rounded-full px-2 py-0.5">
                       {translateLang(l, lang)}
                     </span>
                   ))}
@@ -304,7 +317,7 @@ function CompareContent() {
                 <span className="text-gray-400 block mb-1">🌐 {tr.hosts.languages}</span>
                 <div className="flex flex-wrap gap-1">
                   {h.languages.map((l) => (
-                    <span key={l} className="text-xs bg-blue-50 text-blue-700 rounded-full px-2 py-0.5">{translateLang(l, lang)}</span>
+                    <span key={l} className="text-xs bg-amber-50 text-amber-700 rounded-full px-2 py-0.5">{translateLang(l, lang)}</span>
                   ))}
                 </div>
               </div>
@@ -334,9 +347,5 @@ function CompareContent() {
 }
 
 export default function ComparePage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin" /></div>}>
-      <CompareContent />
-    </Suspense>
-  );
+  return <CompareContent />;
 }

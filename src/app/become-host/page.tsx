@@ -217,9 +217,9 @@ export default function BecomeHostPage() {
                 </div>
                 <textarea value={form.description} onChange={e => set("description", e.target.value)}
                   rows={2} placeholder={b.shortDesc}
-                  className={`w-full px-4 py-3 rounded-xl border outline-none text-gray-900 resize-none ${aiDesc.loading ? "border-purple-300 bg-purple-50" : "border-gray-200 focus:border-red-400"}`} />
+                  className={`w-full px-4 py-3 rounded-xl border outline-none text-gray-900 resize-none ${aiDesc.loading ? "border-amber-300 bg-amber-50" : "border-gray-200 focus:border-red-400"}`} />
                 {aiDesc.original && !aiDesc.loading && (
-                  <p className="text-xs text-purple-600 mt-1 flex items-center gap-1"><Sparkles size={10} /> {b.aiImproved}</p>
+                  <p className="text-xs text-amber-600 mt-1 flex items-center gap-1"><Sparkles size={10} /> {b.aiImproved}</p>
                 )}
               </div>
 
@@ -242,14 +242,14 @@ export default function BecomeHostPage() {
                 </div>
                 <textarea value={form.longDescription} onChange={e => set("longDescription", e.target.value)}
                   rows={5} placeholder={b.longDesc}
-                  className={`w-full px-4 py-3 rounded-xl border outline-none text-gray-900 resize-none ${aiLong.loading ? "border-purple-300 bg-purple-50" : "border-gray-200 focus:border-red-400"}`} />
+                  className={`w-full px-4 py-3 rounded-xl border outline-none text-gray-900 resize-none ${aiLong.loading ? "border-amber-300 bg-amber-50" : "border-gray-200 focus:border-red-400"}`} />
                 {aiLong.original && !aiLong.loading && (
-                  <p className="text-xs text-purple-600 mt-1 flex items-center gap-1"><Sparkles size={10} /> {b.aiImprovedLong}</p>
+                  <p className="text-xs text-amber-600 mt-1 flex items-center gap-1"><Sparkles size={10} /> {b.aiImprovedLong}</p>
                 )}
               </div>
 
-              <div className="bg-purple-50 border border-purple-100 rounded-xl p-4">
-                <p className="text-xs text-purple-700 leading-relaxed"><strong>✨</strong> {b.aiHint}</p>
+              <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
+                <p className="text-xs text-amber-700 leading-relaxed"><strong>✨</strong> {b.aiHint}</p>
               </div>
             </div>
           )}

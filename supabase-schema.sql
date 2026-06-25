@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS hayhome_users (
   name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'guest' CHECK (role IN ('guest', 'host', 'admin')),
+  role TEXT NOT NULL DEFAULT 'guest' CHECK (role IN ('guest', 'host', 'admin', 'provider')),
   "createdAt" TEXT NOT NULL DEFAULT ''
 );
 
@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS hayhome_referrals (
   id TEXT PRIMARY KEY,
   partner_id TEXT NOT NULL REFERENCES hayhome_partners(id),
   referred_user_id TEXT NOT NULL REFERENCES hayhome_users(id),
-  type TEXT NOT NULL CHECK (type IN ('guest', 'host', 'experience')),
+  type TEXT NOT NULL DEFAULT 'guest' CHECK (type IN ('guest', 'host', 'experience')),
   referred_entity_id TEXT,
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'expired', 'fraud')),
   first_booking_at TIMESTAMPTZ,
@@ -172,3 +172,166 @@ CREATE POLICY "Partners can read own payouts" ON hayhome_payouts FOR SELECT USIN
 CREATE POLICY "Service role full access partners" ON hayhome_partners FOR ALL USING (auth.role() = 'service_role');
 CREATE POLICY "Service role full access referrals" ON hayhome_referrals FOR ALL USING (auth.role() = 'service_role');
 CREATE POLICY "Service role full access payouts" ON hayhome_payouts FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
+-- 8. TABLE: hayhome_services
+-- ============================================
+CREATE TABLE IF NOT EXISTS hayhome_services (
+  id TEXT PRIMARY KEY,
+  provider_id TEXT NOT NULL REFERENCES hayhome_users(id),
+  category TEXT NOT NULL DEFAULT '',
+  title TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  price NUMERIC NOT NULL DEFAULT 0,
+  price_unit TEXT NOT NULL DEFAULT 'per_event' CHECK (price_unit IN ('per_hour', 'per_event', 'per_person')),
+  min_duration INTEGER NOT NULL DEFAULT 1,
+  max_duration INTEGER NOT NULL DEFAULT 8,
+  photos JSONB DEFAULT '[]',
+  region TEXT NOT NULL DEFAULT '',
+  available BOOLEAN NOT NULL DEFAULT TRUE,
+  rating NUMERIC(2,1) NOT NULL DEFAULT 0,
+  review_count INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_services_provider ON hayhome_services(provider_id);
+CREATE INDEX IF NOT EXISTS idx_services_category ON hayhome_services(category);
+CREATE INDEX IF NOT EXISTS idx_services_region ON hayhome_services(region);
+ALTER TABLE hayhome_services ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "hayhome_services_public_read" ON hayhome_services FOR SELECT USING (true);
+CREATE POLICY "Service role full access services" ON hayhome_services FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
+-- 9. TABLE: hayhome_service_bookings
+-- ============================================
+CREATE TABLE IF NOT EXISTS hayhome_service_bookings (
+  id TEXT PRIMARY KEY,
+  booking_id TEXT REFERENCES hayhome_bookings(id) ON DELETE SET NULL,
+  service_id TEXT NOT NULL REFERENCES hayhome_services(id) ON DELETE CASCADE,
+  date TEXT NOT NULL,
+  start_time TEXT NOT NULL,
+  end_time TEXT NOT NULL,
+  guests_count INTEGER NOT NULL DEFAULT 1,
+  status TEXT NOT NULL DEFAULT 'requested' CHECK (status IN ('requested', 'confirmed', 'cancelled', 'completed')),
+  total_price NUMERIC NOT NULL DEFAULT 0,
+  client_note TEXT NOT NULL DEFAULT '',
+  time_of_day TEXT,
+  custom_time TEXT,
+  guest_name TEXT,
+  guest_phone TEXT,
+  payment_method TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_service_bookings_service ON hayhome_service_bookings(service_id);
+CREATE INDEX IF NOT EXISTS idx_service_bookings_booking ON hayhome_service_bookings(booking_id);
+CREATE INDEX IF NOT EXISTS idx_service_bookings_status ON hayhome_service_bookings(status);
+ALTER TABLE hayhome_service_bookings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role full access service_bookings" ON hayhome_service_bookings FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
+-- 10. TABLE: hayhome_messages
+-- ============================================
+CREATE TABLE IF NOT EXISTS hayhome_messages (
+  id TEXT PRIMARY KEY,
+  from_user_id TEXT NOT NULL REFERENCES hayhome_users(id),
+  to_user_id TEXT NOT NULL REFERENCES hayhome_users(id),
+  booking_id TEXT REFERENCES hayhome_bookings(id) ON DELETE SET NULL,
+  service_id TEXT,
+  text TEXT NOT NULL DEFAULT '',
+  media_url TEXT,
+  media_type TEXT,
+  read BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_messages_from ON hayhome_messages(from_user_id);
+CREATE INDEX IF NOT EXISTS idx_messages_to ON hayhome_messages(to_user_id);
+CREATE INDEX IF NOT EXISTS idx_messages_booking ON hayhome_messages(booking_id);
+CREATE INDEX IF NOT EXISTS idx_messages_created ON hayhome_messages(created_at);
+ALTER TABLE hayhome_messages ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role full access messages" ON hayhome_messages FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
+-- 11. TABLE: hayhome_favorites
+-- ============================================
+CREATE TABLE IF NOT EXISTS hayhome_favorites (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES hayhome_users(id) ON DELETE CASCADE,
+  host_id TEXT NOT NULL REFERENCES hayhome_hosts(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, host_id)
+);
+CREATE INDEX IF NOT EXISTS idx_favorites_user ON hayhome_favorites(user_id);
+CREATE INDEX IF NOT EXISTS idx_favorites_host ON hayhome_favorites(host_id);
+ALTER TABLE hayhome_favorites ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role full access favorites" ON hayhome_favorites FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
+-- 12. TABLE: hayhome_calendar
+-- ============================================
+CREATE TABLE IF NOT EXISTS hayhome_calendar (
+  id TEXT PRIMARY KEY,
+  host_id TEXT NOT NULL REFERENCES hayhome_hosts(id) ON DELETE CASCADE,
+  date TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'available' CHECK (status IN ('available', 'blocked', 'booked')),
+  note TEXT,
+  UNIQUE(host_id, date)
+);
+CREATE INDEX IF NOT EXISTS idx_calendar_host ON hayhome_calendar(host_id);
+CREATE INDEX IF NOT EXISTS idx_calendar_date ON hayhome_calendar(date);
+ALTER TABLE hayhome_calendar ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "hayhome_calendar_public_read" ON hayhome_calendar FOR SELECT USING (true);
+CREATE POLICY "Service role full access calendar" ON hayhome_calendar FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
+-- 13. TABLE: hayhome_payments
+-- ============================================
+CREATE TABLE IF NOT EXISTS hayhome_payments (
+  id TEXT PRIMARY KEY,
+  booking_id TEXT REFERENCES hayhome_bookings(id) ON DELETE SET NULL,
+  service_booking_id TEXT REFERENCES hayhome_service_bookings(id) ON DELETE SET NULL,
+  user_id TEXT NOT NULL REFERENCES hayhome_users(id),
+  amount NUMERIC NOT NULL DEFAULT 0,
+  currency TEXT NOT NULL DEFAULT 'USD',
+  method TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed', 'refunded')),
+  provider_payment_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_payments_user ON hayhome_payments(user_id);
+CREATE INDEX IF NOT EXISTS idx_payments_booking ON hayhome_payments(booking_id);
+CREATE INDEX IF NOT EXISTS idx_payments_status ON hayhome_payments(status);
+ALTER TABLE hayhome_payments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role full access payments" ON hayhome_payments FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
+-- 14. TABLE: hayhome_promocodes
+-- ============================================
+CREATE TABLE IF NOT EXISTS hayhome_promocodes (
+  id TEXT PRIMARY KEY,
+  code TEXT NOT NULL UNIQUE,
+  discount_type TEXT NOT NULL CHECK (discount_type IN ('percentage', 'fixed')),
+  discount_value NUMERIC NOT NULL DEFAULT 0,
+  min_amount NUMERIC NOT NULL DEFAULT 0,
+  max_uses INTEGER,
+  uses_count INTEGER NOT NULL DEFAULT 0,
+  expires_at TIMESTAMPTZ,
+  created_by TEXT REFERENCES hayhome_users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_promocodes_code ON hayhome_promocodes(code);
+ALTER TABLE hayhome_promocodes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role full access promocodes" ON hayhome_promocodes FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
+-- 15. TABLE: hayhome_host_history
+-- ============================================
+CREATE TABLE IF NOT EXISTS hayhome_host_history (
+  id TEXT PRIMARY KEY,
+  host_id TEXT NOT NULL REFERENCES hayhome_hosts(id) ON DELETE CASCADE,
+  action TEXT NOT NULL,
+  note TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_host_history_host ON hayhome_host_history(host_id);
+CREATE INDEX IF NOT EXISTS idx_host_history_created ON hayhome_host_history(created_at);
+ALTER TABLE hayhome_host_history ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role full access host_history" ON hayhome_host_history FOR ALL USING (auth.role() = 'service_role');

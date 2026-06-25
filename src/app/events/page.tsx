@@ -79,7 +79,7 @@ const EVENTS: EventItem[] = [
     host: "Areni Wine Cellars",
     category: "wineTasting",
     coords: [39.7308, 45.4708],
-    gradient: "from-purple-500 to-red-500",
+    gradient: "from-amber-500 to-red-500",
   },
   {
     id: "e4",

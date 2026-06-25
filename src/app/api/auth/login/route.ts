@@ -22,13 +22,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  // Support both bcrypt hashed and legacy plaintext passwords
-  let valid = false;
-  if (user.password.startsWith("$2")) {
-    valid = await bcrypt.compare(password, user.password);
-  } else {
-    valid = user.password === password;
-  }
+  // Only bcrypt hashed passwords are allowed
+  const valid = await bcrypt.compare(password, user.password);
 
   if (!valid) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });

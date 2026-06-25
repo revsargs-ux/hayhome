@@ -21,14 +21,42 @@ const ALLOWED_STATUSES = ["pending", "confirmed", "cancelled", "completed"];
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  // Auth required — only admin can change booking status
   const user = await getAuthUser(req);
   if (!user) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
-  if (user.role !== "admin" && user.role !== "host") {
-    return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+
+  // Ownership check
+  if (user.role === "guest") {
+    // Guest: only their own bookings
+    const { data: existing } = await supabase
+      .from("hayhome_bookings")
+      .select("guest_email, guest_id")
+      .eq("id", id)
+      .single();
+    if (!existing || (existing.guest_email !== user.email && existing.guest_id !== user.id)) {
+      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+    }
+  } else if (user.role === "host") {
+    // Host: only bookings for their hosts
+    const { data: existing } = await supabase
+      .from("hayhome_bookings")
+      .select("host_id")
+      .eq("id", id)
+      .single();
+    if (!existing) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+    const { data: host } = await supabase
+      .from("hayhome_hosts")
+      .select("user_id")
+      .eq("id", existing.host_id)
+      .single();
+    if (!host || host.user_id !== user.id) {
+      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+    }
   }
+  // Admin: can modify any booking
 
   const body = await req.json();
 

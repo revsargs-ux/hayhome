@@ -192,6 +192,7 @@ export default function ChatWidget({ initialWithUserId, bookingId, openInitially
         onClick={() => { setOpen(true); if (initialWithUserId) setActiveUserId(initialWithUserId); }}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-white hover:scale-105 transition active:scale-95"
         style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
+        aria-label={u.openChat}
       >
         <MessageCircle size={26} />
         {unreadTotal > 0 && (

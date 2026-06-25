@@ -202,7 +202,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-2">
             {user?.role === "admin" && (
-              <Link href="/admin" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-purple-700 bg-purple-50 rounded-xl hover:bg-purple-100 transition">
+              <Link href="/admin" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-amber-700 bg-amber-50 rounded-xl hover:bg-amber-100 transition">
                 <Shield size={14} /> {u.adminPanel}
               </Link>
             )}
@@ -219,8 +219,8 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {[
             { icon: <Calendar size={20} />, value: pending, label: u.newRequests, color: "text-yellow-500" },
-            { icon: <Users size={20} />, value: confirmed, label: u.confirmedLabel, color: "text-blue-500" },
-            { icon: <Star size={20} />, value: myBookings.length, label: u.totalBookings, color: "text-purple-500" },
+            { icon: <Users size={20} />, value: confirmed, label: u.confirmedLabel, color: "text-green-500" },
+            { icon: <Star size={20} />, value: myBookings.length, label: u.totalBookings, color: "text-red-500" },
             { icon: <DollarSign size={20} />, value: `$${revenue}`, label: u.earnedLabel, color: "text-green-500" },
           ].map((stat) => (
             <div key={stat.label} className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3">
@@ -312,7 +312,7 @@ export default function DashboardPage() {
                         <span className="text-gray-400 text-sm">· {b.guestCountry}</span>
                         <span className={`text-xs rounded-full px-2 py-0.5 font-medium ${
                           b.status === "pending" ? "bg-yellow-100 text-yellow-700" :
-                          b.status === "confirmed" ? "bg-blue-100 text-blue-700" :
+                          b.status === "confirmed" ? "bg-green-100 text-green-700" :
                           b.status === "completed" ? "bg-green-100 text-green-700" :
                           "bg-red-100 text-red-700"
                         }`}>{statusLabels[b.status]}</span>
@@ -726,7 +726,7 @@ function DashRouteSection({ booking, lang }: { booking: Booking; lang: string })
         <Navigation size={14} className="text-red-600" />
         <span className="text-xs font-semibold text-gray-700">{dashLabel("route")}</span>
         {!showMap && (
-          <button onClick={handleGeo} className="text-xs text-blue-600 hover:underline ml-auto">
+          <button onClick={handleGeo} className="text-xs text-amber-600 hover:underline ml-auto">
             {dashLabel("showRoute")}
           </button>
         )}

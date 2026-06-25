@@ -266,7 +266,7 @@ export default function HostCalendarPage() {
                           if (!isPast && status !== "booked") toggleDate(dateStr, status);
                           else if (status === "booked") setPopupEntry(calendarEntries.get(dateStr) || null);
                         }}
-                        className={`min-h-[64px] rounded-xl p-2 transition-all ${cellBgClass(status, isPast, isToday)} ${isToday ? "ring-2 ring-blue-400" : ""} ${isUpdating ? "opacity-50" : ""}`}
+                        className={`min-h-[64px] rounded-xl p-2 transition-all ${cellBgClass(status, isPast, isToday)} ${isToday ? "ring-2 ring-amber-400" : ""} ${isUpdating ? "opacity-50" : ""}`}
                       >
                         <div className="text-sm font-bold">{date.getDate()}</div>
                         {status === "booked" && booking && (

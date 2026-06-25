@@ -6,6 +6,7 @@ import { Host } from "@/lib/types";
 import { ChevronLeft, Star, Check, ChevronRight, Navigation, MapPin } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";
+import type { LangCode } from "@/lib/translations";
 import { useAuth } from "@/contexts/AuthContext";
 import { getLocalizedField } from "@/lib/i18n-utils";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
@@ -197,7 +198,7 @@ export default function BookPage() {
     e.preventDefault();
     if (!host) return;
     if (!user) { setAuthRequired(true); return; }
-    if (nights < 1) { setError(lang === "ru" ? "Выберите корректные даты" : lang === "hy" ? "Ընտրեք ճիշտ ամսաթվեր" : "Please select valid dates"); return; }
+    if (nights < 1) { setError(u.bookingDatesError); return; }
     setLoading(true);
     setError("");
     try {
@@ -205,7 +206,7 @@ export default function BookPage() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, hostId: id, hostName: host.familyName, totalPrice: finalTotal }),
+        body: JSON.stringify({ ...form, hostId: id, hostName: host.familyName, totalPrice: finalTotal, paymentMethod }),
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
@@ -220,9 +221,9 @@ export default function BookPage() {
     } catch (e) {
       const msg = e instanceof Error ? e.message : undefined;
       if (msg === "Some dates are not available") {
-        setError(lang === "ru" ? "Выбранные даты недоступны." : lang === "hy" ? "Ընտրված ամսաթվերը հասանելի չեն։" : "Selected dates are not available.");
+        setError(u.datesNotAvailable);
       } else {
-        setError(lang === "ru" ? "Ошибка отправки." : lang === "hy" ? "Ուղարկման սխալ։" : "Submission error.");
+        setError(u.submissionError);
       }
     } finally {
       setLoading(false);
@@ -269,10 +270,10 @@ export default function BookPage() {
       <div className="bg-white rounded-2xl shadow-sm p-8 max-w-sm w-full text-center">
         <div className="text-5xl mb-4">🔐</div>
         <h2 className="text-xl font-bold text-gray-900 mb-3">
-          {lang === "ru" ? "Для бронирования нужно войти" : lang === "hy" ? "Ամրագրելու համար մուտք գործեք" : "Login required to book"}
+          {u.loginRequiredTitle}
         </h2>
         <p className="text-gray-500 mb-6 text-sm">
-          {lang === "ru" ? "Создайте аккаунт или войдите" : lang === "hy" ? "Ստեղծեք հաշիվ կամ մուտք գործեք" : "Create an account or log in"}
+          {u.loginRequiredDesc}
         </p>
         <div className="flex flex-col gap-3">
           <Link href={`/login?redirect=/book/${id}`}
@@ -306,7 +307,7 @@ export default function BookPage() {
         <div className="flex flex-col gap-3">
           <Link href="/dashboard" className="block w-full py-3 rounded-full text-white font-semibold text-center"
             style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-            lang === "ru" ? "Мои бронирования" : lang === "hy" ? "Իմ ամրագրումները" : lang === "fr" ? "Mes réservations" : lang === "de" ? "Meine Buchungen" : lang === "es" ? "Mis reservas" : lang === "it" ? "Le mie prenotazioni" : lang === "ar" ? "حجوزاتي" : lang === "zh" ? "我的预订" : lang === "fa" ? "رزروهای من" : "My bookings"
+            {u.myBookingsBtn}
           </Link>
           <Link href="/hosts" className="block w-full py-3 rounded-full text-center font-semibold border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition">
             {t("moreFamilies")}
@@ -329,8 +330,8 @@ export default function BookPage() {
             <div className="bg-white rounded-2xl shadow-sm p-6">
               <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("title")}</h1>
               {draftRestored && (
-                <div className="mb-4 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700 flex items-center gap-2">
-                  <span>💾</span> {lang === "ru" ? "Восстановлены данные предыдущего бронирования" : lang === "hy" ? "Վերականգնվել են նախորդ ամրագրման տվյալները" : lang === "fr" ? "Données précédentes restaurées" : lang === "de" ? "Vorherige Buchungsdaten wiederhergestellt" : lang === "es" ? "Datos de reserva anteriores restaurados" : lang === "it" ? "Dati prenotazione precedente ripristinati" : lang === "ar" ? "تمت استعادة بيانات الحجز السابق" : lang === "zh" ? "已恢复之前的预订数据" : lang === "fa" ? "اطلاعات رزرو قبلی بازیابی شد" : "Previous booking data restored"}
+                <div className="mb-4 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700 flex items-center gap-2">
+                  <span>💾</span> {u.draftRestored}
                 </div>
               )}
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -425,9 +426,9 @@ export default function BookPage() {
 
                 {/* Detected city display */}
                 {detectedCity && (
-                  <div className="px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700 flex items-center gap-2">
+                  <div className="px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700 flex items-center gap-2">
                     <span>📍</span>
-                    <span>{lang === "ru" ? "Ваш город:" : lang === "hy" ? "Ձեր քաղաքը՝" : lang === "fr" ? "Votre ville:" : lang === "de" ? "Ihre Stadt:" : lang === "es" ? "Tu ciudad:" : lang === "it" ? "La tua città:" : lang === "ar" ? "مدينتك:" : lang === "zh" ? "您的城市:" : lang === "fa" ? "شهر شما:" : "Your city:"} <strong>{detectedCity}</strong>{detectedRegion ? `, ${detectedRegion}` : ""}</span>
+                    <span>{u.yourCity} <strong>{detectedCity}</strong>{detectedRegion ? `, ${detectedRegion}` : ""}</span>
                   </div>
                 )}
                 <div>
@@ -442,7 +443,7 @@ export default function BookPage() {
                 {nights > 0 && (
                   <div className="border border-gray-200 rounded-xl p-4 space-y-3">
                     <label className="block text-sm font-semibold text-gray-700">
-                      {lang === "ru" ? "Способ оплаты" : lang === "hy" ? "Վճարման եղանակ" : lang === "fr" ? "Méthode de paiement" : lang === "de" ? "Zahlungsmethode" : lang === "es" ? "Método de pago" : lang === "it" ? "Metodo di pagamento" : lang === "ar" ? "طريقة الدفع" : lang === "zh" ? "付款方式" : lang === "fa" ? "روش پرداخت" : "Payment method"}
+                      {u.paymentMethodLabel}
                     </label>
                     <div className="flex gap-3">
                       <button
@@ -457,12 +458,12 @@ export default function BookPage() {
                         onClick={() => setPaymentMethod("transfer")}
                         className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition ${paymentMethod === "transfer" ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
                       >
-                        🏦 {lang === "ru" ? "Переводом" : lang === "hy" ? "Փոխանցմամբ" : lang === "en" ? "By transfer" : lang === "fr" ? "Par virement" : lang === "de" ? "Per Überweisung" : lang === "es" ? "Por transferencia" : lang === "it" ? "Per bonifico" : lang === "ar" ? "بالتحويل" : lang === "zh" ? "转账" : "ترانسفر"}
+                        🏦 {u.transferPayment}
                       </button>
                     </div>
                     {paymentMethod === "transfer" && (
                       <p className="text-xs text-gray-400">
-                        {lang === "ru" ? "Реквизиты для перевода будут отправлены вам в сообщении." : lang === "hy" ? "Փոխանցման տվյալները կուղարկվեն ձեզ հաղորդագրությամբ։" : lang === "fr" ? "Les coordonnées bancaires vous seront envoyées par message." : lang === "de" ? "Bankdaten werden Ihnen per Nachricht zugesandt." : lang === "es" ? "Los datos bancarios se le enviarán por mensaje." : lang === "it" ? "I dati bancari vi saranno inviati tramite messaggio." : lang === "ar" ? "سيتم إرسال التفاصيل المصرفية لك عبر رسالة." : lang === "zh" ? "银行信息将通过消息发送给您。" : lang === "fa" ? "اطلاعات بانکی از طریق پیام برای شما ارسال خواهد شد." : "Bank details will be sent to you by message."}
+                        {u.bankDetailsSent}
                       </p>
                     )}
                   </div>
@@ -471,7 +472,7 @@ export default function BookPage() {
                 <button type="submit" disabled={loading}
                   className="w-full py-4 rounded-xl text-white font-bold text-lg hover:opacity-90 transition disabled:opacity-70"
                   style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  {loading ? (lang === "ru" ? "Отправка..." : lang === "hy" ? "Ուղարկում..." : "Sending...") : `${t("submit")} · $${finalTotal}`}
+                  {loading ? u.sendingText : `${t("submit")} · $${finalTotal}`}
                 </button>
                 <p className="text-center text-xs text-gray-400">{t("cancel")}</p>
               </form>
@@ -546,12 +547,12 @@ function MiniCalendar({ year, month, calendarData, checkIn, checkOut, lang, dayL
   onDateClick: (dateStr: string) => void;
   onPrevMonth: () => void; onNextMonth: () => void;
 }) {
+  const u = getUI(lang as LangCode);
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-  const monthNames = lang === "ru"
-    ? ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
-    : ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const ui2 = getUI(lang as LangCode);
+  const monthNames = ui2.months;
 
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
@@ -612,9 +613,9 @@ function MiniCalendar({ year, month, calendarData, checkIn, checkOut, lang, dayL
         </div>
       ))}
       <div className="flex items-center justify-center gap-3 mt-2 text-[10px] text-gray-400">
-        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-green-100" /> <span>{lang === "ru" ? "Свободно" : lang === "hy" ? "Հասանելի" : lang === "fr" ? "Disponible" : lang === "de" ? "Verfügbar" : lang === "es" ? "Disponible" : lang === "it" ? "Disponibile" : lang === "ar" ? "متاح" : lang === "zh" ? "可预订" : lang === "fa" ? "در دسترس" : "Available"}</span></div>
-        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-gray-200" /> <span>{lang === "ru" ? "Занято" : lang === "hy" ? "Զբաղված" : lang === "fr" ? "Pris" : lang === "de" ? "Belegt" : lang === "es" ? "Ocupado" : lang === "it" ? "Occupato" : lang === "ar" ? "محجوز" : lang === "zh" ? "已订" : lang === "fa" ? "اشغال" : "Booked"}</span></div>
-        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-yellow-200" /> <span>{lang === "ru" ? "Выбрано" : lang === "hy" ? "Ընտրված" : lang === "fr" ? "Sélectionné" : lang === "de" ? "Gewählt" : lang === "es" ? "Seleccionado" : lang === "it" ? "Selezionato" : lang === "ar" ? "محدد" : lang === "zh" ? "已选" : lang === "fa" ? "انتخاب شده" : "Selected"}</span></div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-green-100" /> <span>{u.free}</span></div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-gray-200" /> <span>{u.booked}</span></div>
+        <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-yellow-200" /> <span>{u.selected}</span></div>
       </div>
     </div>
   );
@@ -649,6 +650,7 @@ function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang
   guests: number;
   lang: string;
 }) {
+  const u = getUI(lang as LangCode);
   const [expanded, setExpanded] = useState(false);
   const [activeCat, setActiveCat] = useState<string>("");
   const [services, setServices] = useState<Service[]>([]);
@@ -699,15 +701,15 @@ function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang
     return "🕐";
   };
 
-  const titleText = lang === "ru" ? "🎯 Улучшите ваш визит" : lang === "hy" ? "🎯 Բարելավեք ձեր այցը" : lang === "fr" ? "🎯 Améliorez votre visite" : lang === "de" ? "🎯 Verbessern Sie Ihren Besuch" : lang === "es" ? "🎯 Mejora tu visita" : lang === "it" ? "🎯 Migliora la tua visita" : lang === "ar" ? "🎯 حسّن زيارتك" : lang === "zh" ? "🎯 提升您的体验" : lang === "fa" ? "🎯 بازدید خود را بهبود بخشید" : "🎯 Enhance your visit";
-  const btnText = lang === "ru" ? "Добавить услуги" : lang === "hy" ? "Ծառայություններ ավելացնել" : lang === "fr" ? "Ajouter des services" : lang === "de" ? "Dienste hinzufügen" : lang === "es" ? "Añadir servicios" : lang === "it" ? "Aggiungi servizi" : lang === "ar" ? "إضافة خدمات" : lang === "zh" ? "添加服务" : lang === "fa" ? "افزودن خدمات" : "Add services";
-  const totalText = lang === "ru" ? "Дополнительно" : lang === "hy" ? "Լրացուցիչ" : lang === "fr" ? "Supplément" : lang === "de" ? "Zusätzlich" : lang === "es" ? "Adicional" : lang === "it" ? "Extra" : lang === "ar" ? "إضافي" : lang === "zh" ? "额外" : lang === "fa" ? "اضافی" : "Extra";
-  const noneText = lang === "ru" ? "Нет услуг в этой категории" : lang === "hy" ? "Այս կատեգորիայում ծառայություններ չկան" : lang === "fr" ? "Aucun service dans cette catégorie" : lang === "de" ? "Keine Dienste in dieser Kategorie" : lang === "es" ? "Sin servicios en esta categoría" : lang === "it" ? "Nessun servizio in questa categoria" : lang === "ar" ? "لا خدمات في هذه الفئة" : lang === "zh" ? "此类别无服务" : lang === "fa" ? "خدماتی در این دسته وجود ندارد" : "No services in this category";
-  const addText = lang === "ru" ? "Добавить" : lang === "hy" ? "Ավելացնել" : lang === "fr" ? "Ajouter" : lang === "de" ? "Hinzufügen" : lang === "es" ? "Añadir" : lang === "it" ? "Aggiungi" : lang === "ar" ? "إضافة" : lang === "zh" ? "添加" : lang === "fa" ? "افزودن" : "Add";
-  const todText = lang === "ru" ? "Время дня" : lang === "hy" ? "Օրվա ժամ" : lang === "fr" ? "Moment" : lang === "de" ? "Tageszeit" : lang === "es" ? "Hora" : lang === "it" ? "Orario" : lang === "ar" ? "وقت" : lang === "zh" ? "时间" : lang === "fa" ? "زمان" : "Time of day";
-  const morningText = lang === "ru" ? "🌅 Утро" : lang === "hy" ? "🌅 Առաւոտ" : lang === "fr" ? "🌅 Matin" : lang === "de" ? "🌅 Morgen" : lang === "es" ? "🌅 Mañana" : lang === "it" ? "🌅 Mattina" : lang === "ar" ? "🌅 صباح" : lang === "zh" ? "🌅 早上" : lang === "fa" ? "🌅 صبح" : "🌅 Morning";
-  const eveningText = lang === "ru" ? "🌙 Вечер" : lang === "hy" ? "🌙 Երեկո" : lang === "fr" ? "🌙 Soir" : lang === "de" ? "🌙 Abend" : lang === "es" ? "🌙 Noche" : lang === "it" ? "🌙 Sera" : lang === "ar" ? "🌙 مساء" : lang === "zh" ? "🌙 晚上" : lang === "fa" ? "🌙 عصر" : "🌙 Evening";
-  const customTimeText = lang === "ru" ? "🕐 Другое" : lang === "hy" ? "🕐 Այլ" : lang === "fr" ? "🕐 Autre" : lang === "de" ? "🕐 Andere" : lang === "es" ? "🕐 Otro" : lang === "it" ? "🕐 Altro" : lang === "ar" ? "🕐 آخر" : lang === "zh" ? "🕐 其他" : lang === "fa" ? "🕐 دیگر" : "🕐 Custom";
+  const titleText = u.enhanceVisit;
+  const btnText = u.addServicesBtn;
+  const totalText = u.extraTotal;
+  const noneText = u.noServicesInCat;
+  const addText = u.addBtn;
+  const todText = u.timeOfDay;
+  const morningText = u.morning;
+  const eveningText = u.evening;
+  const customTimeText = u.customTime;
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-5">

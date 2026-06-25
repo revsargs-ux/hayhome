@@ -150,11 +150,10 @@ export async function POST(req: NextRequest) {
             if (!ref.first_booking_at) {
               await sb.from("hayhome_referrals").update({ first_booking_at: new Date().toISOString(), expires_at: new Date(Date.now() + 2 * 365.25 * 24 * 60 * 60 * 1000).toISOString() }).eq("id", ref.id);
             } else if (new Date(ref.expires_at) > new Date()) {
-              // Still within 2-year window — credit partner
-              await sb.from("hayhome_partners").update({ balance: 0, total_earned: 0 }).eq("id", partner.id);
+              // Still within 2-year window — credit partner (read then update)
               const { data: p } = await sb.from("hayhome_partners").select("balance, total_earned").eq("id", partner.id).single();
               if (p) {
-                await sb.from("hayhome_partners").update({ balance: p.balance + commission, total_earned: p.total_earned + commission }).eq("id", partner.id);
+                await sb.from("hayhome_partners").update({ balance: (p.balance || 0) + commission, total_earned: (p.total_earned || 0) + commission }).eq("id", partner.id);
               }
             }
           }

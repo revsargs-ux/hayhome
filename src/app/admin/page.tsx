@@ -93,7 +93,7 @@ export default function AdminPage() {
   const { lang } = useLang();
   const u = getUI(lang);
 
-  const a = (ru: string, en: string) => lang === "ru" ? ru : en; // Keep for backwards compat with AdminCalendarView
+  const a = () => ""; // deprecated — do not use, kept for type compat only
 
   const load = async () => {
     setLoading(true);
@@ -185,7 +185,7 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { icon: <Home size={18} />, value: activeHosts.length, label: u.activeFamilies, color: "text-blue-600" },
+              { icon: <Home size={18} />, value: activeHosts.length, label: u.activeFamilies, color: "text-amber-600" },
               { icon: <Star size={18} />, value: pendingHosts.length, label: u.pendingReviewAdmin, color: "text-yellow-600" },
               { icon: <Users size={18} />, value: bookings.length, label: u.bookingsTab, color: "text-green-600" },
               { icon: <DollarSign size={18} />, value: `$${totalRevenue}`, label: u.revenue, color: "text-red-600" },
@@ -223,6 +223,9 @@ export default function AdminPage() {
             {/* Hosts tab */}
             {tab === "hosts" && (
               <div className="space-y-4">
+                {pendingHosts.length === 0 && activeHosts.length === 0 && hosts.filter(h => h.status === "suspended").length === 0 && (
+                  <div className="text-center py-20 text-gray-400">{u.noHosts}</div>
+                )}
                 {pendingHosts.length > 0 && (
                   <div>
                     <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -287,7 +290,7 @@ export default function AdminPage() {
                       )}
                       {booking.status === "confirmed" && (
                         <button onClick={() => updateBooking(booking.id, "completed")} disabled={updating === booking.id}
-                          className="px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg font-medium hover:bg-blue-600 disabled:opacity-50">
+                          className="px-3 py-1.5 bg-amber-500 text-white text-xs rounded-lg font-medium hover:bg-amber-600 disabled:opacity-50">
                           ✓ {u.completeBtn}
                         </button>
                       )}
@@ -372,7 +375,7 @@ export default function AdminPage() {
                 ) : (
                   <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
+                      <div className="overflow-x-auto"><table className="w-full text-sm">
                         <thead><tr className="bg-gray-50 text-left">
                           <th className="px-4 py-3 font-medium text-gray-600">{u.nameLabel}</th>
                           <th className="px-4 py-3 font-medium text-gray-600">Email</th>
@@ -385,13 +388,13 @@ export default function AdminPage() {
                             <tr key={usr.id} className="hover:bg-gray-50">
                               <td className="px-4 py-3 font-medium text-gray-900">{usr.name}</td>
                               <td className="px-4 py-3 text-gray-500">{usr.email}</td>
-                              <td className="px-4 py-3"><span className={"text-xs rounded-full px-2 py-0.5 font-medium " + (usr.role === "admin" ? "bg-purple-100 text-purple-700" : usr.role === "host" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600")}>{usr.role}</span></td>
+                              <td className="px-4 py-3"><span className={"text-xs rounded-full px-2 py-0.5 font-medium " + (usr.role === "admin" ? "bg-red-100 text-red-700" : usr.role === "host" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600")}>{usr.role}</span></td>
                               <td className="px-4 py-3 text-gray-400 text-xs">{usr.referred_by_code || "—"}</td>
                               <td className="px-4 py-3 text-gray-400 text-xs">{usr.created_at?.slice(0, 10)}</td>
                             </tr>
                           ))}
                         </tbody>
-                      </table>
+                      </table></div>
                     </div>
                   </div>
                 )}
@@ -549,7 +552,7 @@ export default function AdminPage() {
                   <div className="p-8 text-center text-gray-400">{u.noPromocodes}</div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                    <div className="overflow-x-auto"><table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-gray-200 text-gray-500">
                           <th className="text-left py-2 px-3">{u.promocodeCode}</th>
@@ -595,7 +598,7 @@ export default function AdminPage() {
                           </tr>
                         ))}
                       </tbody>
-                    </table>
+                    </table></div>
                   </div>
                 )}
               </div>
@@ -687,7 +690,7 @@ function HostRow({ host, updating, onUpdate, onLogAction, lang }: {
           )}
           {host.status === "suspended" && (
             <button onClick={() => { onUpdate(host.id, { status: "active" }); onLogAction(host.id, "restored"); }} disabled={updating === host.id}
-              className="px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg font-medium hover:bg-blue-600 disabled:opacity-50">
+              className="px-3 py-1.5 bg-amber-500 text-white text-xs rounded-lg font-medium hover:bg-amber-600 disabled:opacity-50">
               {u.restore}
             </button>
           )}
@@ -731,7 +734,7 @@ function HostRow({ host, updating, onUpdate, onLogAction, lang }: {
 function StatusBadge({ status, lang }: { status: Booking["status"]; lang: string }) {
   const map = {
     pending: "bg-yellow-100 text-yellow-700",
-    confirmed: "bg-blue-100 text-blue-700",
+    confirmed: "bg-green-100 text-green-700",
     completed: "bg-green-100 text-green-700",
     cancelled: "bg-red-100 text-red-700",
   };
@@ -780,7 +783,7 @@ function AdminServicesTab({ lang }: { lang: LangCode }) {
           <p className="text-gray-400 text-sm">{u.noServicesAdmin}</p>
         ) : (
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto"><table className="w-full text-sm">
               <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
                 <tr>
                   <th className="text-left px-4 py-3">{u.serviceName}</th>
@@ -805,7 +808,7 @@ function AdminServicesTab({ lang }: { lang: LangCode }) {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           </div>
         )}
       </div>
@@ -817,7 +820,7 @@ function AdminServicesTab({ lang }: { lang: LangCode }) {
           <p className="text-gray-400 text-sm">{u.noOrdersAdmin}</p>
         ) : (
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto"><table className="w-full text-sm">
               <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
                 <tr>
                   <th className="text-left px-4 py-3">{u.serviceName}</th>
@@ -838,14 +841,14 @@ function AdminServicesTab({ lang }: { lang: LangCode }) {
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                         sb.status === "confirmed" ? "bg-green-100 text-green-700" :
                         sb.status === "cancelled" ? "bg-red-100 text-red-600" :
-                        sb.status === "completed" ? "bg-blue-100 text-blue-700" :
+                        sb.status === "completed" ? "bg-green-100 text-green-700" :
                         "bg-yellow-100 text-yellow-700"
                       }`}>{sb.status}</span>
                     </td>
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           </div>
         )}
       </div>

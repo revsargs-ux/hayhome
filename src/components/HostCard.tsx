@@ -140,7 +140,7 @@ export default function HostCard({ host, valueRank }: Props) {
 
           <div className="flex flex-wrap gap-1 mb-3">
             {host.languages.map((l) => (
-              <span key={l} className="text-xs bg-blue-50 text-blue-700 rounded-full px-2 py-0.5 font-medium">
+              <span key={l} className="text-xs bg-amber-50 text-amber-700 rounded-full px-2 py-0.5 font-medium">
                 {translateLang(l, lang)}
               </span>
             ))}

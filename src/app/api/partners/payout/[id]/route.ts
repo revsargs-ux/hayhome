@@ -10,7 +10,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   const { payoutId, decision, reason } = await req.json();
-  if (!payoutId || !["confirmed", "rejected"].includes(decision)) {
+  if (!payoutId || !["completed", "rejected"].includes(decision)) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
@@ -24,15 +24,20 @@ export async function PATCH(req: NextRequest) {
   if (!payout) return NextResponse.json({ error: "Payout not found" }, { status: 404 });
   if (payout.status !== "pending") return NextResponse.json({ error: "Already processed" }, { status: 400 });
 
-  const newStatus = decision === "confirmed" ? "confirmed" : "rejected";
+  const newStatus = decision === "completed" ? "completed" : "rejected";
 
   await supabase.from("hayhome_payouts").update({ status: newStatus }).eq("id", payoutId);
 
-  // If rejected — return balance to partner
+  // If rejected — return balance to partner (fetch fresh balance directly)
   if (decision === "rejected") {
+    const { data: partnerRow } = await supabase
+      .from("hayhome_partners")
+      .select("balance")
+      .eq("id", payout.partner_id)
+      .single();
     await supabase
       .from("hayhome_partners")
-      .update({ balance: (payout.partner?.balance || 0) + payout.amount })
+      .update({ balance: (partnerRow?.balance || 0) + payout.amount })
       .eq("id", payout.partner_id);
   }
 

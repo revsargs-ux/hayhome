@@ -128,7 +128,7 @@ export default function TermsPage() {
 
           <div className="mt-10 pt-6 border-t border-gray-200 text-sm text-gray-400">
             <p>Последнее обновление: 22 июня 2026 г.</p>
-            <p className="mt-1">Связь: <a href="mailto:hayhome.arm@gmail.com" className="text-red-600 hover:underline">hayhome.arm@gmail.com</a></p>
+            <p className="mt-1">Связь: <a href="mailto:info@hayhome.am" className="text-red-600 hover:underline">info@hayhome.am</a></p>
           </div>
         </div>
       </div>

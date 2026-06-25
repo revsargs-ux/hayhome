@@ -150,8 +150,7 @@ export default function Header() {
                 {user.name[0]}
               </Link>
             )}
-            <button className="p-2 rounded-lg text-gray-600 hover:bg-gray-100" onClick={() => setOpen(!open)}>
-              {open ? <X size={22} /> : <Menu size={22} />}
+            <button className="p-2 rounded-lg text-gray-600 hover:bg-gray-100" onClick={() => setOpen(!open)} aria-label={open ? u.closeMenu : u.openMenu}>
             </button>
           </div>
         </div>

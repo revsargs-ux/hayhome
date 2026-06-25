@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getHosts, createHost } from "@/lib/data";
 import { rateLimit } from "@/lib/rateLimit";
+import { getAuthUser } from "@/lib/auth";
 import { sendHostApplicationNotification } from "@/lib/email";
 import { createClient } from "@supabase/supabase-js";
 
@@ -11,8 +12,10 @@ export async function GET(req: NextRequest) {
   const all = req.nextUrl.searchParams.get("all");
   const hosts = await getHosts();
   if (all) {
-    // Only return all (incl. pending) — no auth check here since
-    // the list doesn't expose sensitive data (no passwords/emails in list)
+    const user = await getAuthUser(req);
+    if (!user || user.role !== "admin") {
+      return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    }
     return NextResponse.json(hosts);
   }
   return NextResponse.json(hosts.filter((h) => h.status === "active"));

@@ -497,7 +497,7 @@ export default function ProviderDashboardPage() {
                         <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
                           ord.status === "confirmed" ? "bg-green-100 text-green-700" :
                           ord.status === "cancelled" ? "bg-red-100 text-red-600" :
-                          ord.status === "completed" ? "bg-blue-100 text-blue-700" :
+                          ord.status === "completed" ? "bg-green-100 text-green-700" :
                           "bg-yellow-100 text-yellow-700"
                         }`}>
                           {statusLabel(ord.status)}

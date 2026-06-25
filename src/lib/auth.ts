@@ -1,9 +1,11 @@
 import { SignJWT, jwtVerify } from "jose";
 import { NextRequest, NextResponse } from "next/server";
 
-const SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "hayhome-secret-key-2024-change-in-prod"
-);
+const _jwtSecret = process.env.JWT_SECRET;
+if (!_jwtSecret) {
+  throw new Error("JWT_SECRET environment variable is not set. Refusing to start.");
+}
+const SECRET = new TextEncoder().encode(_jwtSecret);
 
 export interface JWTPayload {
   id: string;

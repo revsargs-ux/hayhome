@@ -289,7 +289,7 @@ export default function ProviderRegisterPage() {
                 <div className="flex flex-wrap gap-2 mt-3">
                   {form.photos.map((url, idx) => (
                     <div key={idx} className="relative">
-                      <img src={url} alt="" className="w-20 h-20 rounded-lg object-cover" />
+                      <img src={url} alt="Uploaded photo" className="w-20 h-20 rounded-lg object-cover" />
                       <button type="button" onClick={() => removePhoto(idx)}
                         className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">×</button>
                     </div>

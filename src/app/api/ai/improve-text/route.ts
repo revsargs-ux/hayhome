@@ -1,5 +1,7 @@
 import OpenAI from "openai";
 import { NextRequest } from "next/server";
+import { getAuthUser } from "@/lib/auth";
+import { rateLimit } from "@/lib/rateLimit";
 
 const client = new OpenAI({
   apiKey: process.env.AI_API_KEY,
@@ -7,6 +9,14 @@ const client = new OpenAI({
 });
 
 export async function POST(req: NextRequest) {
+  const blocked = rateLimit(req);
+  if (blocked) return blocked;
+
+  const user = await getAuthUser(req);
+  if (!user) {
+    return new Response(JSON.stringify({ error: "Authentication required" }), { status: 401, headers: { "Content-Type": "application/json" } });
+  }
+
   const { text, type } = await req.json();
 
   if (!text || text.trim().length < 5) {

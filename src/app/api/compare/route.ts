@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getHost } from "@/lib/data";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function GET(req: NextRequest) {
+  const blocked = rateLimit(req);
+  if (blocked) return blocked;
+
   const idsParam = req.nextUrl.searchParams.get("ids") ?? "";
   const ids = idsParam
     .split(",")

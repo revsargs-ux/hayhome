@@ -35,9 +35,9 @@ export default function Footer() {
 
           <div className="flex items-center justify-center gap-6 mt-10">
             {[
-              { label: "Instagram", href: "#", icon: "📸" },
-              { label: "Facebook", href: "#", icon: "👤" },
-              { label: "Telegram", href: "#", icon: "✈️" },
+              { label: "Instagram", href: "https://instagram.com/hayhome.am", icon: "📸" },
+              { label: "Facebook", href: "https://facebook.com/hayhome.am", icon: "👤" },
+              { label: "Telegram", href: "https://t.me/hayhome_bot", icon: "✈️" },
               { label: "YouTube", href: "#", icon: "▶️" },
             ].map((s) => (
               <a key={s.label} href={s.href}

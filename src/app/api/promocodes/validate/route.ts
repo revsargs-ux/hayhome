@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
+  const blocked = rateLimit(req);
+  if (blocked) return blocked;
+
   const body = await req.json();
   const { code, amount } = body as { code: string; amount: number };
 
