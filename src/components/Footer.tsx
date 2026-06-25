@@ -97,6 +97,7 @@ export default function Footer() {
               <li><Link href="/terms" className="hover:text-white transition-colors">{tr.legal?.terms}</Link></li>
               <li><Link href="/privacy" className="hover:text-white transition-colors">{tr.legal?.privacy}</Link></li>
               <li><Link href="/rules" className="hover:text-white transition-colors">{tr.legal?.rules}</Link></li>
+              <li><Link href="/requisites" className="hover:text-white transition-colors">{u.requisites}</Link></li>
             </ul>
           </div>
         </div>
@@ -107,6 +108,7 @@ export default function Footer() {
             <Link href="/terms" className="hover:text-gray-400 transition-colors">{tr.legal?.terms}</Link>
             <Link href="/privacy" className="hover:text-gray-400 transition-colors">{tr.legal?.privacy}</Link>
             <Link href="/rules" className="hover:text-gray-400 transition-colors">{tr.legal?.rules}</Link>
+            <Link href="/requisites" className="hover:text-gray-400 transition-colors">{u.requisites}</Link>
           </div>
         </div>
       </div>

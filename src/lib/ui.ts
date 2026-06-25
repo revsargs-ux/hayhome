@@ -314,6 +314,7 @@ export interface UI {
   openChat: string;
   closeMenu: string;
   openMenu: string;
+  requisites: string;
 }
 
 type Rec = Record<string, string>;
@@ -599,6 +600,7 @@ const translations: Record<LangCode, UI> = {
     openChat: "Открыть чат",
     closeMenu: "Закрыть меню",
     openMenu: "Открыть меню",
+    requisites: "Реквизиты",
   },
 
   en: {
@@ -881,6 +883,7 @@ const translations: Record<LangCode, UI> = {
     openChat: "Open chat",
     closeMenu: "Close menu",
     openMenu: "Open menu",
+    requisites: "Legal Details",
   },
 
   hy: {
@@ -1163,6 +1166,7 @@ const translations: Record<LangCode, UI> = {
     openChat: "Բացել չաթ",
     closeMenu: "Փակել մենյուը",
     openMenu: "Բացել մենյուը",
+    requisites: "Տվյալներ",
   },
 
   fr: {
@@ -1445,6 +1449,7 @@ const translations: Record<LangCode, UI> = {
     openChat: "Ouvrir le chat",
     closeMenu: "Fermer le menu",
     openMenu: "Ouvrir le menu",
+    requisites: "Coordonnées",
   },
 
   de: {
@@ -1727,6 +1732,7 @@ const translations: Record<LangCode, UI> = {
     openChat: "Chat öffnen",
     closeMenu: "Menü schließen",
     openMenu: "Menü öffnen",
+    requisites: "Bankdaten",
   },
 
   es: {
@@ -2009,6 +2015,7 @@ const translations: Record<LangCode, UI> = {
     openChat: "Abrir chat",
     closeMenu: "Cerrar menú",
     openMenu: "Abrir menú",
+    requisites: "Datos legales",
   },
 
   it: {
@@ -2291,6 +2298,7 @@ const translations: Record<LangCode, UI> = {
     openChat: "Apri chat",
     closeMenu: "Chiudi menu",
     openMenu: "Apri menu",
+    requisites: "Dati legali",
   },
 
   ar: {
@@ -2573,6 +2581,7 @@ const translations: Record<LangCode, UI> = {
     openChat: "فتح الدردشة",
     closeMenu: "إغلاق القائمة",
     openMenu: "فتح القائمة",
+    requisites: "البيانات القانونية",
   },
 
   zh: {
@@ -2855,6 +2864,7 @@ const translations: Record<LangCode, UI> = {
     openChat: "打开聊天",
     closeMenu: "关闭菜单",
     openMenu: "打开菜单",
+    requisites: "法律信息",
   },
 
   fa: {
@@ -3117,6 +3127,7 @@ const translations: Record<LangCode, UI> = {
     openChat: "باز کردن چت",
     closeMenu: "بستن منو",
     openMenu: "باز کردن منو",
+    requisites: "اطلاعات قانونی",
     free: "در دسترس",
     booked: "اشغال",
     selected: "انتخاب شده",
