@@ -164,6 +164,29 @@ export async function POST(req: NextRequest) {
     } catch { /* keep default */ }
   }
 
+  // ── Check for slot conflicts (prevent double-booking) ──
+  const { data: existingBookings } = await supabase
+    .from("hayhome_service_bookings")
+    .select("id, start_time, end_time, status")
+    .eq("service_id", body.service_id)
+    .eq("date", body.date)
+    .in("status", ["requested", "confirmed"]);
+
+  if (existingBookings && existingBookings.length > 0) {
+    const newStart = startTime;
+    const newEnd = endTime;
+    const conflict = existingBookings.find((b: any) => {
+      // Check overlap: existing [b.start_time, b.end_time) vs new [newStart, newEnd)
+      return b.start_time < newEnd && b.end_time > newStart;
+    });
+    if (conflict) {
+      return NextResponse.json(
+        { error: "This time slot is already booked", conflict: { start: conflict.start_time, end: conflict.end_time } },
+        { status: 409 }
+      );
+    }
+  }
+
   const insertData: Record<string, unknown> = {
     service_id: body.service_id,
     date: body.date,

@@ -66,6 +66,26 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (!ALLOWED_STATUSES.includes(body.status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
+
+    // ── Cancellation policy: block cancellation within 24h of check-in ──
+    if (body.status === "cancelled") {
+      const { data: bookingData } = await supabase
+        .from("hayhome_bookings")
+        .select("checkIn, status")
+        .eq("id", id)
+        .single();
+      if (bookingData) {
+        const checkInDate = new Date(bookingData.checkIn);
+        const hoursUntilCheckIn = (checkInDate.getTime() - Date.now()) / (1000 * 60 * 60);
+        if (hoursUntilCheckIn < 24 && hoursUntilCheckIn > 0 && bookingData.status !== "pending") {
+          return NextResponse.json(
+            { error: "Cannot cancel within 24 hours of check-in. Contact support." },
+            { status: 409 }
+          );
+        }
+      }
+    }
+
     updates.status = body.status;
   }
 
@@ -76,9 +96,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const booking = await updateBooking(id, updates);
   if (!booking) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  // ── On cancellation: free up calendar dates ──
+  // ── On cancellation: free calendar + refund payments ──
   if (body.status === "cancelled") {
-    // Fetch the booking to get date range
     const { data: fullBooking } = await supabase
       .from("hayhome_bookings")
       .select("host_id, checkIn, checkOut")
@@ -86,6 +105,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       .single();
 
     if (fullBooking) {
+      // Free calendar dates
       const dateRange = getDateRange(fullBooking.checkIn, fullBooking.checkOut);
       if (dateRange.length > 0) {
         const restoreRows = dateRange.map((d) => ({
@@ -98,6 +118,73 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         await supabase
           .from("hayhome_calendar")
           .upsert(restoreRows, { onConflict: "host_id,date" });
+      }
+
+      // ── Refund logic: mark payments as refunded ──
+      const { data: payments } = await supabase
+        .from("hayhome_payments")
+        .select("id, status, method, provider_payment_id")
+        .eq("booking_id", id)
+        .eq("status", "completed");
+
+      if (payments && payments.length > 0) {
+        for (const payment of payments) {
+          // Mark as refund_pending in DB
+          await supabase
+            .from("hayhome_payments")
+            .update({ status: "refund_pending" })
+            .eq("id", payment.id);
+
+          // Process actual refund via provider
+          try {
+            if (payment.method === "stripe" && payment.provider_payment_id && process.env.STRIPE_SECRET_KEY) {
+              await fetch(`https://api.stripe.com/v1/payment_links/${payment.provider_payment_id}/line_items`, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${process.env.STRIPE_SECRET_KEY}` },
+              });
+              // For Stripe Checkout Sessions, refund via sessions→payment_intent
+              const sessionRes = await fetch(`https://api.stripe.com/v1/checkout/sessions/${payment.provider_payment_id}`, {
+                headers: { "Authorization": `Bearer ${process.env.STRIPE_SECRET_KEY}` },
+              });
+              if (sessionRes.ok) {
+                const session = await sessionRes.json();
+                if (session.payment_intent) {
+                  await fetch(`https://api.stripe.com/v1/refunds`, {
+                    method: "POST",
+                    headers: {
+                      "Authorization": `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+                      "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: `payment_intent=${session.payment_intent}`,
+                  });
+                }
+              }
+            } else if (payment.method === "yookassa" && payment.provider_payment_id && process.env.YOOKASSA_CLIENT_ID && process.env.YOOKASSA_SECRET_KEY) {
+              await fetch(`https://api.yookassa.ru/v3/payments/${payment.provider_payment_id}/cancel`, {
+                method: "POST",
+                headers: {
+                  "Authorization": "Basic " + Buffer.from(`${process.env.YOOKASSA_CLIENT_ID}:${process.env.YOOKASSA_SECRET_KEY}`).toString("base64"),
+                  "Content-Type": "application/json",
+                  "Idempotence-Key": `refund-${payment.id}`,
+                },
+                body: JSON.stringify({}),
+              });
+            }
+
+            // Mark as refunded
+            await supabase
+              .from("hayhome_payments")
+              .update({ status: "refunded" })
+              .eq("id", payment.id);
+          } catch (refundErr) {
+            console.error(`[refund] Payment ${payment.id} refund failed:`, refundErr);
+            // Revert to completed so admin can retry manually
+            await supabase
+              .from("hayhome_payments")
+              .update({ status: "completed" })
+              .eq("id", payment.id);
+          }
+        }
       }
     }
   }

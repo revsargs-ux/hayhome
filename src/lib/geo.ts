@@ -23,7 +23,7 @@ export async function reverseGeocode(lat: number, lng: number): Promise<GeoResul
 
   const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=ru,en`;
   const res = await fetch(url, {
-    headers: { "Accept-Language": "ru,en" },
+    headers: { "Accept-Language": "ru,en", "User-Agent": "HayHome/1.0 (hay-home.com)" },
   });
   if (!res.ok) {
     throw new Error(`Reverse geocoding failed: ${res.status}`);
