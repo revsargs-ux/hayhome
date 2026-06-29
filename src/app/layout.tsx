@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Inter } from "next/font/google";
 
@@ -9,7 +9,15 @@ import Footer from "@/components/Footer";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import LightboxWrapper from "@/components/LightboxWrapper";
+import CookieBanner from "@/components/CookieBanner";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#D4001A",
+};
 
 export const metadata: Metadata = {
   title: "HayHome — Armenian Hospitality",
@@ -35,6 +43,20 @@ export const metadata: Metadata = {
   icons: {
     icon: "/icon-192.png",
     apple: "/icon-192.png",
+  },
+  alternates: {
+    languages: {
+      'ru': '/?lang=ru',
+      'en': '/?lang=en',
+      'hy': '/?lang=hy',
+      'fr': '/?lang=fr',
+      'de': '/?lang=de',
+      'es': '/?lang=es',
+      'it': '/?lang=it',
+      'ar': '/?lang=ar',
+      'zh': '/?lang=zh',
+      'fa': '/?lang=fa',
+    },
   },
   appleWebApp: {
     capable: true,
@@ -117,6 +139,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Header />
               <main className="flex-1">{children}</main>
               <Footer />
+              <CookieBanner />
               <ServiceWorkerRegister />
             </LightboxWrapper>
           </LanguageProvider>
