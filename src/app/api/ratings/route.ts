@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { rateLimit } from "@/lib/rateLimit";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const blocked = rateLimit(req);
+  if (blocked) return blocked;
+
   // Fetch all active hosts
   const { data: hosts, error } = await supabase
     .from("hayhome_hosts")

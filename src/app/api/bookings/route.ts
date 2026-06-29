@@ -61,9 +61,7 @@ export async function POST(req: NextRequest) {
   if (!body.guests || typeof body.guests !== "number" || body.guests < 1 || body.guests > 20) {
     return NextResponse.json({ error: "Invalid guest count" }, { status: 400 });
   }
-  if (typeof body.totalPrice !== "number" || body.totalPrice < 0 || body.totalPrice > 100000) {
-    return NextResponse.json({ error: "Invalid price" }, { status: 400 });
-  }
+  // totalPrice is calculated server-side (not trusted from client)
   if (body.message && typeof body.message === "string" && body.message.length > 2000) {
     return NextResponse.json({ error: "Message too long" }, { status: 400 });
   }
@@ -90,6 +88,18 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // ── Server-side price calculation ──
+  const { data: host } = await supabase
+    .from("hayhome_hosts")
+    .select("price_per_night")
+    .eq("id", body.hostId)
+    .single();
+  if (!host || !host.price_per_night) {
+    return NextResponse.json({ error: "Host not found or price not set" }, { status: 400 });
+  }
+  const nights = dateRange.length;
+  const serverTotalPrice = Math.round(host.price_per_night * nights * 100) / 100;
+
   const booking = await createBooking({
     hostId: body.hostId,
     hostName: String(body.hostName || "").slice(0, 200),
@@ -100,7 +110,7 @@ export async function POST(req: NextRequest) {
     checkIn: body.checkIn,
     checkOut: body.checkOut,
     guests: body.guests,
-    totalPrice: body.totalPrice,
+    totalPrice: serverTotalPrice,
     message: String(body.message || "").slice(0, 2000),
   });
 

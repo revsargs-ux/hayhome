@@ -1,5 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import crypto from "crypto";
+
+// ── Stripe Webhook Signature Verification ──
+function verifyStripeSignature(payload: string, signature: string, secret: string): boolean {
+  const elements = signature.split(",");
+  let timestamp = "";
+  const signatures: string[] = [];
+  for (const el of elements) {
+    const [key, value] = el.split("=");
+    if (key === "t") timestamp = value;
+    if (key === "v1") signatures.push(value);
+  }
+  if (!timestamp || signatures.length === 0) return false;
+
+  // Check timestamp freshness (5 min tolerance)
+  const age = Math.floor(Date.now() / 1000) - parseInt(timestamp);
+  if (age > 300) return false;
+
+  const signedPayload = `${timestamp}.${payload}`;
+  const expectedSig = crypto.createHmac("sha256", secret).update(signedPayload).digest("hex");
+  return signatures.some((sig) => {
+    try {
+      const a = Buffer.from(sig, "hex");
+      const b = Buffer.from(expectedSig, "hex");
+      return a.length === b.length && crypto.timingSafeEqual(a, b);
+    } catch {
+      return false;
+    }
+  });
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -8,26 +38,39 @@ export async function POST(req: NextRequest) {
 
   // ── Stripe Webhook ──
   if (signature) {
-    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!webhookSecret) {
       return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
     }
+
+    // Verify signature
+    if (!verifyStripeSignature(body, signature, webhookSecret)) {
+      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    }
+
     try {
-      // Parse the event
       const event = JSON.parse(body);
 
-      // Verify signature (simplified — in production use Stripe SDK)
       if (event.type === "checkout.session.completed") {
         const session = event.data.object;
         const paymentId = session.metadata?.payment_id;
 
         if (paymentId) {
-          // Update payment status
+          // Idempotency check — skip if already completed
+          const { data: existing } = await supabase
+            .from("hayhome_payments")
+            .select("status")
+            .eq("id", paymentId)
+            .single();
+          if (existing?.status === "completed") {
+            return NextResponse.json({ received: true, duplicate: true });
+          }
+
           await supabase
             .from("hayhome_payments")
             .update({ status: "completed" })
             .eq("id", paymentId);
 
-          // Update booking status
           const { data: payment } = await supabase
             .from("hayhome_payments")
             .select("booking_id, service_booking_id")
@@ -39,6 +82,12 @@ export async function POST(req: NextRequest) {
               .from("hayhome_bookings")
               .update({ status: "confirmed" })
               .eq("id", payment.booking_id);
+          }
+          if (payment?.service_booking_id) {
+            await supabase
+              .from("hayhome_service_bookings")
+              .update({ status: "confirmed" })
+              .eq("id", payment.service_booking_id);
           }
         }
       }
@@ -52,9 +101,17 @@ export async function POST(req: NextRequest) {
 
   // ── YooKassa Webhook ──
   if (contentType.includes("application/json")) {
-    if (!process.env.YOOKASSA_WEBHOOK_SECRET) {
+    const yookassaSecret = process.env.YOOKASSA_WEBHOOK_SECRET;
+    if (!yookassaSecret) {
       return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
     }
+
+    // Verify YooKassa signature (IP whitelist or shared secret header)
+    const incomingSecret = req.headers.get("x-yookassa-secret") || "";
+    if (incomingSecret !== yookassaSecret) {
+      return NextResponse.json({ error: "Invalid webhook secret" }, { status: 401 });
+    }
+
     try {
       const event = JSON.parse(body);
 
@@ -63,6 +120,16 @@ export async function POST(req: NextRequest) {
         const paymentId = payment.metadata?.payment_id;
 
         if (paymentId) {
+          // Idempotency check
+          const { data: existing } = await supabase
+            .from("hayhome_payments")
+            .select("status")
+            .eq("id", paymentId)
+            .single();
+          if (existing?.status === "completed") {
+            return NextResponse.json({ received: true, duplicate: true });
+          }
+
           await supabase
             .from("hayhome_payments")
             .update({ status: "completed" })
@@ -79,6 +146,12 @@ export async function POST(req: NextRequest) {
               .from("hayhome_bookings")
               .update({ status: "confirmed" })
               .eq("id", payRecord.booking_id);
+          }
+          if (payRecord?.service_booking_id) {
+            await supabase
+              .from("hayhome_service_bookings")
+              .update({ status: "confirmed" })
+              .eq("id", payRecord.service_booking_id);
           }
         }
       }

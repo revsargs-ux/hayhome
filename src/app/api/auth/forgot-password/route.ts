@@ -5,7 +5,11 @@ import { rateLimit } from "@/lib/rateLimit";
 import nodemailer from "nodemailer";
 import { SignJWT } from "jose";
 
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "hayhome-secret-key-2024");
+function getSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) return new TextEncoder().encode("dev-only-not-for-production");
+  return new TextEncoder().encode(secret);
+}
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(req: NextRequest) {
@@ -29,7 +33,7 @@ export async function POST(req: NextRequest) {
   const token = await new SignJWT({ id: user.id, email: user.email, purpose: "reset" })
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime("15m")
-    .sign(SECRET);
+    .sign(getSecret());
 
   const resetLink = `${process.env.NEXT_PUBLIC_SUPABASE_URL?.replace("supabase.co", "") || ""}https://hay-home.com/reset-password?token=${token}`;
   const correctLink = `https://hay-home.com/reset-password?token=${token}`;

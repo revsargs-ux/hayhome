@@ -9,20 +9,51 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { amount, booking_id, service_booking_id, method, currency } = body as {
-    amount: number;
+  const { booking_id, service_booking_id, method, currency } = body as {
     booking_id?: string;
     service_booking_id?: string;
     method: "stripe" | "yookassa";
     currency?: "USD" | "RUB" | "AMD";
   };
 
-  if (!amount || amount <= 0) {
-    return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
-  }
-
   if (!method || !["stripe", "yookassa"].includes(method)) {
     return NextResponse.json({ error: "Invalid payment method" }, { status: 400 });
+  }
+
+  // ── Server-side amount calculation ──
+  let amount = 0;
+
+  if (booking_id) {
+    // Verify booking belongs to user
+    const { data: booking } = await supabase
+      .from("hayhome_bookings")
+      .select("totalPrice, guestEmail, status")
+      .eq("id", booking_id)
+      .single();
+    if (!booking) {
+      return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
+    if (booking.guestEmail !== user.email && user.role !== "admin") {
+      return NextResponse.json({ error: "Not your booking" }, { status: 403 });
+    }
+    amount = Number(booking.totalPrice);
+  } else if (service_booking_id) {
+    // Verify service booking
+    const { data: svcBooking } = await supabase
+      .from("hayhome_service_bookings")
+      .select("total_price, status")
+      .eq("id", service_booking_id)
+      .single();
+    if (!svcBooking) {
+      return NextResponse.json({ error: "Service booking not found" }, { status: 404 });
+    }
+    amount = Number(svcBooking.total_price);
+  } else {
+    return NextResponse.json({ error: "booking_id or service_booking_id required" }, { status: 400 });
+  }
+
+  if (!amount || amount <= 0) {
+    return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
   }
 
   const finalCurrency = currency || "USD";

@@ -1,6 +1,7 @@
-// HayHome Service Worker — basic shell caching
-const CACHE_NAME = "hayhome-v1";
+// HayHome Service Worker — shell + static caching (API excluded)
+const CACHE_NAME = "hayhome-v2";
 const SHELL = ["/", "/manifest.json"];
+const API_PREFIX = "/api/";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -20,6 +21,16 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+
+  const url = new URL(event.request.url);
+
+  // Never cache API requests — always go to network
+  if (url.pathname.startsWith(API_PREFIX)) {
+    event.respondWith(fetch(event.request).catch(() => new Response('Network error', { status: 503 })));
+    return;
+  }
+
+  // Cache-first for static assets, network fallback
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;

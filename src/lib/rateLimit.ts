@@ -16,6 +16,7 @@ const LIMITS: Record<string, { max: number; windowMs: number }> = {
   "POST:/api/ai/improve-text": { max: 10, windowMs: 60_000 },// 10 per minute
   "POST:/api/services": { max: 5, windowMs: 60_000 },       // 5 per minute
   "POST:/api/service-bookings": { max: 5, windowMs: 60_000 }, // 5 per minute
+  "GET:/api/ratings": { max: 30, windowMs: 60_000 },            // 30 per minute
   "POST:/api/chat": { max: 30, windowMs: 60_000 },              // 30 per minute
   "POST:/api/favorites": { max: 20, windowMs: 60_000 },          // 20 per minute
   "DELETE:/api/favorites": { max: 20, windowMs: 60_000 },        // 20 per minute

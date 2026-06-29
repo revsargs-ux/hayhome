@@ -1,17 +1,22 @@
 import { SignJWT, jwtVerify } from "jose";
 import { NextRequest, NextResponse } from "next/server";
 
-const _jwtSecret = process.env.JWT_SECRET;
-if (!_jwtSecret) {
-  throw new Error("JWT_SECRET environment variable is not set. Refusing to start.");
+function getSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production" && process.env.NEXT_PHASE !== "phase-production-build") {
+      throw new Error("JWT_SECRET environment variable is not set.");
+    }
+    return new TextEncoder().encode("dev-only-secret-not-for-production");
+  }
+  return new TextEncoder().encode(secret);
 }
-const SECRET = new TextEncoder().encode(_jwtSecret);
 
 export interface JWTPayload {
   id: string;
   email: string;
   name: string;
-  role: "guest" | "host" | "admin" | "provider";
+  role: "guest" | "host" | "admin" | "provider" | "partner";
 }
 
 export async function signToken(payload: JWTPayload): Promise<string> {
@@ -19,12 +24,12 @@ export async function signToken(payload: JWTPayload): Promise<string> {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(SECRET);
+    .sign(getSecret());
 }
 
 export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, SECRET);
+    const { payload } = await jwtVerify(token, getSecret());
     return payload as unknown as JWTPayload;
   } catch {
     return null;

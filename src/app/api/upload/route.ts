@@ -27,24 +27,16 @@ const ALLOWED_EXTENSIONS = [
 const BUCKET = "hayhome-media";
 const VALID_FOLDERS = ["hosts", "providers", "reviews", "avatars", "general"];
 
-// Server-side Supabase client with service_role for storage writes
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const serviceRoleKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-
-if (
-  !process.env.SUPABASE_SERVICE_ROLE_KEY &&
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-) {
-  console.warn(
-    "[upload] WARNING: SUPABASE_SERVICE_ROLE_KEY not set — falling back to publishable key. Uploads may fail due to RLS policies."
-  );
+// Server-side Supabase client with service_role for storage writes (lazy init)
+function getSupabaseServer() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) throw new Error("Supabase env vars not configured");
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.warn("[upload] WARNING: Using publishable key — uploads may fail due to RLS");
+  }
+  return createClient(url, key, { auth: { persistSession: false } });
 }
-
-const supabaseServer = createClient(supabaseUrl, serviceRoleKey!, {
-  auth: { persistSession: false },
-});
 
 // Simple in-memory rate limiter for uploads
 const uploadRequests = new Map<string, { count: number; resetAt: number }>();
@@ -151,7 +143,7 @@ export async function POST(req: NextRequest) {
 
     try {
       const buffer = Buffer.from(await file.arrayBuffer());
-      const { data, error: uploadError } = await supabaseServer.storage
+      const { data, error: uploadError } = await getSupabaseServer().storage
         .from(BUCKET)
         .upload(storagePath, buffer, {
           contentType: file.type,
@@ -164,7 +156,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Get public URL
-      const { data: urlData } = supabaseServer.storage
+      const { data: urlData } = getSupabaseServer().storage
         .from(BUCKET)
         .getPublicUrl(data.path);
 
@@ -210,16 +202,23 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "URL is required" }, { status: 400 });
   }
 
+  // Only admin can delete files
+  if (user.role !== "admin") {
+    return NextResponse.json(
+      { error: "Only administrators can delete files. Contact support." },
+      { status: 403 }
+    );
+  }
+
   const storagePath = extractStoragePath(url);
   if (!storagePath) {
-    // Not a Supabase Storage URL — might be an old local upload
     return NextResponse.json(
       { error: "Not a Supabase Storage URL" },
       { status: 400 }
     );
   }
 
-  const { error: deleteError } = await supabaseServer.storage
+  const { error: deleteError } = await getSupabaseServer().storage
     .from(BUCKET)
     .remove([storagePath]);
 

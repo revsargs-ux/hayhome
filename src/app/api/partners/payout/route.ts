@@ -44,17 +44,23 @@ export async function POST(req: NextRequest) {
     status: "pending",
   };
 
-  // Списываем с баланса сразу
-  const { error } = await supabase
-    .from("hayhome_partners")
-    .update({ balance: partner.balance - amount })
-    .eq("id", partner.id);
+  // Списываем с баланса атомарно ( protects against race condition )
+  const { error } = await supabase.rpc('deduct_partner_balance', {
+    p_partner_id: partner.id,
+    p_amount: amount,
+  });
 
-  if (error) return NextResponse.json({ error: "Failed to process" }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ error: "Failed to process payout: " + error.message }, { status: 500 });
+  }
 
   const { error: pErr } = await supabase.from("hayhome_payouts").insert(payout);
   if (pErr) {
-    await supabase.from("hayhome_partners").update({ balance: partner.balance }).eq("id", partner.id);
+    // Re-credit balance if payout insert fails
+    await supabase.rpc('credit_partner_balance', {
+      p_partner_id: partner.id,
+      p_amount: amount,
+    });
     return NextResponse.json({ error: "Failed to create payout" }, { status: 500 });
   }
 

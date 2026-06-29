@@ -3,10 +3,16 @@ import { NextRequest } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
 
-const client = new OpenAI({
-  apiKey: process.env.AI_API_KEY,
-  baseURL: process.env.AI_BASE_URL,
-});
+let _client: OpenAI | null = null;
+function getClient(): OpenAI {
+  if (!_client) {
+    _client = new OpenAI({
+      apiKey: process.env.AI_API_KEY || "placeholder",
+      baseURL: process.env.AI_BASE_URL,
+    });
+  }
+  return _client;
+}
 
 export async function POST(req: NextRequest) {
   const blocked = rateLimit(req);
@@ -22,6 +28,9 @@ export async function POST(req: NextRequest) {
   if (!text || text.trim().length < 5) {
     return new Response("Текст слишком короткий", { status: 400 });
   }
+  if (text.length > 5000) {
+    return new Response("Текст слишком длинный (макс. 5000 символов)", { status: 400 });
+  }
 
   const model = process.env.AI_MODEL || "glm-5.2";
 
@@ -31,7 +40,7 @@ export async function POST(req: NextRequest) {
       : `Ты помогаешь армянским семьям описать гостеприимство для платформы HayHome.\nУлучши описание: сохрани факты, но сделай его теплее, живее, как личную историю. Отвечай только на русском.\nВерни ТОЛЬКО улучшенный текст:\n\n${text}`;
 
   try {
-    const response = await client.chat.completions.create({
+    const response = await getClient().chat.completions.create({
       model,
       max_tokens: 800,
       temperature: 0.85,
@@ -74,7 +83,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    return new Response(`Ошибка: ${msg}`, { status: 500 });
+    console.error("[AI] improve-text error:", err);
+    return new Response("Сервис временно недоступен. Попробуйте позже.", { status: 503 });
   }
 }
