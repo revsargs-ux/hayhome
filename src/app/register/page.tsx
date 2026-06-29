@@ -21,11 +21,13 @@ function RegisterContent() {
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!consent) { setError("⚠️ " + a.consentPD); return; }
     if (form.password !== form.confirm) { setError(a.passMismatch); return; }
     if (form.password.length < 6) { setError(a.minPass); return; }
     setLoading(true);
@@ -102,6 +104,13 @@ function RegisterContent() {
             </div>
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
+          <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
+            <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
+              className="mt-1 w-4 h-4 accent-red-600" required />
+            <span>{a.consentPD}{" "}
+              <Link href="/privacy" target="_blank" className="underline hover:text-gray-900" style={{ color: "#D4001A" }}>Privacy Policy</Link>
+            </span>
+          </label>
           <button type="submit" disabled={loading}
             className="w-full py-3.5 rounded-xl text-white font-bold hover:opacity-90 transition disabled:opacity-70"
             style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
