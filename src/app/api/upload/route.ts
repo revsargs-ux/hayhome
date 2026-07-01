@@ -3,7 +3,8 @@ import { getAuthUser } from "@/lib/auth";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB (photos/videos)
+const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB for photos
 const ALLOWED_TYPES = [
   "image/jpeg",
   "image/png",
@@ -124,9 +125,11 @@ export async function POST(req: NextRequest) {
       continue;
     }
 
-    // Validate size
-    if (file.size > MAX_FILE_SIZE) {
-      errors.push(`${file.name}: exceeds 5MB`);
+    // Validate size — photos 10MB, videos 50MB
+    const isVideo = file.type.startsWith("video/");
+    const sizeLimit = isVideo ? MAX_FILE_SIZE : MAX_PHOTO_SIZE;
+    if (file.size > sizeLimit) {
+      errors.push(`${file.name}: exceeds ${isVideo ? "50" : "10"}MB`);
       continue;
     }
 
