@@ -660,11 +660,14 @@ function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang
   const [activeCat, setActiveCat] = useState<string>("");
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(false);
+  const [regionFilter, setRegionFilter] = useState<"nearby" | "all">("all");
   const [selected, setSelected] = useState<{ service: Service; date: string; startTime: string; endTime: string; timeOfDay: TimeOfDay; customTime: string }[]>([]);
 
   const fetchServices = async (cat: string) => {
     setLoading(true);
-    const res = await fetch(`/api/services?category=${cat}&region=${encodeURIComponent(hostRegion)}`);
+    const params = new URLSearchParams({ category: cat });
+    if (regionFilter === "nearby") params.set("region", hostRegion);
+    const res = await fetch(`/api/services?${params}`);
     const data = await res.json();
     setServices(Array.isArray(data) ? data : []);
     setLoading(false);
@@ -674,6 +677,11 @@ function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang
     setActiveCat(cat);
     fetchServices(cat);
   };
+
+  // Refetch when region filter changes
+  useEffect(() => {
+    if (activeCat) fetchServices(activeCat);
+  }, [regionFilter]);
 
   const addToSelected = (svc: Service) => {
     const defaultTod: TimeOfDay = DEFAULT_TOD[svc.category] || "morning";
@@ -743,6 +751,26 @@ function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang
               </button>
             ))}
           </div>
+
+          {/* Region filter toggle */}
+          {activeCat && !loading && (
+            <div className="flex items-center gap-2 mb-3">
+              <button
+                onClick={() => setRegionFilter("all")}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition ${regionFilter === "all" ? "text-white" : "text-gray-500 hover:text-gray-700"}`}
+                style={regionFilter === "all" ? { background: "#D4001A" } : {}}
+              >
+                {lang === "ru" ? "Все" : "All"}
+              </button>
+              <button
+                onClick={() => setRegionFilter("nearby")}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition ${regionFilter === "nearby" ? "text-white" : "text-gray-500 hover:text-gray-700"}`}
+                style={regionFilter === "nearby" ? { background: "#D4001A" } : {}}
+              >
+                {lang === "ru" ? "Рядом" : "Nearby"}
+              </button>
+            </div>
+          )}
 
           {/* Services in category */}
           {loading && (

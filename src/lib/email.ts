@@ -250,3 +250,36 @@ export async function sendPayoutDecisionNotification(data: {
       </div></div>`,
   });
 }
+
+export async function sendServiceBookingNotification(data: {
+  providerName: string;
+  providerEmail: string;
+  serviceTitle: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  guestName: string;
+}) {
+  if (!process.env.GMAIL_APP_PASSWORD) return;
+  const transporter = getTransporter();
+  await transporter.sendMail({
+    from: `"HayHome 🇦🇲" <${ADMIN_EMAIL}>`,
+    to: data.providerEmail,
+    subject: `🔔 Новый заказ: ${data.serviceTitle} — ${data.date}`,
+    html: `<div style="font-family:Arial;max-width:600px;margin:0 auto">
+      <div style="background:linear-gradient(135deg,#D4001A,#F2A900);padding:24px;border-radius:12px 12px 0 0;text-align:center">
+        <h1 style="color:white;margin:0">🔔 Новый заказ услуги</h1></div>
+      <div style="background:white;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e5e5">
+        <p style="color:#333;font-size:16px"><strong>${data.guestName}</strong> заказал(а) вашу услугу:</p>
+        <table style="width:100%;color:#555;font-size:15px;margin:16px 0">
+          <tr><td style="padding:4px 0;color:#999">Услуга:</td><td style="padding:4px 0;font-weight:bold">${data.serviceTitle}</td></tr>
+          <tr><td style="padding:4px 0;color:#999">Дата:</td><td style="padding:4px 0;font-weight:bold">${data.date}</td></tr>
+          <tr><td style="padding:4px 0;color:#999">Время:</td><td style="padding:4px 0;font-weight:bold">${data.startTime} — ${data.endTime}</td></tr>
+        </table>
+        <p style="color:#555">Откройте чат на платформе, чтобы подтвердить или обсудить детали.</p>
+        <div style="text-align:center;margin:24px 0">
+          <a href="https://hay-home.com/provider/dashboard" style="background:linear-gradient(135deg,#D4001A,#F2A900);color:white;padding:14px 32px;border-radius:24px;text-decoration:none;font-weight:bold">Открыть dashboard</a>
+        </div>
+      </div></div>`,
+  });
+}

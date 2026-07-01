@@ -232,6 +232,90 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to create service booking: " + error.message }, { status: 500 });
   }
 
+  // ── Notify provider via email + create group chat ──
+  try {
+    // Get service + provider info
+    const { data: svc } = await supabase
+      .from("hayhome_services")
+      .select("title, provider_id")
+      .eq("id", body.service_id)
+      .single();
+
+    if (svc?.provider_id) {
+      const { data: provider } = await supabase
+        .from("hayhome_users")
+        .select("id, name, email")
+        .eq("id", svc.provider_id)
+        .single();
+
+      // Get booking info for context
+      let bookingInfo: { guestName?: string; guestEmail?: string; hostName?: string; hostId?: string } | null = null;
+      if (!isStandalone && body.booking_id) {
+        const { data: b } = await supabase
+          .from("hayhome_bookings")
+          .select("guestName, guestEmail, hostName, hostId")
+          .eq("id", body.booking_id)
+          .single();
+        bookingInfo = b;
+      }
+
+      // Email notification to provider
+      if (provider?.email) {
+        const { sendServiceBookingNotification } = await import("@/lib/email");
+        sendServiceBookingNotification({
+          providerName: provider.name || "Provider",
+          providerEmail: provider.email,
+          serviceTitle: svc.title || "Service",
+          date: body.date,
+          startTime,
+          endTime,
+          guestName: isStandalone ? body.guest_name : bookingInfo?.guestName || user!.name,
+        }).catch((e) => console.error("[Email] Service booking notification failed:", e));
+      }
+
+      // Create group chat: guest + host + provider
+      if (!isStandalone && bookingInfo?.hostId) {
+        // Get host's user_id
+        const { data: hostUser } = await supabase
+          .from("hayhome_hosts")
+          .select("user_id")
+          .eq("id", bookingInfo.hostId)
+          .single();
+
+        const participants = [
+          user!.id,
+          svc.provider_id,
+          ...(hostUser?.user_id ? [hostUser.user_id] : []),
+        ].filter(Boolean);
+
+        if (participants.length >= 2) {
+          // Create group conversation
+          const { data: existingConv } = await supabase
+            .from("hayhome_messages")
+            .select("id")
+            .eq("booking_id", body.booking_id)
+            .eq("service_id", body.service_id)
+            .limit(1);
+
+          if (!existingConv || existingConv.length === 0) {
+            // Send system message to start group chat
+            const guestName = bookingInfo?.guestName || user!.name;
+            await supabase.from("hayhome_messages").insert({
+              from_user_id: user!.id,
+              to_user_id: svc.provider_id,
+              booking_id: body.booking_id || null,
+              service_id: body.service_id,
+              text: `🔔 ${guestName} заказал услугу «${svc.title}» на ${body.date} (${startTime}-${endTime}). Чат создан для обсуждения деталей.`,
+              read: false,
+            });
+          }
+        }
+      }
+    }
+  } catch (notifyErr) {
+    console.error("[service-booking] Notification error:", notifyErr);
+  }
+
   return NextResponse.json(data, { status: 201 });
 }
 
