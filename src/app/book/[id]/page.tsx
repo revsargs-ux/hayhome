@@ -164,6 +164,7 @@ export default function BookPage() {
         ...f,
         guestName: f.guestName || user.name,
         guestEmail: f.guestEmail || user.email,
+        guestCountry: f.guestCountry || "",
       }));
     }
   }, [user]);
@@ -203,6 +204,7 @@ export default function BookPage() {
     setLoading(true);
     setError("");
     try {
+      console.log("[book] Submitting:", { ...form, hostId: id, hostName: host.familyName });
       const res = await fetch("/api/bookings", {
         method: "POST",
         credentials: "include",
@@ -235,11 +237,12 @@ export default function BookPage() {
       }
       setSuccess(true);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : undefined;
-      if (msg === "Some dates are not available") {
-        setError(u.datesNotAvailable);
+      const msg = e instanceof Error ? e.message : "Unknown error";
+      console.error("[book] Submit error:", msg);
+      if (msg.includes("not available") || msg.includes("dates")) {
+        setError(u.datesNotAvailable || "Dates not available");
       } else {
-        setError(u.submissionError);
+        setError(msg);
       }
     } finally {
       setLoading(false);
@@ -359,7 +362,7 @@ export default function BookPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("country")} *</label>
-                    <input required value={form.guestCountry} onChange={e => setForm(f => ({ ...f, guestCountry: e.target.value }))}
+                    <input value={form.guestCountry} onChange={e => setForm(f => ({ ...f, guestCountry: e.target.value }))}
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
                   </div>
                 </div>
