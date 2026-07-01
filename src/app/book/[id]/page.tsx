@@ -462,43 +462,6 @@ export default function BookPage() {
                 </div>
                 {error && <p className="text-red-600 text-sm">{error}</p>}
 
-                {/* Payment Method Section */}
-                {nights > 0 && (
-                  <div className="border border-gray-200 rounded-xl p-4 space-y-3">
-                    <label className="block text-sm font-semibold text-gray-700">
-                      {u.paymentMethodLabel}
-                    </label>
-                    <div className="flex gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod("onsite")}
-                        className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition ${paymentMethod === "onsite" ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
-                      >
-                        🏠 {u.payOnSite}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod("transfer")}
-                        className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition ${paymentMethod === "transfer" ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
-                      >
-                        🏦 {u.transferPayment}
-                      </button>
-                    </div>
-                    {paymentMethod === "transfer" && (
-                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2 text-xs text-gray-600 space-y-1">
-                        <p className="font-semibold text-gray-800">{u.bankDetails || "Реквизиты"}</p>
-                        <p className="font-semibold">ИП САРГСЯН РЕВИК СЕРГЕЕВИЧ</p>
-                        <p>ИНН: 410102126296</p>
-                        <p>ОГРНИП: 325410000011701</p>
-                        <p>Р/с: 40802810836710000838</p>
-                        <p>СБЕРБАНК, г. Магадан</p>
-                        <p>БИК: 044442607</p>
-                        <p>К/с: 30101810300000000607</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
                 <button type="submit" disabled={loading}
                   className="w-full py-4 rounded-xl text-white font-bold text-lg hover:opacity-90 transition disabled:opacity-70"
                   style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
