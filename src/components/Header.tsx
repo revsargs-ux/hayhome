@@ -17,6 +17,7 @@ export default function Header() {
   const { user, logout } = useAuth();
   const n = tr.nav;
   const u = getUI(lang);
+  const isRu = lang === "ru";
 
   useEffect(() => {
     const updateCount = () => {
@@ -56,6 +57,9 @@ export default function Header() {
             </Link>
             <Link href="/services" className="flex items-center gap-1.5 text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
               ✨ {u.services}
+            </Link>
+            <Link href="/requests" className="flex items-center gap-1.5 text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
+              🔍 {isRu ? "Найти гостей" : "Find guests"}
             </Link>
             <Link href="/events" className="flex items-center gap-1.5 text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
               🎉 {u.events}
@@ -185,6 +189,9 @@ export default function Header() {
           </Link>
           <Link href="/services" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
             ✨ {u.services}
+          </Link>
+          <Link href="/requests" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
+            🔍 {isRu ? "Найти гостей" : "Find guests"}
           </Link>
           <Link href="/events" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
             🎉 {u.events}
