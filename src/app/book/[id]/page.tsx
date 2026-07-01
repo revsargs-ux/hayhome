@@ -192,7 +192,10 @@ export default function BookPage() {
   })();
 
   const total = host ? nights * host.pricePerNight : 0;
-  const commission = Math.round(total * 0.10 * 100) / 100; // 10% platform commission
+  const [extraTotal, setExtraTotal] = useState(0);
+  const grandTotal = total + extraTotal;
+  const commission = Math.round(grandTotal * 0.10 * 100) / 100; // 10% of stay + services
+  // commission is calculated in ServiceStep where totalExtra is known
   const finalTotal = total;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -469,7 +472,7 @@ export default function BookPage() {
                 </button>
                 {nights > 0 && (
                   <p className="text-center text-xs text-gray-500">
-                    {lang === "ru" ? `Остаток $${(total - commission).toFixed(2)} — на месте при заселении` : `Balance $${(total - commission).toFixed(2)} — paid on-site`}
+                    {lang === "ru" ? `Остаток $${(grandTotal - commission).toFixed(2)} — на месте при заселении` : `Balance $${(grandTotal - commission).toFixed(2)} — paid on-site`}
                   </p>
                 )}
                 <p className="text-center text-xs text-gray-400">{t("cancel")}</p>
@@ -498,13 +501,19 @@ export default function BookPage() {
                     <span>${host.pricePerNight} × {nights} {t("nights")}</span>
                     <span>${total}</span>
                   </div>
+                  {extraTotal > 0 && (
+                    <div className="flex justify-between text-gray-700">
+                      <span>{lang === "ru" ? "Доп. услуги" : "Extra services"}</span>
+                      <span>${extraTotal.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-gray-600">
                     <span>{lang === "ru" ? "Комиссия платформы (10%)" : "Platform commission (10%)"}</span>
                     <span className="font-medium" style={{ color: "#D4001A" }}>${commission}</span>
                   </div>
                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-2">
                     <p className="text-xs text-amber-800">
-                      {lang === "ru" ? "💵 Проживание оплачивается на месте. Комиссия 10% оплачивается онлайн для подтверждения брони и открытия контактов." : "💵 Accommodation is paid on-site. 10% commission is paid online to confirm booking and unlock contacts."}
+                      {lang === "ru" ? "💵 Проживание и доп. услуги оплачиваются на месте. Комиссия 10% оплачивается онлайн для подтверждения брони." : "💵 Accommodation and services are paid on-site. 10% commission is paid online to confirm booking."}
                     </p>
                   </div>
                   <div className="flex justify-between font-bold text-gray-900 text-base pt-2 border-t border-gray-100">
@@ -533,6 +542,7 @@ export default function BookPage() {
               checkOut={form.checkOut}
               guests={form.guests}
               lang={lang}
+              onExtraChange={setExtraTotal}
             />
           </div>
       </div>
@@ -644,12 +654,13 @@ const DEFAULT_TOD: Record<string, TimeOfDay> = {
   decor: "evening",
 };
 
-function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang }: {
+function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang, onExtraChange }: {
   hostRegion: string;
   checkIn: string;
   checkOut: string;
   guests: number;
   lang: string;
+  onExtraChange?: (total: number) => void;
 }) {
   const u = getUI(lang as LangCode);
   const [expanded, setExpanded] = useState(false);
@@ -703,6 +714,11 @@ function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang
   };
 
   const totalExtra = selected.reduce((sum, s) => sum + calcTotal(s.service), 0);
+
+  // Notify parent of extra services total
+  useEffect(() => {
+    onExtraChange?.(totalExtra);
+  }, [totalExtra, onExtraChange]);
 
   const todLabel = (tod: TimeOfDay): string => {
     if (tod === "morning") return "🌅";
