@@ -33,7 +33,7 @@ export default function BookPage() {
   const [authRequired, setAuthRequired] = useState(false);
 
   // Payment state
-  const [paymentMethod, setPaymentMethod] = useState<"onsite" | "transfer">("onsite");
+  const [extraTotal, setExtraTotal] = useState(0);
 
   const [form, setForm] = useState({
     guestName: "", guestEmail: "", guestPhone: "",
@@ -192,6 +192,7 @@ export default function BookPage() {
   })();
 
   const total = host ? nights * host.pricePerNight : 0;
+  const commission = Math.round((total + extraTotal) * 0.10 * 100) / 100;
   const finalTotal = total;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -199,6 +200,7 @@ export default function BookPage() {
     if (!host) return;
     if (!user) { setAuthRequired(true); return; }
     if (nights < 1) { setError(u.bookingDatesError); return; }
+    if (!user) { window.location.href = `/login?from=/book/${id}`; return; }
     setLoading(true);
     setError("");
     try {
@@ -206,7 +208,7 @@ export default function BookPage() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, hostId: id, hostName: host.familyName, totalPrice: finalTotal, paymentMethod }),
+        body: JSON.stringify({ ...form, hostId: id, hostName: host.familyName }),
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
@@ -217,6 +219,19 @@ export default function BookPage() {
       // Clear draft on successful booking
       try { localStorage.removeItem(`hayhome_booking_draft_${id}`); } catch {}
 
+      if (bookingId) {
+        try {
+          const payRes = await fetch("/api/payments/create", {
+            method: "POST", credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ booking_id: bookingId, method: "yookassa", currency: "RUB" }),
+          });
+          if (payRes.ok) {
+            const payData = await payRes.json();
+            if (payData.url) { window.location.href = payData.url; return; }
+          }
+        } catch (e) {}
+      }
       setSuccess(true);
     } catch (e) {
       const msg = e instanceof Error ? e.message : undefined;
@@ -438,48 +453,10 @@ export default function BookPage() {
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900 resize-none" />
                 </div>
                 {error && <p className="text-red-600 text-sm">{error}</p>}
-
-                {/* Payment Method Section */}
-                {nights > 0 && (
-                  <div className="border border-gray-200 rounded-xl p-4 space-y-3">
-                    <label className="block text-sm font-semibold text-gray-700">
-                      {u.paymentMethodLabel}
-                    </label>
-                    <div className="flex gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod("onsite")}
-                        className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition ${paymentMethod === "onsite" ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
-                      >
-                        🏠 {u.payOnSite}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod("transfer")}
-                        className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition ${paymentMethod === "transfer" ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
-                      >
-                        🏦 {u.transferPayment}
-                      </button>
-                    </div>
-                    {paymentMethod === "transfer" && (
-                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2 text-xs text-gray-600 space-y-1">
-                        <p className="font-semibold text-gray-800">{u.bankDetails || "Реквизиты"}</p>
-                        <p className="font-semibold">ИП САРГСЯН РЕВИК СЕРГЕЕВИЧ</p>
-                        <p>ИНН: 410102126296</p>
-                        <p>ОГРНИП: 325410000011701</p>
-                        <p>Р/с: 40802810836710000838</p>
-                        <p>СБЕРБАНК, г. Магадан</p>
-                        <p>БИК: 044442607</p>
-                        <p>К/с: 30101810300000000607</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <button type="submit" disabled={loading}
+<button type="submit" disabled={loading}
                   className="w-full py-4 rounded-xl text-white font-bold text-lg hover:opacity-90 transition disabled:opacity-70"
                   style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  {loading ? u.sendingText : `${t("submit")} · $${finalTotal}`}
+                  {loading ? u.sendingText : (nights > 0 ? `${lang === "ru" ? "Оплатить комиссию" : "Pay commission"} · $${commission}` : t("submit"))}
                 </button>
                 <p className="text-center text-xs text-gray-400">{t("cancel")}</p>
               </form>
@@ -532,6 +509,7 @@ export default function BookPage() {
         {/* Additional Services Section */}
         <div className="mt-8">
             <AdditionalServicesSection
+              onExtraChange={setExtraTotal}
               hostRegion={host.region}
               checkIn={form.checkIn}
               checkOut={form.checkOut}
@@ -648,12 +626,13 @@ const DEFAULT_TOD: Record<string, TimeOfDay> = {
   decor: "evening",
 };
 
-function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang }: {
+function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang, onExtraChange }: {
   hostRegion: string;
   checkIn: string;
   checkOut: string;
   guests: number;
   lang: string;
+  onExtraChange?: (total: number) => void;
 }) {
   const u = getUI(lang as LangCode);
   const [expanded, setExpanded] = useState(false);
@@ -707,6 +686,7 @@ function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang
   };
 
   const totalExtra = selected.reduce((sum, s) => sum + calcTotal(s.service), 0);
+  useEffect(() => { onExtraChange?.(totalExtra); }, [totalExtra, onExtraChange]);
 
   const todLabel = (tod: TimeOfDay): string => {
     if (tod === "morning") return "🌅";
