@@ -192,6 +192,7 @@ export default function BookPage() {
   })();
 
   const total = host ? nights * host.pricePerNight : 0;
+  const commission = Math.round(total * 0.10 * 100) / 100; // 10% platform commission
   const finalTotal = total;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -216,6 +217,28 @@ export default function BookPage() {
       const bookingId = bookingResult?.id || bookingResult?.[0]?.id;
       // Clear draft on successful booking
       try { localStorage.removeItem(`hayhome_booking_draft_${id}`); } catch {}
+
+      // Redirect to commission payment (10% via YooKassa)
+      if (bookingId) {
+        const payRes = await fetch("/api/payments/create", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            booking_id: bookingId,
+            method: "yookassa",
+            currency: "RUB",
+          }),
+        });
+        if (payRes.ok) {
+          const payData = await payRes.json();
+          if (payData.url) {
+            window.location.href = payData.url;
+            return;
+          }
+        }
+        // If payment creation fails, still show success — user can pay later
+      }
 
       setSuccess(true);
     } catch (e) {
@@ -479,8 +502,13 @@ export default function BookPage() {
                 <button type="submit" disabled={loading}
                   className="w-full py-4 rounded-xl text-white font-bold text-lg hover:opacity-90 transition disabled:opacity-70"
                   style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  {loading ? u.sendingText : `${t("submit")} · $${finalTotal}`}
+                  {loading ? u.sendingText : (nights > 0 ? `${lang === "ru" ? "Оплатить комиссию" : "Pay commission"} · $${commission}` : t("submit"))}
                 </button>
+                {nights > 0 && (
+                  <p className="text-center text-xs text-gray-500">
+                    {lang === "ru" ? `Остаток $${(total - commission).toFixed(2)} — на месте при заселении` : `Balance $${(total - commission).toFixed(2)} — paid on-site`}
+                  </p>
+                )}
                 <p className="text-center text-xs text-gray-400">{t("cancel")}</p>
               </form>
             </div>
@@ -507,12 +535,17 @@ export default function BookPage() {
                     <span>${host.pricePerNight} × {nights} {t("nights")}</span>
                     <span>${total}</span>
                   </div>
-                  <div className="flex justify-between text-gray-500 text-xs">
-                    <span>{t("service")}</span>
-                    <span className="text-green-600 font-medium">{t("free")}</span>
+                  <div className="flex justify-between text-gray-600">
+                    <span>{lang === "ru" ? "Комиссия платформы (10%)" : "Platform commission (10%)"}</span>
+                    <span className="font-medium" style={{ color: "#D4001A" }}>${commission}</span>
+                  </div>
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-2">
+                    <p className="text-xs text-amber-800">
+                      {lang === "ru" ? "💵 Проживание оплачивается на месте. Комиссия 10% оплачивается онлайн для подтверждения брони и открытия контактов." : "💵 Accommodation is paid on-site. 10% commission is paid online to confirm booking and unlock contacts."}
+                    </p>
                   </div>
                   <div className="flex justify-between font-bold text-gray-900 text-base pt-2 border-t border-gray-100">
-                    <span>{t("total")}</span><span>${finalTotal}</span>
+                    <span>{lang === "ru" ? "К оплате сейчас" : "Pay now"}</span><span style={{ color: "#D4001A" }}>${commission}</span>
                   </div>
                 </div>
               ) : (

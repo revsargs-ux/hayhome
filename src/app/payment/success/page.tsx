@@ -20,7 +20,15 @@ function SuccessContent() {
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-3">{u.paymentSuccess}</h1>
         <p className="text-gray-500 mb-2">
-          {lang === "ru" ? "Ваше бронирование подтверждено и оплачено." : lang === "hy" ? "Ձեր ամրագրումը հաստատված է և վճարված:" : lang === "fr" ? "Votre réservation est confirmée et payée." : lang === "de" ? "Ihre Buchung ist bestätigt und bezahlt." : lang === "es" ? "Su reserva está confirmada y pagada." : lang === "it" ? "La tua prenotazione è confermata e pagata." : lang === "ar" ? "تم تأكيد ودفع حجزك." : lang === "zh" ? "您的预订已确认并付款。" : lang === "fa" ? "رزرو شما تأیید و پرداخت شد." : "Your booking is confirmed and paid."}
+          {lang === "ru" ? "Комиссия (10%) оплачена. Бронирование подтверждено." : "Commission (10%) paid. Booking confirmed."}
+        </p>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 my-4 text-left">
+          <p className="text-sm text-green-800 font-medium">
+            {lang === "ru" ? "✅ Контакты семьи теперь доступны на странице семьи и в личном кабинете." : "✅ Host contacts are now unlocked on the host page and in your dashboard."}
+          </p>
+        </div>
+        <p className="text-gray-500 text-sm mb-4">
+          {lang === "ru" ? "💵 Остаток суммы оплачивается на месте при заселении." : "💵 The remaining balance is paid on-site at check-in."}
         </p>
         {paymentId && (
           <p className="text-gray-400 text-sm mb-6">

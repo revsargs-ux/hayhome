@@ -32,6 +32,7 @@ export default function HostProfilePage() {
   const [submitting, setSubmitting] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const ui = getUI(lang);
 
   // Review media state
@@ -74,6 +75,11 @@ export default function HostProfilePage() {
           (b) => b.hostId === id && b.status === "completed"
         );
         setCanReview(true); // Allow all logged-in users to review (demo)
+        // Check if user has a confirmed/paid booking → unlock contacts
+        const hasConfirmed = bookings && bookings.some(
+          (b) => b.hostId === id && (b.status === "confirmed" || b.status === "completed")
+        );
+        setBookingConfirmed(!!hasConfirmed);
       })
       .catch(() => setCanReview(false));
   }, [user, id]);
@@ -670,11 +676,19 @@ export default function HostProfilePage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone size={16} className="text-gray-400 flex-shrink-0" />
-                  <span>{host.phone}</span>
+                  {bookingConfirmed ? (
+                    <span className="font-medium">{host.phone}</span>
+                  ) : (
+                    <span className="text-gray-400 select-none">•••••••• — {lang === "ru" ? "виден после оплаты комиссии" : "visible after commission payment"}</span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail size={16} className="text-gray-400 flex-shrink-0" />
-                  <span className="break-all text-xs">{host.email}</span>
+                  {bookingConfirmed ? (
+                    <span className="break-all text-xs">{host.email}</span>
+                  ) : (
+                    <span className="text-gray-400 select-none text-xs">••••@•••• — {lang === "ru" ? "виден после оплаты" : "visible after payment"}</span>
+                  )}
                 </div>
               </div>
 
