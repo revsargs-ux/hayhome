@@ -91,14 +91,14 @@ export async function POST(req: NextRequest) {
   // ── Server-side price calculation ──
   const { data: host } = await supabase
     .from("hayhome_hosts")
-    .select("price_per_night")
+    .select("pricePerNight")
     .eq("id", body.hostId)
     .single();
-  if (!host || !host.price_per_night) {
+  if (!host || !host.pricePerNight) {
     return NextResponse.json({ error: "Host not found or price not set" }, { status: 400 });
   }
   const nights = dateRange.length;
-  const serverTotalPrice = Math.round(host.price_per_night * nights * 100) / 100;
+  const serverTotalPrice = Math.round(host.pricePerNight * nights * 100) / 100;
 
   const booking = await createBooking({
     hostId: body.hostId,

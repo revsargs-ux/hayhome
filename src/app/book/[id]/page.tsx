@@ -200,7 +200,6 @@ export default function BookPage() {
     if (!host) return;
     if (!user) { setAuthRequired(true); return; }
     if (nights < 1) { setError(u.bookingDatesError); return; }
-    if (!user) { window.location.href = `/login?from=/book/${id}`; return; }
     setLoading(true);
     setError("");
     try {
@@ -212,9 +211,11 @@ export default function BookPage() {
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || "Error");
+        console.error("[book] API error:", res.status, errData);
+        throw new Error(errData.error || `Server error (${res.status})`);
       }
       const bookingResult = await res.json();
+      console.log("[book] Booking created:", bookingResult);
       const bookingId = bookingResult?.id || bookingResult?.[0]?.id;
       // Clear draft on successful booking
       try { localStorage.removeItem(`hayhome_booking_draft_${id}`); } catch {}
