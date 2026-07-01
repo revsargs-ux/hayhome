@@ -13,7 +13,7 @@ import AddressAutocomplete from "@/components/AddressAutocomplete";
 import type { NominatimResult } from "@/components/AddressAutocomplete";
 import dynamic from "next/dynamic";
 import NavigatorLinks from "@/components/NavigatorLinks";
-import { getCityCoords } from "@/components/Map";
+import { getCityCoords } from "@/lib/cityCoords";
 import { reverseGeocode } from "@/lib/geo";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false });
@@ -192,10 +192,6 @@ export default function BookPage() {
   })();
 
   const total = host ? nights * host.pricePerNight : 0;
-  const [extraTotal, setExtraTotal] = useState(0);
-  const grandTotal = total + extraTotal;
-  const commission = Math.round(grandTotal * 0.10 * 100) / 100; // 10% of stay + services
-  // commission is calculated in ServiceStep where totalExtra is known
   const finalTotal = total;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -220,28 +216,6 @@ export default function BookPage() {
       const bookingId = bookingResult?.id || bookingResult?.[0]?.id;
       // Clear draft on successful booking
       try { localStorage.removeItem(`hayhome_booking_draft_${id}`); } catch {}
-
-      // Redirect to commission payment (10% via YooKassa)
-      if (bookingId) {
-        const payRes = await fetch("/api/payments/create", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            booking_id: bookingId,
-            method: "yookassa",
-            currency: "RUB",
-          }),
-        });
-        if (payRes.ok) {
-          const payData = await payRes.json();
-          if (payData.url) {
-            window.location.href = payData.url;
-            return;
-          }
-        }
-        // If payment creation fails, still show success — user can pay later
-      }
 
       setSuccess(true);
     } catch (e) {
@@ -465,16 +439,48 @@ export default function BookPage() {
                 </div>
                 {error && <p className="text-red-600 text-sm">{error}</p>}
 
+                {/* Payment Method Section */}
+                {nights > 0 && (
+                  <div className="border border-gray-200 rounded-xl p-4 space-y-3">
+                    <label className="block text-sm font-semibold text-gray-700">
+                      {u.paymentMethodLabel}
+                    </label>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod("onsite")}
+                        className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition ${paymentMethod === "onsite" ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+                      >
+                        🏠 {u.payOnSite}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod("transfer")}
+                        className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition ${paymentMethod === "transfer" ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+                      >
+                        🏦 {u.transferPayment}
+                      </button>
+                    </div>
+                    {paymentMethod === "transfer" && (
+                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2 text-xs text-gray-600 space-y-1">
+                        <p className="font-semibold text-gray-800">{u.bankDetails || "Реквизиты"}</p>
+                        <p className="font-semibold">ИП САРГСЯН РЕВИК СЕРГЕЕВИЧ</p>
+                        <p>ИНН: 410102126296</p>
+                        <p>ОГРНИП: 325410000011701</p>
+                        <p>Р/с: 40802810836710000838</p>
+                        <p>СБЕРБАНК, г. Магадан</p>
+                        <p>БИК: 044442607</p>
+                        <p>К/с: 30101810300000000607</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <button type="submit" disabled={loading}
                   className="w-full py-4 rounded-xl text-white font-bold text-lg hover:opacity-90 transition disabled:opacity-70"
                   style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  {loading ? u.sendingText : (nights > 0 ? `${lang === "ru" ? "Оплатить комиссию" : "Pay commission"} · $${commission}` : t("submit"))}
+                  {loading ? u.sendingText : `${t("submit")} · $${finalTotal}`}
                 </button>
-                {nights > 0 && (
-                  <p className="text-center text-xs text-gray-500">
-                    {lang === "ru" ? `Остаток $${(grandTotal - commission).toFixed(2)} — на месте при заселении` : `Balance $${(grandTotal - commission).toFixed(2)} — paid on-site`}
-                  </p>
-                )}
                 <p className="text-center text-xs text-gray-400">{t("cancel")}</p>
               </form>
             </div>
@@ -501,23 +507,12 @@ export default function BookPage() {
                     <span>${host.pricePerNight} × {nights} {t("nights")}</span>
                     <span>${total}</span>
                   </div>
-                  {extraTotal > 0 && (
-                    <div className="flex justify-between text-gray-700">
-                      <span>{lang === "ru" ? "Доп. услуги" : "Extra services"}</span>
-                      <span>${extraTotal.toFixed(2)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between text-gray-600">
-                    <span>{lang === "ru" ? "Комиссия платформы (10%)" : "Platform commission (10%)"}</span>
-                    <span className="font-medium" style={{ color: "#D4001A" }}>${commission}</span>
-                  </div>
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-2">
-                    <p className="text-xs text-amber-800">
-                      {lang === "ru" ? "💵 Проживание и доп. услуги оплачиваются на месте. Комиссия 10% оплачивается онлайн для подтверждения брони." : "💵 Accommodation and services are paid on-site. 10% commission is paid online to confirm booking."}
-                    </p>
+                  <div className="flex justify-between text-gray-500 text-xs">
+                    <span>{t("service")}</span>
+                    <span className="text-green-600 font-medium">{t("free")}</span>
                   </div>
                   <div className="flex justify-between font-bold text-gray-900 text-base pt-2 border-t border-gray-100">
-                    <span>{lang === "ru" ? "К оплате сейчас" : "Pay now"}</span><span style={{ color: "#D4001A" }}>${commission}</span>
+                    <span>{t("total")}</span><span>${finalTotal}</span>
                   </div>
                 </div>
               ) : (
@@ -542,7 +537,6 @@ export default function BookPage() {
               checkOut={form.checkOut}
               guests={form.guests}
               lang={lang}
-              onExtraChange={setExtraTotal}
             />
           </div>
       </div>
@@ -654,13 +648,12 @@ const DEFAULT_TOD: Record<string, TimeOfDay> = {
   decor: "evening",
 };
 
-function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang, onExtraChange }: {
+function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang }: {
   hostRegion: string;
   checkIn: string;
   checkOut: string;
   guests: number;
   lang: string;
-  onExtraChange?: (total: number) => void;
 }) {
   const u = getUI(lang as LangCode);
   const [expanded, setExpanded] = useState(false);
@@ -714,11 +707,6 @@ function AdditionalServicesSection({ hostRegion, checkIn, checkOut, guests, lang
   };
 
   const totalExtra = selected.reduce((sum, s) => sum + calcTotal(s.service), 0);
-
-  // Notify parent of extra services total
-  useEffect(() => {
-    onExtraChange?.(totalExtra);
-  }, [totalExtra, onExtraChange]);
 
   const todLabel = (tod: TimeOfDay): string => {
     if (tod === "morning") return "🌅";

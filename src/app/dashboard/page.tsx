@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import NavigatorLinks from "@/components/NavigatorLinks";
-import { getCityCoords } from "@/components/Map";
+import { getCityCoords } from "@/lib/cityCoords";
 import getUI from "@/lib/ui";
 import ChatWidget from "@/components/ChatWidget";
 import FavoriteButton from "@/components/FavoriteButton";
