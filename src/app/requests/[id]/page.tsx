@@ -32,6 +32,11 @@ interface GuestRequest {
   responses?: RequestResponse[];
 }
 
+interface Recommendation {
+  services: Array<{ id: string; title: string; description: string; price: number; category: string; region: string; }>;
+  hosts: Array<{ id: string; familyName: string; pricePerNight: number; region: string; city: string; coverPhoto: string; rating: number; maxGuests: number; }>;
+}
+
 export default function RequestDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { lang } = useLang();
@@ -44,6 +49,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
   const [responseText, setResponseText] = useState("");
   const [responsePrice, setResponsePrice] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [recommendations, setRecommendations] = useState<Recommendation | null>(null);
 
   useEffect(() => {
     fetch(`/api/requests/${id}`)
@@ -51,6 +57,17 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
       .then((data) => {
         setRequest(data);
         setLoading(false);
+        // Fetch recommendations
+        if (data) {
+          fetch(`/api/requests/recommend`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title: data.title, description: data.description, region: data.region, category: data.category }),
+          })
+            .then(r => r.ok ? r.json() : null)
+            .then(rec => setRecommendations(rec))
+            .catch(() => {});
+        }
       })
       .catch(() => setLoading(false));
   }, [id]);
@@ -144,6 +161,39 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
             )}
           </div>
         </div>
+
+        {/* Recommendations */}
+        {recommendations && (recommendations.services?.length > 0 || recommendations.hosts?.length > 0) && (
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-3">
+              {isRu ? "🎯 Вам может подойти" : "🎯 You might like"}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {recommendations.services?.map((s) => (
+                <Link key={s.id} href={`/services#${s.id}`} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow block">
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className="font-semibold text-gray-900 text-sm">{s.title}</h4>
+                    <span className="text-sm font-bold text-red-600 flex-shrink-0">${s.price}</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{s.description}</p>
+                </Link>
+              ))}
+              {recommendations.hosts?.map((h) => (
+                <Link key={h.id} href={`/hosts/${h.id}`} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow block">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                      {h.coverPhoto && <img src={h.coverPhoto} alt={h.familyName} className="w-full h-full object-cover" />}
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-semibold text-gray-900 text-sm truncate">{h.familyName}</h4>
+                      <p className="text-sm font-bold text-red-600">${h.pricePerNight}<span className="text-xs text-gray-400 font-normal">/{isRu ? "ночь" : "night"}</span></p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Responses */}
         <div className="mb-4 flex items-center justify-between">
