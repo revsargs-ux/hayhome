@@ -58,6 +58,9 @@ export default function Header() {
             <Link href="/services" className="flex items-center gap-1.5 text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
               ✨ {u.services}
             </Link>
+            <Link href="/requests/new" className="flex items-center gap-1.5 text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
+              💭 {isRu ? "Я ищу впечатления" : "I want experiences"}
+            </Link>
             <Link href="/requests" className="flex items-center gap-1.5 text-gray-600 hover:text-red-600 transition-colors font-medium text-sm">
               🔍 {isRu ? "Найти гостей" : "Find guests"}
             </Link>
@@ -189,6 +192,9 @@ export default function Header() {
           </Link>
           <Link href="/services" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
             ✨ {u.services}
+          </Link>
+          <Link href="/requests/new" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
+            💭 {isRu ? "Я ищу впечатления" : "I want experiences"}
           </Link>
           <Link href="/requests" className="flex items-center gap-2 py-2 text-gray-700 font-medium" onClick={() => setOpen(false)}>
             🔍 {isRu ? "Найти гостей" : "Find guests"}

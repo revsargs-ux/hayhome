@@ -227,15 +227,15 @@ export default function NewRequestPage() {
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <Link href="/requests" className="text-sm text-gray-500 hover:text-gray-700">
-            ← {isRu ? "Назад к запросам" : "Back to requests"}
+            ← {isRu ? "Все запросы" : "All requests"}
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mt-2">
-            {isRu ? "Создать запрос" : "Create Request"}
+            {isRu ? "Что вы ищете?" : "What are you looking for?"}
           </h1>
           <p className="text-gray-500 text-sm mt-1">
             {isRu
-              ? "Опишите что вы ищете — организаторы сами найдут вас"
-              : "Describe what you're looking for — organizers will find you"}
+              ? "Опишите что хотите — семьи и организаторы сами вам предложат"
+              : "Describe what you want — hosts and organizers will offer you"}
           </p>
         </div>
 
@@ -377,8 +377,8 @@ export default function NewRequestPage() {
               style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
             >
               {submitting
-                ? (isRu ? "Создание..." : "Creating...")
-                : (isRu ? "Создать запрос" : "Create Request")}
+                ? (isRu ? "Отправка..." : "Submitting...")
+                : (isRu ? "Отправить запрос" : "Submit Request")}
             </button>
           </div>
         </form>

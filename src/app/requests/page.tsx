@@ -141,11 +141,17 @@ export default function RequestsPage() {
         ) : requests.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-400 text-lg mb-2">
-              {isRu ? "Нет открытых запросов" : "No open requests"}
+              {isRu ? "Пока нет открытых запросов" : "No open requests yet"}
             </p>
-            <p className="text-gray-400 text-sm">
-              {isRu ? "Создайте первый запрос!" : "Create the first request!"}
+            <p className="text-gray-400 text-sm mb-4">
+              {isRu ? "Как только туристы начнут искать — вы увидите их запросы здесь" : "When tourists start searching, you'll see their requests here"}
             </p>
+            <Link
+              href="/requests/new"
+              className="inline-block px-5 py-2.5 rounded-full border-2 border-dashed border-gray-300 text-gray-500 font-medium text-sm hover:border-red-400 hover:text-red-600 transition-colors"
+            >
+              💭 {isRu ? "Или создайте запрос сами" : "Or create a request yourself"}
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
