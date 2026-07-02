@@ -1,7 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import { NextRequest, NextResponse } from "next/server";
 
-function getSecret(): Uint8Array {
+export function getSecret(): Uint8Array {
   const secret = process.env.JWT_SECRET;
   if (!secret) {
     if (process.env.NODE_ENV === "production" && process.env.NEXT_PHASE !== "phase-production-build") {

@@ -3,8 +3,9 @@ import { supabase } from "@/lib/supabase";
 import { rateLimit } from "@/lib/rateLimit";
 import { jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
+import { getSecret } from "@/lib/auth";
 
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "hayhome-secret-key-2024");
+const SECRET = getSecret();
 
 export async function POST(req: NextRequest) {
   const blocked = rateLimit(req);
