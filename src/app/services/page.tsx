@@ -7,6 +7,7 @@ import { Star, MapPin, Search } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";
 import type { Service } from "@/lib/types";
+import Recommendations from "@/components/Recommendations";
 
 const ServiceMap = dynamic(() => import("@/components/ServiceMap"), { ssr: false });
 
@@ -250,6 +251,16 @@ function ServicesContent() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Smart Recommendations */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <Recommendations
+          type="hosts"
+          title="🏠 Рекомендуемые семьи"
+          titleEn="🏠 Recommended families"
+          limit={4}
+        />
       </div>
     </div>
   );

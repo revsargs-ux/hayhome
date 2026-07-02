@@ -10,6 +10,7 @@ import getUI from "@/lib/ui";
 import { useSearchParams } from "next/navigation";
 
 import { regionName } from "@/lib/i18n-utils";
+import Recommendations from "@/components/Recommendations";
 
 const REGIONS_LIST = ["Ереван", "Тавуш", "Ширак", "Арарат", "Гегаркуник", "Лори", "Вайоц Дзор", "Арагацотн", "Котайк", "Сюник"];
 
@@ -220,6 +221,16 @@ function HostsContent() {
             {filtered.map((host) => <HostCard key={host.id} host={host} valueRank={valueRanks[host.id]} />)}
           </div>
         )}
+      </div>
+
+      {/* Smart Recommendations */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <Recommendations
+          type="services"
+          title="✨ Услуги в Армении"
+          titleEn="✨ Services in Armenia"
+          limit={4}
+        />
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ import type { NominatimResult } from "@/components/AddressAutocomplete";
 import dynamic from "next/dynamic";
 import NavigatorLinks from "@/components/NavigatorLinks";
 import { getCityCoords } from "@/lib/cityCoords";
+import Recommendations from "@/components/Recommendations";
 import { reverseGeocode } from "@/lib/geo";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false });
@@ -332,6 +333,17 @@ export default function BookPage() {
             {t("moreFamilies")}
           </Link>
         </div>
+      </div>
+
+      {/* Recommendations after booking */}
+      <div className="max-w-4xl mx-auto px-4 mt-8 w-full">
+        <Recommendations
+          type="similar-services"
+          hostId={id}
+          title="✨ Добавьте впечатления"
+          titleEn="✨ Add experiences"
+          limit={4}
+        />
       </div>
     </div>
   );

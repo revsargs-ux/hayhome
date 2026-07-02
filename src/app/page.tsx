@@ -8,6 +8,7 @@ import { useLightbox } from "@/contexts/LightboxContext";
 import { Host, Review } from "@/lib/types";
 import { getHistory } from "@/lib/viewHistory";
 import getUI from "@/lib/ui";
+import Recommendations from "@/components/Recommendations";
 
 export default function HomePage() {
   const { lang, tr } = useLang();
@@ -166,6 +167,24 @@ export default function HomePage() {
               </div>
             </>
           )}
+        </div>
+      </section>
+
+      {/* Smart Recommendations */}
+      <section className="py-12 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Recommendations
+            type="services"
+            title="✨ Рекомендуемые услуги"
+            titleEn="✨ Recommended Services"
+            limit={4}
+          />
+          <Recommendations
+            type="hosts"
+            title="🏆 Топ семьи этого месяца"
+            titleEn="🏆 Top families this month"
+            limit={4}
+          />
         </div>
       </section>
 

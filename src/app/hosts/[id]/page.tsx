@@ -13,6 +13,7 @@ import FavoriteButton from "@/components/FavoriteButton";
 import ChatWidget from "@/components/ChatWidget";
 import getUI from "@/lib/ui";
 import { addToHistory } from "@/lib/viewHistory";
+import Recommendations from "@/components/Recommendations";
 
 export default function HostProfilePage() {
   const { id } = useParams<{ id: string }>();
@@ -702,6 +703,24 @@ export default function HostProfilePage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Smart Recommendations */}
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <Recommendations
+          type="similar-hosts"
+          hostId={host.id}
+          title="🏠 Другие семьи в этом регионе"
+          titleEn="🏠 Other families in this region"
+          limit={4}
+        />
+        <Recommendations
+          type="similar-services"
+          hostId={host.id}
+          title="✨ Услуги рядом"
+          titleEn="✨ Services nearby"
+          limit={4}
+        />
       </div>
 
       {showChat && user && host.user_id && (
