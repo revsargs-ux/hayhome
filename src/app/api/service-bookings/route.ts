@@ -214,12 +214,10 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // time_of_day
+  // time_of_day — store in notes if column doesn't exist
   if (tod && ["morning", "evening", "custom"].includes(tod)) {
-    insertData.time_of_day = tod;
-    if (tod === "custom" && typeof body.custom_time === "string") {
-      insertData.custom_time = body.custom_time.slice(0, 100);
-    }
+    const timeDesc = tod === "custom" && body.custom_time ? body.custom_time : tod;
+    insertData.notes = (insertData.notes || "") + (insertData.notes ? " | " : "") + "Time: " + timeDesc;
   }
 
   const { data, error } = await supabase
