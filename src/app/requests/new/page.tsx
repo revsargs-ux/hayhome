@@ -71,12 +71,18 @@ export default function NewRequestPage() {
     setSubmitting(true);
     setError("");
 
+    // Auto-fill date_to = date_from if not set
+    const finalForm = { ...form };
+    if (!finalForm.date_to && finalForm.date_from) {
+      finalForm.date_to = finalForm.date_from;
+    }
+
     try {
       // 1. Create request
       const res = await fetch("/api/requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(finalForm),
       });
 
       if (!res.ok) {
@@ -321,7 +327,10 @@ export default function NewRequestPage() {
               <input
                 type="date"
                 value={form.date_from}
-                onChange={(e) => setForm({ ...form, date_from: e.target.value })}
+                onChange={(e) => {
+                  const newDate = e.target.value;
+                  setForm(f => ({ ...f, date_from: newDate, date_to: f.date_to || newDate }));
+                }}
                 className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400"
               />
             </div>
@@ -345,11 +354,17 @@ export default function NewRequestPage() {
                 {isRu ? "Кол-во гостей" : "Guests"}
               </label>
               <input
-                type="number"
-                min={1}
-                max={100}
-                value={form.guests_count}
-                onChange={(e) => setForm({ ...form, guests_count: parseInt(e.target.value) || 1 })}
+                type="text"
+                inputMode="numeric"
+                value={form.guests_count || ""}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/[^0-9]/g, "");
+                  setForm({ ...form, guests_count: v ? parseInt(v) : 0 });
+                }}
+                onBlur={() => {
+                  if (!form.guests_count || form.guests_count < 1) setForm({ ...form, guests_count: 1 });
+                }}
+                placeholder="1"
                 className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400"
               />
             </div>
