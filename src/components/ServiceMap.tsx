@@ -152,7 +152,7 @@ export default function ServiceMap({ services }: ServiceMapProps) {
                     );
                   })()}
                   <a
-                    href={"/services/" + svc.id}
+                    href={"/services/book/" + svc.id}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{

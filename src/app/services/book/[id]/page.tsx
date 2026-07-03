@@ -31,6 +31,7 @@ function ServiceBookContent() {
   const [guestName, setGuestName] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
   const [date, setDate] = useState("");
+  const [bookedDates, setBookedDates] = useState<string[]>([]);
   const [timeOfDay, setTimeOfDay] = useState<"morning" | "evening" | "custom">("morning");
   const [customTime, setCustomTime] = useState("");
   const [guests, setGuests] = useState(1);
@@ -54,6 +55,14 @@ function ServiceBookContent() {
       }
       setLoading(false);
     })();
+    // Load booked dates for calendar
+    fetch("/api/service-bookings/public")
+      .then((r) => r.ok ? r.json() : [])
+      .then((data: any[]) => {
+        const dates = (data || []).filter((b: any) => b.serviceId === id && b.status !== "cancelled").map((b: any) => b.date);
+        setBookedDates(dates);
+      })
+      .catch(() => {});
   }, [id]);
 
   // Auto-fill name from profile
@@ -261,19 +270,65 @@ function ServiceBookContent() {
                   </div>
                 </div>
 
-                {/* Date */}
+                {/* Date — visual calendar */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                     {u.selectDate} *
                   </label>
-                  <input
-                    required
-                    type="date"
-                    value={date}
-                    min={new Date().toISOString().split("T")[0]}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-orange-400 text-gray-900"
-                  />
+                  <input type="hidden" value={date} />
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "4px" }}>
+                    {(() => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      const dayNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+                      const cells = [];
+                      // Header
+                      dayNames.forEach((n) => {
+                        cells.push(<div key={"h" + n} style={{ textAlign: "center", fontSize: "10px", color: "#999", fontWeight: 600 }}>{n}</div>);
+                      });
+                      // 4 weeks = 28 days
+                      for (let i = 0; i < 28; i++) {
+                        const d = new Date(today);
+                        d.setDate(d.getDate() + i);
+                        const ds = d.toISOString().substring(0, 10);
+                        const isBooked = bookedDates.includes(ds);
+                        const isPast = d < today && i > 0;
+                        const isSelected = date === ds;
+                        const isDisabled = isPast || isBooked;
+                        let bg = "#f0fdf4";
+                        let border = "#bbf7d0";
+                        let color = "#16a34a";
+                        if (isBooked) { bg = "#fef2f2"; border = "#fecaca"; color = "#ef4444"; }
+                        if (isPast && i > 0) { bg = "#f9fafb"; border = "#e5e7eb"; color = "#d1d5db"; }
+                        if (isSelected) { bg = "#dbeafe"; border = "#3b82f6"; color = "#1d4ed8"; }
+                        cells.push(
+                          <button
+                            key={ds}
+                            type="button"
+                            disabled={isDisabled}
+                            onClick={() => !isDisabled && setDate(ds)}
+                            style={{
+                              textAlign: "center", padding: "6px 0", borderRadius: "8px",
+                              background: bg, border: "1px solid " + border,
+                              color: color, fontWeight: 700, fontSize: "13px",
+                              cursor: isDisabled ? "default" : "pointer",
+                              opacity: isPast && i > 0 ? 0.5 : 1,
+                              textDecoration: isBooked ? "line-through" : "none",
+                              boxShadow: isSelected ? "0 0 0 2px #3b82f6" : "none",
+                            }}
+                          >
+                            {d.getDate()}
+                          </button>
+                        );
+                      }
+                      return cells;
+                    })()}
+                  </div>
+                  <div style={{ marginTop: "8px", display: "flex", gap: "12px", fontSize: "11px" }}>
+                    <span style={{ color: "#16a34a" }}>🟢 Свободно</span>
+                    <span style={{ color: "#ef4444" }}>🔴 Занято</span>
+                    <span style={{ color: "#1d4ed8" }}>🔵 Выбрано</span>
+                  </div>
                 </div>
 
                 {/* Time of Day */}
@@ -355,40 +410,6 @@ function ServiceBookContent() {
                     rows={4}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-orange-400 text-gray-900 resize-none"
                   />
-                </div>
-
-                {/* Payment Method */}
-                <div className="border border-gray-200 rounded-xl p-4 space-y-3">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    {lang === "ru" ? "Способ оплаты" : lang === "hy" ? "Վճարման եղանակ" : lang === "fr" ? "Méthode de paiement" : lang === "de" ? "Zahlungsmethode" : lang === "es" ? "Método de pago" : lang === "it" ? "Metodo di pagamento" : lang === "ar" ? "طريقة الدفع" : lang === "zh" ? "付款方式" : lang === "fa" ? "روش پرداخت" : "Payment method"}
-                  </label>
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod("onsite")}
-                      className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition ${
-                        paymentMethod === "onsite"
-                          ? "border-orange-400 bg-orange-50 text-orange-700"
-                          : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                      }`}
-                    >
-                      🏠 {t("payOnsite")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod("transfer")}
-                      className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition ${
-                        paymentMethod === "transfer"
-                          ? "border-orange-400 bg-orange-50 text-orange-700"
-                          : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                      }`}
-                    >
-                      🏦 {t("payTransfer")}
-                    </button>
-                  </div>
-                  {paymentMethod === "transfer" && (
-                    <p className="text-xs text-gray-400">{t("transferHint")}</p>
-                  )}
                 </div>
 
                 {error && <p className="text-red-600 text-sm">{error}</p>}
