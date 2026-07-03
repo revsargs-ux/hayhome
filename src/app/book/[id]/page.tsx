@@ -507,11 +507,6 @@ export default function BookPage() {
                   <div className="flex justify-between font-bold text-gray-900 text-base pt-2 border-t border-gray-100">
                     <span>{t("total")}</span><span>${finalTotal}</span>
                   </div>
-                  <div className="text-xs text-gray-400 mt-1 space-y-0.5">
-                    <p>Комиссия платформы: 15% (${commission})</p>
-                    <p>Комиссия за перевод: 1% (${Math.round((finalTotal - commission) * 0.01 * 100) / 100})</p>
-                    <p className="text-gray-500">Хозяин получит: <strong>${(Math.round((finalTotal - commission) * 0.99 * 100) / 100)}</strong></p>
-                  </div>
                 </div>
               ) : (
                 <p className="text-gray-400 text-sm text-center py-4">{t("selectDates")}</p>
