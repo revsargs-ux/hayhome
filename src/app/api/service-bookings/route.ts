@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getAuthUser } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
+import { sendHostNotification, buildServiceEmailHtml } from "@/lib/notify";
 
 // GET /api/service-bookings — list bookings (auth required)
 export async function GET(req: NextRequest) {
@@ -273,12 +274,29 @@ export async function POST(req: NextRequest) {
 
       // Create group chat: guest + host + provider
       if (!isStandalone && bookingInfo?.hostId) {
-        // Get host's user_id
+        // Get host's user_id and email
         const { data: hostUser } = await supabase
           .from("hayhome_hosts")
-          .select("user_id")
+          .select("user_id, email, familyName")
           .eq("id", bookingInfo.hostId)
           .single();
+
+        // ── Notify host about service booking ──
+        if (hostUser?.email) {
+          const guestName = isStandalone ? body.guest_name : bookingInfo?.guestName || user!.name;
+          await sendHostNotification(
+            hostUser.email,
+            `🔔 Новый заказ услуги — ${svc.title || "Service"}`,
+            buildServiceEmailHtml({
+              guestName,
+              serviceTitle: svc.title || "Service",
+              date: body.date,
+              startTime,
+              endTime,
+              totalPrice: typeof insertData.total_price === "number" ? insertData.total_price : undefined,
+            })
+          );
+        }
 
         const participants = [
           user!.id,

@@ -3,6 +3,7 @@ import { getBookings, createBooking } from "@/lib/data";
 import { getAuthUser } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
 import { sendBookingNotification } from "@/lib/email";
+import { sendHostNotification, buildBookingEmailHtml } from "@/lib/notify";
 import { supabase } from "@/lib/supabase";
 
 // Helper: get all dates between checkIn and checkOut (exclusive of checkOut)
@@ -140,6 +141,37 @@ export async function POST(req: NextRequest) {
     totalPrice: booking.totalPrice,
     message: booking.message,
   }).catch((err) => console.error("[Email] Booking notification failed:", err));
+
+  // ── Notify host (family) about new booking ──
+  try {
+    const { data: hostData } = await supabase
+      .from("hayhome_hosts")
+      .select("email, familyName")
+      .eq("id", body.hostId)
+      .single();
+
+    if (hostData?.email) {
+      await sendHostNotification(
+        hostData.email,
+        `🏡 Новое бронирование — ${booking.hostName}`,
+        buildBookingEmailHtml({
+          guestName: booking.guestName,
+          guestEmail: booking.guestEmail,
+          guestPhone: booking.guestPhone,
+          hostName: booking.hostName,
+          checkIn: booking.checkIn,
+          checkOut: booking.checkOut,
+          guests: booking.guests,
+          totalPrice: booking.totalPrice,
+          message: booking.message,
+        })
+      );
+    } else {
+      console.log(`[Notify] Host ${body.hostId} has no email — skipping host notification`);
+    }
+  } catch (notifyErr) {
+    console.error("[Notify] Host notification failed:", notifyErr);
+  }
 
   // Partner commission (async, non-blocking)
   (async () => {
