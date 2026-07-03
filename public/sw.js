@@ -1,5 +1,5 @@
 // HayHome Service Worker — shell + static caching (API excluded)
-const CACHE_NAME = "hayhome-v3";
+const CACHE_NAME = "hayhome-v4";
 const SHELL = ["/", "/manifest.json"];
 const API_PREFIX = "/api/";
 
