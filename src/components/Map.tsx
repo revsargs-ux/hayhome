@@ -194,7 +194,7 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    fetch("/api/bookings")
+    fetch("/api/bookings/public")
       .then((r) => r.ok ? r.json() : [])
       .then((data: any[]) => setAllBookings(data || []))
       .catch(() => {});
