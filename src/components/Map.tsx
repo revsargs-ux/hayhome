@@ -156,14 +156,13 @@ interface MapProps {
 
 export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
   const [mounted, setMounted] = useState(false);
-  const [allBookings, setAllBookings] = useState<any[]>([]);
-
   useEffect(() => setMounted(true), []);
 
+  const [allBookings, setAllBookings] = useState<{ hostId: string; checkIn: string; checkOut: string; status: string }[]>([]);
   useEffect(() => {
     fetch("/api/bookings/public")
-      .then((r) => r.ok ? r.json() : [])
-      .then((data: any[]) => setAllBookings(data || []))
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data)) setAllBookings(data); })
       .catch(() => {});
   }, []);
 
@@ -191,27 +190,6 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
 
   const markerIcon = createMarkerIcon();
 
-  // Pre-compute booked dates per host
-  const BOOKED_STATUSES = ["confirmed", "completed", "pending"];
-  function buildHostBookedMap(bookings: any[]): Record<string, Set<string>> {
-    const map: Record<string, Set<string>> = {};
-    bookings.forEach((b) => {
-      if (!b.hostId || !BOOKED_STATUSES.includes(b.status)) return;
-      if (!map[b.hostId]) map[b.hostId] = new Set<string>();
-      const dates = map[b.hostId];
-      let d = new Date(b.checkIn);
-      const end = new Date(b.checkOut);
-      while (d < end) {
-        const iso = d.toISOString();
-        dates.add(iso.substring(0, 10));
-        d.setDate(d.getDate() + 1);
-      }
-    });
-    return map;
-  }
-  const hostBookedMap = buildHostBookedMap(allBookings);
-  const EMPTY_SET = new Set<string>();
-
   return (
     <div className="relative w-full min-h-[400px] rounded-2xl overflow-hidden shadow-sm">
       <MapContainer
@@ -228,42 +206,90 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
           const fullHost = hosts.find((h) => h.id === host.id);
           if (!fullHost) return null;
           const coords = getHostCoords(fullHost);
-          const booked = hostBookedMap[host.id] || EMPTY_SET;
-          const today = new Date();
-          const dayNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
-          const calDays = [];
-          for (let i = 0; i < 7; i++) {
-            const d = new Date(today);
+
+          // 7-day availability computation for this host
+          const todayNow = new Date(); todayNow.setHours(0, 0, 0, 0);
+          const hostBookings = allBookings.filter(
+            (b) => b.hostId === host.id && b.status !== "cancelled" && b.status !== "rejected"
+          );
+          const days7 = Array.from({ length: 7 }, (_, i) => {
+            const d = new Date(todayNow);
             d.setDate(d.getDate() + i);
-            const ds = d.toISOString().substring(0, 10);
-            const isB = booked.has(ds);
-            calDays.push({ day: d.getDate(), name: dayNames[d.getDay()], booked: isB });
-          }
+            const booked = hostBookings.some((b) => {
+              const ci = new Date(b.checkIn); ci.setHours(0, 0, 0, 0);
+              const co = new Date(b.checkOut); co.setHours(0, 0, 0, 0);
+              return d >= ci && d < co;
+            });
+            return { dayNum: d.getDate(), booked };
+          });
+
           return (
             <Marker key={host.id} position={coords} icon={markerIcon}>
               <Popup>
                 <div style={{ minWidth: "180px" }}>
                   {host.coverPhoto && (
-                    <img src={host.coverPhoto} alt={host.familyName} style={{ width: "100%", height: "80px", objectFit: "cover", borderRadius: "8px", marginBottom: "8px" }} />
+                    <img
+                      src={host.coverPhoto}
+                      alt={host.familyName}
+                      style={{
+                        width: "100%",
+                        height: "80px",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                        marginBottom: "8px",
+                      }}
+                    />
                   )}
-                  <div style={{ fontWeight: 700, fontSize: "14px", marginBottom: "4px", color: "#1a1a1a" }}>{host.familyName}</div>
-                  <div style={{ fontSize: "12px", color: "#666", marginBottom: "4px" }}>📍 {host.city}, {host.region}</div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                    <span style={{ fontSize: "12px" }}>{host.rating > 0 ? "⭐ " + host.rating : ""}</span>
-                    <span style={{ fontWeight: 700, color: "#D4001A", fontSize: "14px" }}>${host.pricePerNight}/night</span>
+                  <div style={{ fontWeight: 700, fontSize: "14px", marginBottom: "4px", color: "#1a1a1a" }}>
+                    {host.familyName}
                   </div>
-                  <div style={{ marginTop: "8px" }}>
-                    <div style={{ fontSize: "10px", fontWeight: 600, color: "#666", marginBottom: "4px" }}>📅 Занятость на 7 дней</div>
+                  <div style={{ fontSize: "12px", color: "#666", marginBottom: "4px" }}>
+                    📍 {host.city}, {host.region}
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                    <span style={{ fontSize: "12px" }}>
+                      {host.rating > 0 ? `⭐ ${host.rating}` : ""}
+                    </span>
+                    <span style={{ fontWeight: 700, color: "#D4001A", fontSize: "14px" }}>
+                      ${host.pricePerNight}/night
+                    </span>
+                  </div>
+                  {/* 7-day availability calendar */}
+                  <div style={{ marginBottom: "8px" }}>
+                    <div style={{ fontSize: "10px", color: "#888", marginBottom: "2px" }}>Ближайшие дни:
+                    </div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px" }}>
-                      {calDays.map((cd) => (
-                        <div key={cd.day} style={{ textAlign: "center", borderRadius: "6px", padding: "2px 0", background: cd.booked ? "#fef2f2" : "#f0fdf4", border: "1px solid " + (cd.booked ? "#fecaca" : "#bbf7d0") }}>
-                          <div style={{ fontSize: "8px", color: "#999" }}>{cd.name}</div>
-                          <div style={{ fontSize: "11px", fontWeight: 700, color: cd.booked ? "#ef4444" : "#16a34a", textDecoration: cd.booked ? "line-through" : "none" }}>{cd.day}</div>
+                      {days7.map((dinfo, i) => (
+                        <div key={i} style={{
+                          textAlign: "center",
+                          fontSize: "9px",
+                          padding: "3px 0",
+                          borderRadius: "3px",
+                          background: dinfo.booked ? "#ffd6d6" : "#d4f5d4",
+                          color: dinfo.booked ? "#cc0000" : "#2a8c2a",
+                          textDecoration: dinfo.booked ? "line-through" : "none",
+                        }}>
+                          {dinfo.dayNum}
                         </div>
                       ))}
                     </div>
                   </div>
-                  <a href={"/hosts/" + host.id} style={{ display: "block", textAlign: "center", padding: "6px 12px", borderRadius: "20px", background: "linear-gradient(135deg, #D4001A, #F2A900)", color: "#fff", fontSize: "13px", fontWeight: 600, textDecoration: "none", marginTop: "8px" }}>Открыть профиль</a>
+                  <a
+                    href={`/hosts/${host.id}`}
+                    style={{
+                      display: "block",
+                      textAlign: "center",
+                      padding: "6px 12px",
+                      borderRadius: "20px",
+                      background: "linear-gradient(135deg, #D4001A, #F2A900)",
+                      color: "#fff",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      textDecoration: "none",
+                    }}
+                  >
+                    Забронировать
+                  </a>
                 </div>
               </Popup>
             </Marker>
