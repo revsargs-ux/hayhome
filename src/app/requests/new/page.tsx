@@ -15,7 +15,7 @@ const CATEGORIES = [
 ];
 
 const REGIONS = [
-  "Yerevan", "Kotayk", "Tavush", "Gegharkunik", "Lori", "Shirak",
+  "all", "Yerevan", "Kotayk", "Tavush", "Gegharkunik", "Lori", "Shirak",
   "Aragatsotn", "Armavir", "Ararat", "Syunik", "Vayots Dzor",
 ];
 
@@ -49,7 +49,7 @@ export default function NewRequestPage() {
     title: "",
     description: "",
     category: "events",
-    region: "Yerevan",
+    region: "all",
     date_from: "",
     date_to: "",
     guests_count: 1,

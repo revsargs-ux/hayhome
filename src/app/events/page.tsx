@@ -172,7 +172,7 @@ export default function EventsPage() {
     id: e.id,
     familyName: isHy ? e.titleHy : isRu ? e.titleRu : e.title,
     city: isHy ? e.locationHy : isRu ? e.locationRu : e.location,
-    region: "Yerevan",
+    region: "all",
     coverPhoto: "",
     pricePerNight: e.price,
     rating: 0,

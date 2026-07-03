@@ -80,6 +80,7 @@ export const EXPERIENCE_NAMES: Record<string, Partial<Record<LangCode, string>>>
 
 // Регионы Армении (для перевода)
 export const REGION_NAMES: Record<string, Partial<Record<LangCode, string>>> = {
+  "all":          { ru:"Все регионы",   en:"All regions",  hy:"Բոլոր մարզերը", fr:"Toutes régions", de:"Alle Regionen", es:"Todas las regiones", it:"Tutte le regioni", ar:"جميع المناطق", zh:"所有地区", fa:"همه مناطق" },
   "Ереван":       { ru:"Ереван",       en:"Yerevan",     hy:"Երևան",   fr:"Erevan",     de:"Eriwan",     es:"Ereván",     it:"Erevan",     ar:"يريفان",   zh:"埃里温",     fa:"ایروان" },
   "Тавуш":       { ru:"Тавуш",       en:"Tavush",     hy:"Տավուշ",   fr:"Tavush",     de:"Tawusch",    es:"Tavush",     it:"Tavush",     ar:"تافوش",   zh:"塔武什",     fa:"تاووش" },
   "Ширак":       { ru:"Ширак",       en:"Shirak",     hy:"Շիրակ",   fr:"Shirak",     de:"Schirak",    es:"Shirak",     it:"Shirak",     ar:"شيراك",   zh:"希拉克",     fa:"شیراک" },
