@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { SocialLogin } from "@/components/SocialLogin";
+import Captcha from "@/components/Captcha";
 
 function LoginContent() {
   const router = useRouter();
@@ -21,9 +22,16 @@ function LoginContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [attempts, setAttempts] = useState(0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // CAPTCHA после 2 неудачных попыток
+    if (attempts >= 2 && !captchaToken) {
+      setError("⚠️ " + (lang === "ru" ? "Подтвердите, что вы не робот" : "Verify you are not a robot"));
+      return;
+    }
     setLoading(true);
     setError("");
     const res = await fetch("/api/auth/login", {
@@ -36,6 +44,7 @@ function LoginContent() {
       await refresh(); // обновить AuthContext до навигации
       router.push(redirect || (data.role === "admin" ? "/admin" : "/dashboard"));
     } else {
+      setAttempts(a => a + 1);
       setError(a.wrongCreds);
     }
     setLoading(false);
@@ -82,6 +91,15 @@ function LoginContent() {
             </div>
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
+
+          {/* CAPTCHA после 2 неудач */}
+          {attempts >= 2 && (
+            <div className="py-1">
+              <label className="text-xs text-gray-500 mb-1.5 block">{lang === "ru" ? "Подтвердите, что вы человек:" : "Verify you are human:"}</label>
+              <Captcha onVerify={setCaptchaToken} reset={attempts} />
+            </div>
+          )}
+
           <button type="submit" disabled={loading}
             className="w-full py-3.5 rounded-xl text-white font-bold hover:opacity-90 transition disabled:opacity-70"
             style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>

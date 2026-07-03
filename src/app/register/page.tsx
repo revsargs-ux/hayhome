@@ -7,13 +7,14 @@ import { Suspense } from "react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { SocialLogin } from "@/components/SocialLogin";
+import Captcha from "@/components/Captcha";
 
 function RegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || null;
   const refCode = searchParams.get("ref") || null;
-  const { tr } = useLang();
+  const { tr, lang } = useLang();
   const { refresh } = useAuth();
   const a = tr.auth;
   const n = tr.nav;
@@ -22,12 +23,14 @@ function RegisterContent() {
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [consent, setConsent] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!consent) { setError("⚠️ " + a.consentPD); return; }
+    if (!captchaToken) { setError("⚠️ " + (lang === "ru" ? "Подтвердите, что вы не робот" : "Verify you are not a robot")); return; }
     if (form.password !== form.confirm) { setError(a.passMismatch); return; }
     if (form.password.length < 6) { setError(a.minPass); return; }
     setLoading(true);
@@ -111,6 +114,13 @@ function RegisterContent() {
               <Link href="/privacy" target="_blank" className="underline hover:text-gray-900" style={{ color: "#D4001A" }}>Privacy Policy</Link>
             </span>
           </label>
+
+          {/* CAPTCHA */}
+          <div className="py-1">
+            <label className="text-xs text-gray-500 mb-1.5 block">{lang === "ru" ? "Подтвердите, что вы человек:" : "Verify you are human:"}</label>
+            <Captcha onVerify={setCaptchaToken} />
+          </div>
+
           <button type="submit" disabled={loading}
             className="w-full py-3.5 rounded-xl text-white font-bold hover:opacity-90 transition disabled:opacity-70"
             style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
