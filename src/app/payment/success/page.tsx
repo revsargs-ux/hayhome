@@ -20,7 +20,7 @@ function SuccessContent() {
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-3">{u.paymentSuccess}</h1>
         <p className="text-gray-500 mb-2">
-          {lang === "ru" ? "Комиссия (10%) оплачена. Бронирование подтверждено." : "Commission (10%) paid. Booking confirmed."}
+          {lang === "ru" ? "Комиссия (15%) оплачена. Бронирование подтверждено." : "Commission (15%) paid. Booking confirmed."}
         </p>
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 my-4 text-left">
           <p className="text-sm text-green-800 font-medium">

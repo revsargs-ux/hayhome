@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     if (booking.guestEmail !== user.email && user.role !== "admin") {
       return NextResponse.json({ error: "Not your booking" }, { status: 403 });
     }
-    amount = Math.round(Number(booking.totalPrice) * 0.10 * 100) / 100; // 10% commission
+    amount = Math.round(Number(booking.totalPrice) * 0.15 * 100) / 100; // 15% commission
   } else if (service_booking_id) {
     // Verify service booking
     const { data: svcBooking } = await supabase

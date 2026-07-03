@@ -194,7 +194,7 @@ export default function BookPage() {
   })();
 
   const total = host ? nights * host.pricePerNight : 0;
-  const commission = Math.round((total + extraTotal) * 0.10 * 100) / 100;
+  const commission = Math.round((total + extraTotal) * 0.15 * 100) / 100;
   const finalTotal = total;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -472,7 +472,7 @@ export default function BookPage() {
 <button type="submit" disabled={loading}
                   className="w-full py-4 rounded-xl text-white font-bold text-lg hover:opacity-90 transition disabled:opacity-70"
                   style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  {loading ? u.sendingText : (nights > 0 ? `${lang === "ru" ? "Оплатить комиссию" : "Pay commission"} · $${commission}` : t("submit"))}
+                  {loading ? u.sendingText : (nights > 0 ? `${lang === "ru" ? "Оплатить (комиссия 15%)" : "Pay (15% commission)"} · $${commission}` : t("submit"))}
                 </button>
                 <p className="text-center text-xs text-gray-400">{t("cancel")}</p>
               </form>
@@ -506,6 +506,11 @@ export default function BookPage() {
                   </div>
                   <div className="flex justify-between font-bold text-gray-900 text-base pt-2 border-t border-gray-100">
                     <span>{t("total")}</span><span>${finalTotal}</span>
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1 space-y-0.5">
+                    <p>Комиссия платформы: 15% (${commission})</p>
+                    <p>Комиссия за перевод: 1% (${Math.round((finalTotal - commission) * 0.01 * 100) / 100})</p>
+                    <p className="text-gray-500">Хозяин получит: <strong>${(Math.round((finalTotal - commission) * 0.99 * 100) / 100)}</strong></p>
                   </div>
                 </div>
               ) : (

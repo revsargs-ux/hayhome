@@ -184,6 +184,13 @@ export default function BecomeHostPage() {
                 <input type="range" min={10} max={150} step={5}
                   value={form.pricePerNight} onChange={e => set("pricePerNight", Number(e.target.value))} className="w-full accent-red-600" />
                 <div className="flex justify-between text-xs text-gray-400 mt-1"><span>$10</span><span>$150</span></div>
+                <div className="mt-2 bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-blue-800 space-y-1">
+                  <p className="font-semibold">💰 Расчёт вашего дохода за ночь:</p>
+                  <p>Гость платит: <strong>${form.pricePerNight}</strong></p>
+                  <p>Комиссия платформы (15%): −${(form.pricePerNight * 0.15).toFixed(2)}</p>
+                  <p>Комиссия за перевод (1%): −${(form.pricePerNight * 0.84 * 0.01).toFixed(2)}</p>
+                  <p className="font-bold text-green-700">Вы получите: <span className="text-base">${(form.pricePerNight * 0.84 * 0.99).toFixed(2)}</span></p>
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
