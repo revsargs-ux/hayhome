@@ -154,37 +154,22 @@ interface MapProps {
   zoom?: number;
 }
 
-/* Mini 7-day availability calendar for map popup */
-function PopupCalendar({ bookedDates }: { bookedDates: Set<string> }) {
-  if (!bookedDates) return null;
+/* Generate calendar HTML string for Leaflet popup (no React) */
+function calendarHTML(booked: Set<string>): string {
   const today = new Date();
   const dayNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
-  const monthNames = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
-  const days = Array.from({ length: 7 }, (_, i) => {
+  let cells = "";
+  for (let i = 0; i < 7; i++) {
     const d = new Date(today);
     d.setDate(d.getDate() + i);
-    return d;
-  });
-
-  return (
-    <div style={{ marginTop: "8px" }}>
-      <div style={{ fontSize: "10px", fontWeight: 600, color: "666", marginBottom: "4px" }}>📅 Занятость на 7 дней</div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px" }}>
-        {days.map((d) => {
-          const iso = d.toISOString();
-          const dateStr = iso.substring(0, 10);
-          const isBooked = bookedDates.has(dateStr);
-          return (
-            <div key={dateStr} style={{ textAlign: "center", borderRadius: "6px", padding: "2px 0", background: isBooked ? "#fef2f2" : "#f0fdf4", border: `1px solid ${isBooked ? "#fecaca" : "#bbf7d0"}` }}>
-              <div style={{ fontSize: "8px", color: "#999" }}>{dayNames[d.getDay()]}</div>
-              <div style={{ fontSize: "11px", fontWeight: 700, color: isBooked ? "#ef4444" : "#16a34a", textDecoration: isBooked ? "line-through" : "none" }}>{d.getDate()}</div>
-              <div style={{ fontSize: "7px", color: "#bbb" }}>{monthNames[d.getMonth()]}</div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+    const dateStr = d.toISOString().substring(0, 10);
+    const booked_str = booked.has(dateStr);
+    cells += `<div style="text-align:center;border-radius:6px;padding:2px 0;background:${booked_str ? "#fef2f2" : "#f0fdf4"};border:1px solid ${booked_str ? "#fecaca" : "#bbf7d0"}">
+      <div style="font-size:8px;color:#999">${dayNames[d.getDay()]}</div>
+      <div style="font-size:11px;font-weight:700;color:${booked_str ? "#ef4444" : "#16a34a"};${booked_str ? "text-decoration:line-through" : ""}">${d.getDate()}</div>
+    </div>`;
+  }
+  return `<div style="margin-top:8px"><div style="font-size:10px;font-weight:600;color:#666;margin-bottom:4px">📅 Занятость на 7 дней</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">${cells}</div></div>`;
 }
 
 export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
@@ -262,57 +247,25 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
           if (!fullHost) return null;
           const coords = getHostCoords(fullHost);
           const booked = hostBookedMap[host.id] || EMPTY_SET;
+          const popupContent = (function() {
+            const cal = calendarHTML(booked);
+            const photo = host.coverPhoto
+              ? '<img src="' + host.coverPhoto + '" alt="' + host.familyName + '" style="width:100%;height:80px;object-fit:cover;border-radius:8px;margin-bottom:8px" />'
+              : '';
+            const rating = host.rating > 0 ? '⭐ ' + host.rating : '';
+            return '<div style="min-width:180px">' + photo +
+              '<div style="font-weight:700;font-size:14px;margin-bottom:4px;color:#1a1a1a">' + host.familyName + '</div>' +
+              '<div style="font-size:12px;color:#666;margin-bottom:4px">📍 ' + host.city + ', ' + host.region + '</div>' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+                '<span style="font-size:12px">' + rating + '</span>' +
+                '<span style="font-weight:700;color:#D4001A;font-size:14px">$' + host.pricePerNight + '/night</span></div>' +
+              cal +
+              '<a href="/hosts/' + host.id + '" style="display:block;text-align:center;padding:6px 12px;border-radius:20px;background:linear-gradient(135deg,#D4001A,#F2A900);color:#fff;font-size:13px;font-weight:600;text-decoration:none;margin-top:8px">Открыть профиль</a>' +
+              '</div>';
+          })();
           return (
-            <Marker key={host.id} position={coords} icon={markerIcon}>
-              <Popup>
-                <div style={{ minWidth: "180px" }}>
-                  {host.coverPhoto && (
-                    <img
-                      src={host.coverPhoto}
-                      alt={host.familyName}
-                      style={{
-                        width: "100%",
-                        height: "80px",
-                        objectFit: "cover",
-                        borderRadius: "8px",
-                        marginBottom: "8px",
-                      }}
-                    />
-                  )}
-                  <div style={{ fontWeight: 700, fontSize: "14px", marginBottom: "4px", color: "#1a1a1a" }}>
-                    {host.familyName}
-                  </div>
-                  <div style={{ fontSize: "12px", color: "#666", marginBottom: "4px" }}>
-                    📍 {host.city}, {host.region}
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                    <span style={{ fontSize: "12px" }}>
-                      {host.rating > 0 ? `⭐ ${host.rating}` : ""}
-                    </span>
-                    <span style={{ fontWeight: 700, color: "#D4001A", fontSize: "14px" }}>
-                      ${host.pricePerNight}/night
-                    </span>
-                  </div>
-                  <PopupCalendar bookedDates={booked} />
-                  <a
-                    href={`/hosts/${host.id}`}
-                    style={{
-                      display: "block",
-                      textAlign: "center",
-                      padding: "6px 12px",
-                      borderRadius: "20px",
-                      background: "linear-gradient(135deg, #D4001A, #F2A900)",
-                      color: "#fff",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      textDecoration: "none",
-                      marginTop: "8px",
-                    }}
-                  >
-                    Забронировать
-                  </a>
-                </div>
-              </Popup>
+            <Marker key={host.id} position={coords} icon={markerIcon} eventHandlers={{ click: () => { window.location.href = '/hosts/' + host.id; } }}>
+              <Popup><div dangerouslySetInnerHTML={{ __html: popupContent }} /></Popup>
             </Marker>
           );
         })}
