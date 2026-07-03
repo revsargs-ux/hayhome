@@ -348,51 +348,51 @@ export default function NewRequestPage() {
             </div>
           </div>
 
-          {/* Guests + Budget */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                {isRu ? "Кол-во гостей" : "Guests"}
-              </label>
+          {/* Guests */}
+          <div>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">
+              {isRu ? "Кол-во гостей" : "Guests"}
+            </label>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={form.guests_count || ""}
+              onChange={(e) => {
+                const v = e.target.value.replace(/[^0-9]/g, "");
+                setForm({ ...form, guests_count: v ? parseInt(v) : 0 });
+              }}
+              onBlur={() => {
+                if (!form.guests_count || form.guests_count < 1) setForm({ ...form, guests_count: 1 });
+              }}
+              placeholder="1"
+              className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400"
+            />
+          </div>
+
+          {/* Budget */}
+          <div>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">
+              {isRu ? "Бюджет" : "Budget"}
+            </label>
+            <div className="flex gap-2">
               <input
                 type="text"
                 inputMode="numeric"
-                value={form.guests_count || ""}
-                onChange={(e) => {
-                  const v = e.target.value.replace(/[^0-9]/g, "");
-                  setForm({ ...form, guests_count: v ? parseInt(v) : 0 });
-                }}
-                onBlur={() => {
-                  if (!form.guests_count || form.guests_count < 1) setForm({ ...form, guests_count: 1 });
-                }}
-                placeholder="1"
-                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400"
+                value={form.budget}
+                onChange={(e) => setForm({ ...form, budget: e.target.value.replace(/[^0-9]/g, "") })}
+                placeholder="100"
+                className="flex-1 min-w-0 px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400"
               />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                {isRu ? "Бюджет" : "Budget"}
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={form.budget}
-                  onChange={(e) => setForm({ ...form, budget: e.target.value.replace(/[^0-9]/g, "") })}
-                  placeholder="100"
-                  className="flex-1 px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400"
-                />
-                <select
-                  value={form.budget_currency}
-                  onChange={(e) => setForm({ ...form, budget_currency: e.target.value })}
-                  className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400 bg-white"
-                >
-                  <option value="USD">$ USD</option>
-                  <option value="EUR">€ EUR</option>
-                  <option value="AMD">֏ AMD</option>
-                  <option value="RUB">₽ RUB</option>
-                </select>
-              </div>
+              <select
+                value={form.budget_currency}
+                onChange={(e) => setForm({ ...form, budget_currency: e.target.value })}
+                className="px-2 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400 bg-white flex-shrink-0"
+              >
+                <option value="USD">$</option>
+                <option value="EUR">€</option>
+                <option value="AMD">֏</option>
+                <option value="RUB">₽</option>
+              </select>
             </div>
           </div>
 
