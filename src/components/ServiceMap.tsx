@@ -56,7 +56,15 @@ interface ServiceMapProps {
 
 export default function ServiceMap({ services }: ServiceMapProps) {
   const [mounted, setMounted] = useState(false);
+  const [svcBookings, setSvcBookings] = useState<{ serviceId: string; date: string; status: string }[]>([]);
+
   useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    fetch("/api/service-bookings/public")
+      .then((r) => r.ok ? r.json() : [])
+      .then((data) => setSvcBookings(data || []))
+      .catch(() => {});
+  }, []);
 
   if (!mounted) {
     return (
@@ -111,6 +119,52 @@ export default function ServiceMap({ services }: ServiceMapProps) {
                       ${svc.price}{svc.priceUnit}
                     </span>
                   </div>
+                  {/* 7-day availability */}
+                  {(() => {
+                    const todayNow = new Date(); todayNow.setHours(0, 0, 0, 0);
+                    const bookedDates = new Set(
+                      svcBookings
+                        .filter((b) => b.serviceId === svc.id && b.status !== "cancelled")
+                        .map((b) => b.date)
+                    );
+                    const days7 = [];
+                    for (let i = 0; i < 7; i++) {
+                      const d = new Date(todayNow);
+                      d.setDate(d.getDate() + i);
+                      const ds = d.toISOString().substring(0, 10);
+                      days7.push({ dayNum: d.getDate(), booked: bookedDates.has(ds) });
+                    }
+                    return (
+                      <div style={{ marginTop: "8px" }}>
+                        <div style={{ fontSize: "10px", color: "#888", marginBottom: "2px" }}>Ближайшие дни:</div>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px" }}>
+                          {days7.map((d, i) => (
+                            <div key={i} style={{
+                              textAlign: "center", fontSize: "9px", padding: "3px 0",
+                              borderRadius: "3px",
+                              background: d.booked ? "#ffd6d6" : "#d4f5d4",
+                              color: d.booked ? "#cc0000" : "#2a8c2a",
+                              textDecoration: d.booked ? "line-through" : "none",
+                            }}>{d.dayNum}</div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                  <a
+                    href={"/services/" + svc.id}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "block", textAlign: "center",
+                      padding: "6px 12px", borderRadius: "20px",
+                      background: "linear-gradient(135deg, #C45D3E, #F2A900)",
+                      color: "#fff", fontSize: "13px", fontWeight: 600,
+                      textDecoration: "none", marginTop: "8px",
+                    }}
+                  >
+                    Подробнее
+                  </a>
                 </div>
               </Popup>
             </Marker>

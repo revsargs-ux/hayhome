@@ -276,8 +276,9 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
                   </div>
                   <a
                     href={`/hosts/${host.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     style={{
-                      display: "block",
                       textAlign: "center",
                       padding: "6px 12px",
                       borderRadius: "20px",
