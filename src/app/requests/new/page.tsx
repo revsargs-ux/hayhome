@@ -54,6 +54,7 @@ export default function NewRequestPage() {
     date_to: "",
     guests_count: 1,
     budget: "",
+    budget_currency: "USD",
   });
 
   const [submitting, setSubmitting] = useState(false);
@@ -82,7 +83,7 @@ export default function NewRequestPage() {
       const res = await fetch("/api/requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(finalForm),
+        body: JSON.stringify({ ...finalForm, budget: finalForm.budget ? `${finalForm.budget} ${finalForm.budget_currency}` : "" }),
       });
 
       if (!res.ok) {
@@ -372,14 +373,26 @@ export default function NewRequestPage() {
               <label className="text-sm font-medium text-gray-700 mb-1 block">
                 {isRu ? "Бюджет" : "Budget"}
               </label>
-              <input
-                type="text"
-                maxLength={200}
-                value={form.budget}
-                onChange={(e) => setForm({ ...form, budget: e.target.value })}
-                placeholder={isRu ? "Напр: $100/ночь" : "E.g.: $100/night"}
-                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={form.budget}
+                  onChange={(e) => setForm({ ...form, budget: e.target.value.replace(/[^0-9]/g, "") })}
+                  placeholder="100"
+                  className="flex-1 px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400"
+                />
+                <select
+                  value={form.budget_currency}
+                  onChange={(e) => setForm({ ...form, budget_currency: e.target.value })}
+                  className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400 bg-white"
+                >
+                  <option value="USD">$ USD</option>
+                  <option value="EUR">€ EUR</option>
+                  <option value="AMD">֏ AMD</option>
+                  <option value="RUB">₽ RUB</option>
+                </select>
+              </div>
             </div>
           </div>
 
