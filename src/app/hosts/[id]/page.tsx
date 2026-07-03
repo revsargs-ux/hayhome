@@ -26,6 +26,7 @@ export default function HostProfilePage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [canReview, setCanReview] = useState(false);
+  const [hostBookings, setHostBookings] = useState<Booking[]>([]);
 
   // Review form state
   const [reviewRating, setReviewRating] = useState(5);
@@ -54,9 +55,11 @@ export default function HostProfilePage() {
     Promise.all([
       fetch(`/api/hosts/${id}`).then((r) => r.json()),
       fetch(`/api/reviews?hostId=${id}`).then((r) => r.json()),
-    ]).then(([hostData, reviewData]) => {
+      fetch(`/api/bookings?hostId=${id}`).then((r) => r.ok ? r.json() : []),
+    ]).then(([hostData, reviewData, bookingData]) => {
       setHost(hostData);
       setReviews(Array.isArray(reviewData) ? reviewData : []);
+      setHostBookings(Array.isArray(bookingData) ? bookingData : []);
       setLoading(false);
     });
   }, [id]);
@@ -692,6 +695,47 @@ export default function HostProfilePage() {
                   )}
                 </div>
               </div>
+
+              {/* 7-day availability calendar */}
+              {hostBookings.length > 0 && (() => {
+                const today = new Date();
+                const bookedDates = new Set<string>();
+                hostBookings.forEach((b: Booking) => {
+                  if (b.status === "confirmed" || b.status === "completed" || b.status === "pending") {
+                    let d = new Date(b.checkIn);
+                    const end = new Date(b.checkOut);
+                    while (d < end) {
+                      bookedDates.add(d.toISOString().split("T")[0]);
+                      d.setDate(d.getDate() + 1);
+                    }
+                  }
+                });
+                const days = Array.from({ length: 7 }, (_, i) => {
+                  const d = new Date(today);
+                  d.setDate(d.getDate() + i);
+                  return d;
+                });
+                const dayNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+                const monthNames = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+                return (
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <p className="text-xs font-semibold text-gray-600 mb-2">📅 {lang === "ru" ? "Занятость на 7 дней" : "Availability — next 7 days"}</p>
+                    <div className="grid grid-cols-7 gap-1">
+                      {days.map((d) => {
+                        const dateStr = d.toISOString().split("T")[0];
+                        const isBooked = bookedDates.has(dateStr);
+                        return (
+                          <div key={dateStr} className={`text-center rounded-lg py-1.5 ${isBooked ? "bg-red-50 border border-red-200" : "bg-green-50 border border-green-200"}`}>
+                            <div className="text-[10px] text-gray-400">{dayNames[d.getDay()]}</div>
+                            <div className={`text-sm font-bold ${isBooked ? "text-red-500 line-through" : "text-green-600"}`}>{d.getDate()}</div>
+                            <div className="text-[9px] text-gray-400">{monthNames[d.getMonth()]}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div className="mt-6 pt-5 border-t border-gray-100 space-y-2">
                 {[h.freeCancel, h.directContact, h.noHidden].map((f) => (
