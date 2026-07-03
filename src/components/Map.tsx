@@ -156,7 +156,7 @@ interface MapProps {
 
 /* Mini 7-day availability calendar for map popup */
 function PopupCalendar({ bookedDates }: { bookedDates: Set<string> }) {
-  if (bookedDates.size === 0) return null;
+  if (!bookedDates) return null;
   const today = new Date();
   const dayNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
   const monthNames = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
