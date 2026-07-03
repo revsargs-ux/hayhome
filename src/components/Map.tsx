@@ -154,6 +154,77 @@ interface MapProps {
   zoom?: number;
 }
 
+/* Mini 7-day availability calendar for map popup */
+function PopupCalendar({ hostId }: { hostId: string }) {
+  const [bookedDates, setBookedDates] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/api/bookings?hostId=${hostId}`)
+      .then((r) => r.ok ? r.json() : [])
+      .then((bookings: any[]) => {
+        const dates = new Set<string>();
+        bookings.forEach((b) => {
+          if (b.status === "confirmed" || b.status === "completed" || b.status === "pending") {
+            let d = new Date(b.checkIn);
+            const end = new Date(b.checkOut);
+            while (d < end) {
+              dates.add(d.toISOString().split("T")[0]);
+              d.setDate(d.getDate() + 1);
+            }
+          }
+        });
+        setBookedDates(dates);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [hostId]);
+
+  if (loading) return <div style={{ fontSize: "10px", color: "#999", textAlign: "center" }}>Загрузка...</div>;
+
+  const today = new Date();
+  const dayNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+  const monthNames = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+
+  return (
+    <div style={{ marginTop: "8px" }}>
+      <div style={{ fontSize: "10px", fontWeight: 600, color: "#666", marginBottom: "4px" }}>📅 Занятость на 7 дней</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px" }}>
+        {days.map((d) => {
+          const dateStr = d.toISOString().split("T")[0];
+          const isBooked = bookedDates.has(dateStr);
+          return (
+            <div
+              key={dateStr}
+              style={{
+                textAlign: "center",
+                borderRadius: "6px",
+                padding: "2px 0",
+                background: isBooked ? "#fef2f2" : "#f0fdf4",
+                border: `1px solid ${isBooked ? "#fecaca" : "#bbf7d0"}`,
+              }}
+            >
+              <div style={{ fontSize: "8px", color: "#999" }}>{dayNames[d.getDay()]}</div>
+              <div style={{
+                fontSize: "11px",
+                fontWeight: 700,
+                color: isBooked ? "#ef4444" : "#16a34a",
+                textDecoration: isBooked ? "line-through" : "none",
+              }}>{d.getDate()}</div>
+              <div style={{ fontSize: "7px", color: "#bbb" }}>{monthNames[d.getMonth()]}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -229,6 +300,7 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
                       ${host.pricePerNight}/night
                     </span>
                   </div>
+                  <PopupCalendar hostId={host.id} />
                   <a
                     href={`/hosts/${host.id}`}
                     style={{
@@ -241,6 +313,7 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
                       fontSize: "13px",
                       fontWeight: 600,
                       textDecoration: "none",
+                      marginTop: "8px",
                     }}
                   >
                     Забронировать
