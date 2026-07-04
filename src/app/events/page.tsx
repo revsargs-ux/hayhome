@@ -144,6 +144,10 @@ export default function EventsPage() {
   const u = getUI(lang);
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
+  const [showBookingForm, setShowBookingForm] = useState(false);
+  const [bookingForm, setBookingForm] = useState({ name: "", phone: "", email: "", guests: "1", date: "" });
+  const [bookingLoading, setBookingLoading] = useState(false);
+  const [bookingResult, setBookingResult] = useState<null | "success" | "error">(null);
   const [showMap, setShowMap] = useState(false);
 
   const isRu = lang === "ru";
@@ -179,6 +183,36 @@ export default function EventsPage() {
     stars: 0,
     _coords: e.coords,
   })) as any;
+
+  const handleBookEvent = async () => {
+    if (!selectedEvent || !bookingForm.name || !bookingForm.phone || !bookingForm.guests || !bookingForm.date) return;
+    setBookingLoading(true);
+    setBookingResult(null);
+    try {
+      const res = await fetch("/api/event-bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventId: selectedEvent.id,
+          eventName: selectedEvent.titleRu || selectedEvent.title,
+          guestName: bookingForm.name,
+          guestPhone: bookingForm.phone,
+          guestEmail: bookingForm.email,
+          guests: bookingForm.guests,
+          date: bookingForm.date,
+        }),
+      });
+      if (res.ok) {
+        setBookingResult("success");
+      } else {
+        setBookingResult("error");
+      }
+    } catch {
+      setBookingResult("error");
+    } finally {
+      setBookingLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
@@ -314,7 +348,7 @@ export default function EventsPage() {
       {selectedEvent && (
         <div
           className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/60"
-          onClick={() => setSelectedEvent(null)}
+          onClick={() => { setSelectedEvent(null); setShowBookingForm(false); setBookingResult(null); }}
         >
           <div
             className="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl"
@@ -378,19 +412,101 @@ export default function EventsPage() {
             </div>
 
             {/* Footer */}
-            <div className="p-6 pt-0 flex gap-3">
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="flex-1 py-3 rounded-full border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition"
-              >
-                {u.backBtn}
-              </button>
-              <button
-                className="flex-1 py-3 rounded-full text-white font-medium transition hover:opacity-90"
-                style={{ background: "linear-gradient(135deg, #C45D3E, #D4A04A)" }}
-              >
-                {u.learnMore}
-              </button>
+            <div className="p-6 pt-0">
+              {!showBookingForm ? (
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setSelectedEvent(null)}
+                    className="flex-1 py-3 rounded-full border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition"
+                  >
+                    {u.backBtn}
+                  </button>
+                  <button
+                    onClick={() => setShowBookingForm(true)}
+                    className="flex-1 py-3 rounded-full text-white font-medium transition hover:opacity-90"
+                    style={{ background: "linear-gradient(135deg, #C45D3E, #D4A04A)" }}
+                  >
+                    {isHy ? "Ամրագրել" : "Забронировать"}
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      placeholder="Ваше имя"
+                      value={bookingForm.name}
+                      onChange={(e) => setBookingForm({ ...bookingForm, name: e.target.value })}
+                      className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#C45D3E]/30 focus:border-[#C45D3E]"
+                      required
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Телефон"
+                      value={bookingForm.phone}
+                      onChange={(e) => setBookingForm({ ...bookingForm, phone: e.target.value })}
+                      className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#C45D3E]/30 focus:border-[#C45D3E]"
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="email"
+                      placeholder="Email (необязательно)"
+                      value={bookingForm.email}
+                      onChange={(e) => setBookingForm({ ...bookingForm, email: e.target.value })}
+                      className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#C45D3E]/30 focus:border-[#C45D3E]"
+                    />
+                    <input
+                      type="number"
+                      min="1"
+                      max="20"
+                      placeholder="Кол-во человек"
+                      value={bookingForm.guests}
+                      onChange={(e) => setBookingForm({ ...bookingForm, guests: e.target.value })}
+                      className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#C45D3E]/30 focus:border-[#C45D3E]"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">📅 Дата</label>
+                    <input
+                      type="date"
+                      value={bookingForm.date}
+                      onChange={(e) => setBookingForm({ ...bookingForm, date: e.target.value })}
+                      min={selectedEvent.date}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#C45D3E]/30 focus:border-[#C45D3E]"
+                      required
+                    />
+                  </div>
+                  {bookingResult === "success" && (
+                    <div className="p-3 rounded-xl bg-green-50 text-green-700 text-sm font-medium text-center">
+                      ✅ "Бронирование отправлено! Мы свяжемся с вами."
+                    </div>
+                  )}
+                  {bookingResult === "error" && (
+                    <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium text-center">
+                      ❌ "Ошибка. Попробуйте ещё раз."
+                    </div>
+                  )}
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => { setShowBookingForm(false); setBookingResult(null); }}
+                      className="flex-1 py-3 rounded-full border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition"
+                    >
+                      {u.backBtn}
+                    </button>
+                    <button
+                      onClick={handleBookEvent}
+                      disabled={bookingLoading}
+                      className="flex-1 py-3 rounded-full text-white font-medium transition hover:opacity-90 disabled:opacity-50"
+                      style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
+                    >
+                      {bookingLoading ? "Отправка..." : "Отправить заявку"}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

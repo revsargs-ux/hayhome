@@ -1,0 +1,77 @@
+import { NextRequest, NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { eventId, eventName, guestName, guestPhone, guestEmail, guests, date } = body;
+
+    if (!eventId || !guestName || !guestPhone || !guests || !date) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    // Insert into hayhome_event_bookings table
+    const { data, error } = await supabase
+      .from("hayhome_event_bookings")
+      .insert({
+        eventId,
+        eventName,
+        guestName,
+        guestPhone,
+        guestEmail: guestEmail || null,
+        guests: Number(guests),
+        date,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) {
+      // If table doesn't exist, try hayhome_bookings as fallback
+      if (error.code === "42P01") {
+        const fallback = await supabase
+          .from("hayhome_bookings")
+          .insert({
+            hostId: eventId,
+            guestName,
+            guestPhone,
+            guestEmail: guestEmail || null,
+            checkIn: date,
+            checkOut: date,
+            guests: Number(guests),
+            status: "pending",
+            totalPrice: 0,
+          })
+          .select()
+          .single();
+
+        if (fallback.error) {
+          return NextResponse.json({ error: fallback.error.message }, { status: 500 });
+        }
+        return NextResponse.json({ success: true, booking: fallback.data });
+      }
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Send notification to host if notify module exists
+    try {
+      const { sendHostNotification } = await import("@/lib/notify");
+      await sendHostNotification(
+        "revik@hay-home.com",
+        `Новое бронирование: ${eventName}`,
+        `<h2>Бронирование события</h2>
+        <p><b>${guestName}</b> забронировал(а) <b>${eventName}</b></p>
+        <p>📅 Дата: ${date}</p>
+        <p>👥 Количество: ${guests} чел.</p>
+        <p>📞 Телефон: ${guestPhone}</p>
+        ${guestEmail ? `<p>📧 Email: ${guestEmail}</p>` : ""}`
+      );
+    } catch {}
+
+    return NextResponse.json({ success: true, booking: data });
+  } catch (err) {
+    console.error("Event booking error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
