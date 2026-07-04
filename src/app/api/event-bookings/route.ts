@@ -10,8 +10,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Insert into hayhome_event_bookings table
-    const { data, error } = await supabase
+    // Insert — try hayhome_event_bookings first, fallback to hayhome_bookings
+    let result: any;
+    let error: any;
+    let usedTable = "hayhome_event_bookings";
+
+    ({ data: result, error } = await supabase
       .from("hayhome_event_bookings")
       .insert({
         eventId,
@@ -25,32 +29,29 @@ export async function POST(req: NextRequest) {
         createdAt: new Date().toISOString(),
       })
       .select()
-      .single();
+      .single());
 
-    if (error) {
-      // If table doesn't exist, try hayhome_bookings as fallback
-      if (error.code === "42P01") {
-        const fallback = await supabase
-          .from("hayhome_bookings")
-          .insert({
-            hostId: eventId,
-            guestName,
-            guestPhone,
-            guestEmail: guestEmail || null,
-            checkIn: date,
-            checkOut: date,
-            guests: Number(guests),
-            status: "pending",
-            totalPrice: 0,
-          })
-          .select()
-          .single();
-
-        if (fallback.error) {
-          return NextResponse.json({ error: fallback.error.message }, { status: 500 });
-        }
-        return NextResponse.json({ success: true, booking: fallback.data });
-      }
+    if (error && error.code === "42P01") {
+      // Table doesn't exist — use hayhome_bookings as fallback
+      usedTable = "hayhome_bookings";
+      const fb = await supabase
+        .from("hayhome_bookings")
+        .insert({
+          hostId: eventId,
+          guestName,
+          guestPhone,
+          guestEmail: guestEmail || null,
+          checkIn: date,
+          checkOut: date,
+          guests: Number(guests),
+          status: "pending",
+          totalPrice: 0,
+        })
+        .select()
+        .single();
+      if (fb.error) return NextResponse.json({ error: fb.error.message }, { status: 500 });
+      result = fb.data;
+    } else if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest) {
       );
     } catch {}
 
-    return NextResponse.json({ success: true, booking: data });
+    return NextResponse.json({ success: true, booking: result, table: usedTable });
   } catch (err) {
     console.error("Event booking error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

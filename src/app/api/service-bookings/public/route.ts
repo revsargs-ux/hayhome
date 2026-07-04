@@ -11,7 +11,7 @@ export async function GET() {
 
   const { data, error } = await sb
     .from("hayhome_service_bookings")
-    .select("serviceId,date,status");
+    .select("*");
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data || []);
