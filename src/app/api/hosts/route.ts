@@ -7,6 +7,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_TEXT = 2000;
+const stripHtml = (s: string) => s.replace(/<[^>]*>/g, "").trim();
 
 export async function GET(req: NextRequest) {
   const all = req.nextUrl.searchParams.get("all");
@@ -45,13 +46,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid stars" }, { status: 400 });
   }
 
-  // Sanitize text fields
+  // Sanitize text fields — strip HTML tags to prevent stored XSS
   const sanitize = (v: unknown, max: number = MAX_TEXT) =>
-    typeof v === "string" ? v.slice(0, max) : "";
+    typeof v === "string" ? stripHtml(v).slice(0, max) : "";
 
   const hostData = {
-    name: String(body.name).slice(0, 100),
-    familyName: String(body.familyName).slice(0, 200),
+    name: stripHtml(String(body.name)).slice(0, 100),
+    familyName: stripHtml(String(body.familyName)).slice(0, 200),
     location: sanitize(body.location, 300),
     city: String(body.city).slice(0, 100),
     region: String(body.region).slice(0, 100),
