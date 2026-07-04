@@ -136,7 +136,7 @@ export default function ServiceMap({ services }: ServiceMapProps) {
                     }
                     return (
                       <div style={{ marginTop: "8px" }}>
-                        <div style={{ fontSize: "10px", color: "#888", marginBottom: "2px" }}>Ближайшие дни:</div>
+                        <div style={{ fontSize: "10px", color: "#888", marginBottom: "2px" }}>{({ ru: "Ближайшие дни:", en: "Next 7 days:", hy: "Մոտական 7 օրերը:", fr: "7 prochains jours:", de: "Nächste 7 Tage:", es: "Próximos 7 días:", it: "Prossimi 7 giorni:", ar: "أيام 7 القادمة:", zh: "近7天:", fa: "۷ روز آینده:" }[typeof navigator !== "undefined" ? (document.documentElement.lang || "ru") : "ru"])}</div>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px" }}>
                           {days7.map((d, i) => (
                             <div key={i} style={{

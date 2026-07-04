@@ -16,6 +16,7 @@ const REGIONS_LIST = ["Ереван", "Тавуш", "Ширак", "Арарат"
 
 function HostsContent() {
   const { tr, lang } = useLang();
+  const isRu = lang === "ru";
   const h = tr.hosts;
   const u = getUI(lang);
   const searchParams = useSearchParams();
@@ -26,6 +27,7 @@ function HostsContent() {
   const [search, setSearch] = useState(searchParams.get("q") || "");
   const [region, setRegion] = useState("");
   const [minStars, setMinStars] = useState(0);
+  const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(200);
   const [experience, setExperience] = useState("");
   const [showFilters, setShowFilters] = useState(false);
@@ -66,14 +68,14 @@ function HostsContent() {
     }
     if (region) result = result.filter((h) => h.region === region || h.city === region);
     if (minStars > 0) result = result.filter((h) => h.stars >= minStars);
-    result = result.filter((h) => h.pricePerNight <= maxPrice);
+    result = result.filter((h) => h.pricePerNight >= minPrice && h.pricePerNight <= maxPrice);
     if (experience) result = result.filter((h) => h.experiences?.some(e => e.toLowerCase().includes(experience.toLowerCase())));
     if (sortBy === "rating") result.sort((a, b) => b.rating - a.rating);
     else if (sortBy === "price_asc") result.sort((a, b) => a.pricePerNight - b.pricePerNight);
     else if (sortBy === "price_desc") result.sort((a, b) => b.pricePerNight - a.pricePerNight);
     else if (sortBy === "value") result.sort((a, b) => (valueRanks[a.id] || 999) - (valueRanks[b.id] || 999));
     setFiltered(result);
-  }, [hosts, search, region, minStars, maxPrice, sortBy, experience, valueRanks]);
+  }, [hosts, search, region, minStars, minPrice, maxPrice, sortBy, experience, valueRanks]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -132,13 +134,18 @@ function HostsContent() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
-                  {h.priceTo}: ${maxPrice}/night
+                  {isRu ? "Диапазон цен" : "Price range"}: ${minPrice} — ${maxPrice}/night
                 </label>
-                <input type="range" min={10} max={200} step={5} value={maxPrice}
-                  onChange={(e) => setMaxPrice(Number(e.target.value))}
-                  className="w-full accent-red-600" />
+                <div className="flex items-center gap-2">
+                  <input type="range" min={0} max={200} step={5} value={minPrice}
+                    onChange={(e) => setMinPrice(Math.min(Number(e.target.value), maxPrice - 5))}
+                    className="flex-1 accent-red-600" />
+                  <input type="range" min={0} max={200} step={5} value={maxPrice}
+                    onChange={(e) => setMaxPrice(Math.max(Number(e.target.value), minPrice + 5))}
+                    className="flex-1 accent-red-600" />
+                </div>
                 <div className="flex justify-between text-xs text-gray-400 mt-1">
-                  <span>$10</span><span>$200</span>
+                  <span>$0</span><span>$200</span>
                 </div>
               </div>
               <div>
@@ -202,14 +209,36 @@ function HostsContent() {
             ))}
           </div>
         ) : viewMode === "map" && filtered.length > 0 ? (
-          <Map hosts={filtered} />
+          <div>
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-semibold text-gray-700">{isRu ? "Диапазон цен" : "Price range"}</span>
+                <span className="text-sm font-bold text-red-600">${minPrice} — ${maxPrice}</span>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">{isRu ? "От" : "From"}</label>
+                  <input type="range" min={0} max={200} step={5} value={minPrice}
+                    onChange={(e) => setMinPrice(Math.min(Number(e.target.value), maxPrice - 5))}
+                    className="w-full accent-red-600" />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">{isRu ? "До" : "To"}</label>
+                  <input type="range" min={0} max={200} step={5} value={maxPrice}
+                    onChange={(e) => setMaxPrice(Math.max(Number(e.target.value), minPrice + 5))}
+                    className="w-full accent-red-600" />
+                </div>
+              </div>
+            </div>
+            <Map hosts={filtered} />
+          </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-24">
             <div className="text-5xl mb-4">🔍</div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">{h.notFound}</h3>
             <p className="text-gray-500 mb-6">{h.notFoundSub}</p>
             <button
-              onClick={() => { setSearch(""); setRegion(""); setMinStars(0); setMaxPrice(200); }}
+              onClick={() => { setSearch(""); setRegion(""); setMinStars(0); setMinPrice(0); setMaxPrice(200); }}
               className="px-6 py-2.5 rounded-full text-white font-medium"
               style={{ background: "#D4001A" }}
             >

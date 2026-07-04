@@ -1,8 +1,8 @@
 "use client";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";
 
@@ -11,6 +11,31 @@ function SuccessContent() {
   const u = getUI(lang);
   const searchParams = useSearchParams();
   const paymentId = searchParams.get("payment_id");
+  const [verifying, setVerifying] = useState(true);
+
+  // Fallback: verify payment server-side in case webhook hasn't fired yet
+  useEffect(() => {
+    if (!paymentId) {
+      setVerifying(false);
+      return;
+    }
+    fetch(`/api/payments/verify?payment_id=${paymentId}`)
+      .catch(() => {})
+      .finally(() => setVerifying(false));
+  }, [paymentId]);
+
+  if (verifying) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 size={40} className="animate-spin text-red-600" />
+          <p className="text-gray-500">
+            {lang === "ru" ? "Подтверждение оплаты…" : "Confirming payment…"}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">

@@ -678,22 +678,19 @@ export default function HostProfilePage() {
                   <MapPin size={16} className="text-gray-400 flex-shrink-0" />
                   <span>{host.city}, {host.region}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Phone size={16} className="text-gray-400 flex-shrink-0" />
-                  {bookingConfirmed ? (
-                    <span className="font-medium">{host.phone}</span>
-                  ) : (
-                    <span className="text-gray-400 select-none">•••••••• — {lang === "ru" ? "виден после оплаты комиссии" : "visible after commission payment"}</span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Mail size={16} className="text-gray-400 flex-shrink-0" />
-                  {bookingConfirmed ? (
-                    <span className="break-all text-xs">{host.email}</span>
-                  ) : (
-                    <span className="text-gray-400 select-none text-xs">••••@•••• — {lang === "ru" ? "виден после оплаты" : "visible after payment"}</span>
-                  )}
-                </div>
+                <a href={`tel:${host.phone}`}
+                  className="flex items-center gap-2 group"
+                  onClick={(e) => e.stopPropagation()}>
+                  <Phone size={16} className="text-gray-400 flex-shrink-0 group-hover:text-red-600 transition" />
+                  <span className="font-medium group-hover:text-red-600 transition">{host.phone}</span>
+                  <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-green-50 border border-green-200 text-green-700 font-semibold">📞 {lang === "ru" ? "Позвонить" : "Call"}</span>
+                </a>
+                <a href={`mailto:${host.email}`}
+                  className="flex items-center gap-2 group"
+                  onClick={(e) => e.stopPropagation()}>
+                  <Mail size={16} className="text-gray-400 flex-shrink-0 group-hover:text-red-600 transition" />
+                  <span className="break-all text-xs group-hover:text-red-600 transition">{host.email}</span>
+                </a>
               </div>
 
               {/* 7-day availability calendar */}
