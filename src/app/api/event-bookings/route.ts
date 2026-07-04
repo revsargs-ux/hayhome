@@ -26,7 +26,6 @@ export async function POST(req: NextRequest) {
         guests: Number(guests),
         date,
         status: "pending",
-        createdAt: new Date().toISOString(),
       })
       .select()
       .single());
