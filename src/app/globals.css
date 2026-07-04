@@ -107,6 +107,29 @@ body {
 }
 
 /* ── Quote mark ── */
+/* ── Nav hover gradient ── */
+.nav-link {
+  position: relative;
+  overflow: hidden;
+}
+.nav-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #D4001A, #F2A900);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: -1;
+}
+.nav-link:hover::before {
+  opacity: 1;
+}
+.nav-link:hover {
+  color: white;
+  box-shadow: 0 4px 12px rgba(212,0,26,0.25);
+}
+
 .quote-mark {
   font-family: Georgia, serif;
   font-size: 4rem;

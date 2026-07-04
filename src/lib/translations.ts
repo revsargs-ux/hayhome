@@ -363,9 +363,9 @@ const t: Record<LangCode, Translations> = {
     nav: { findFamily: "Գտնել ընտանիք", hostGuests: "Ընդունել հյուրեր", about: "Մեր մասին", partner: "Գործընկերներ", login: "Մուտք", register: "Գրանցում" , logout: "Ելք" },
     hero: {
       greeting: "Բարի եկաք!",
-      title1: "Եկաք — դարձեք",
-      title2: "հայկական մեծ",
-      title3: "ընտանիքի մասնիկ",
+      title1: "Դարձեք մեր",
+      title2: "ընտանիքի",
+      title3: "մասնիկ",
       subtitle: "Հայաստանը բացվում է ընտանիքի սրտի միջոցով: Իրական ընթրիք, կենդանի պատմություններ, Արարատի տեսարան:",
       searchPlaceholder: "Երևան, Դիլիջան, Սևան...",
       searchBtn: "Գտնել ընտանիք",
