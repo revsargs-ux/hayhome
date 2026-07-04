@@ -1,5 +1,5 @@
 // HayHome Service Worker — no page caching, only API passthrough
-const CACHE_NAME = "hayhome-v8";
+const CACHE_NAME = "hayhome-v9";
 const API_PREFIX = "/api/";
 
 self.addEventListener("install", (event) => {
@@ -9,10 +9,11 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.map((k) => caches.delete(k)))
+        Promise.all(keys.map((k) => caches.delete(k)))
     )
   );
   self.clients.claim();
+  self.clients.matchAll().then(clients => clients.forEach(c => c.postMessage({ type: "SW_UPDATED" })));
 });
 
 self.addEventListener("fetch", (event) => {

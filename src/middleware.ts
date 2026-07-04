@@ -55,16 +55,16 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  return NextResponse.next({
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0",
+      "Surrogate-Control": "no-store",
+    },
+  });
 }
 
 export const config = {
-  matcher: [
-    "/dashboard/:path*",
-    "/admin/:path*",
-    "/partner/dashboard/:path*",
-    "/provider/dashboard/:path*",
-    "/favorites/:path*",
-    "/chat/:path*",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|sw.js).*)"],
 };

@@ -189,7 +189,7 @@ const t: Record<LangCode, Translations> = {
       partner: "Партнёры",
     },
     hero: {
-      greeting: "Բարի եկաք!",
+      greeting: "Добро пожаловать!",
       title1: "Войди — стань",
       title2: "частью большой",
       title3: "армянской семьи",
@@ -287,7 +287,7 @@ const t: Record<LangCode, Translations> = {
   en: {
     nav: { findFamily: "Find a Family", hostGuests: "Host Guests", about: "About", partner: "Partners", login: "Log In", register: "Sign Up", logout: "Sign Out" },
     hero: {
-      greeting: "Bari Ekeq!",
+      greeting: "Welcome!",
       title1: "Come in — become",
       title2: "part of one big",
       title3: "Armenian family",
@@ -362,10 +362,10 @@ const t: Record<LangCode, Translations> = {
   hy: {
     nav: { findFamily: "Գտնել ընտանիք", hostGuests: "Ընդունել հյուրեր", about: "Մեր մասին", partner: "Գործընկերներ", login: "Մուտք", register: "Գրանցում" , logout: "Ելք" },
     hero: {
-      greeting: "Bari Ekeq!",
-      title1: "Արի — դարձիր",
+      greeting: "Բարի եկաք!",
+      title1: "Եկաք — դարձեք",
       title2: "հայկական մեծ",
-      title3: "ընտանիքի մաս",
+      title3: "ընտանիքի մասնիկ",
       subtitle: "Հայաստանը բացվում է ընտանիքի սրտի միջոցով: Իրական ընթրիք, կենդանի պատմություններ, Արարատի տեսարան:",
       searchPlaceholder: "Երևան, Դիլիջան, Սևան...",
       searchBtn: "Գտնել ընտանիք",
@@ -437,7 +437,7 @@ const t: Record<LangCode, Translations> = {
   fr: {
     nav: { findFamily: "Trouver une famille", hostGuests: "Accueillir des hôtes", about: "À propos", login: "Connexion", register: "S'inscrire", logout: "Se déconnecter", partner: "Partenaires" },
     hero: {
-      greeting: "Bari Ekeq!",
+      greeting: "Bienvenue !",
       title1: "Entrez — devenez",
       title2: "membre d'une grande",
       title3: "famille arménienne",
@@ -512,7 +512,7 @@ const t: Record<LangCode, Translations> = {
   de: {
     nav: { findFamily: "Familie finden", hostGuests: "Gäste empfangen", about: "Über uns", login: "Anmelden", register: "Registrieren", logout: "Abmelden", partner: "Partner" },
     hero: {
-      greeting: "Bari Ekeq!",
+      greeting: "Willkommen!",
       title1: "Komm rein — werde",
       title2: "Teil einer großen",
       title3: "armenischen Familie",
@@ -587,7 +587,7 @@ const t: Record<LangCode, Translations> = {
   es: {
     nav: { findFamily: "Encontrar familia", hostGuests: "Recibir huéspedes", about: "Sobre nosotros", login: "Iniciar sesión", register: "Registrarse", logout: "Cerrar sesión", partner: "Socios" },
     hero: {
-      greeting: "¡Bari Ekeq!",
+      greeting: "¡Bienvenido!",
       title1: "Entra — conviértete",
       title2: "en parte de una gran",
       title3: "familia armenia",
@@ -662,7 +662,7 @@ const t: Record<LangCode, Translations> = {
   it: {
     nav: { findFamily: "Trova una famiglia", hostGuests: "Ospita viaggiatori", about: "Chi siamo", login: "Accedi", register: "Registrati", logout: "Esci", partner: "Partner" },
     hero: {
-      greeting: "Bari Ekeq!",
+      greeting: "Benvenuto!",
       title1: "Entra — diventa",
       title2: "parte di una grande",
       title3: "famiglia armena",
@@ -736,7 +736,7 @@ const t: Record<LangCode, Translations> = {
   ar: {
     nav: { findFamily: "ابحث عن عائلة", hostGuests: "استقبال الضيوف", about: "من نحن", login: "تسجيل الدخول", register: "إنشاء حساب", logout: "تسجيل الخروج", partner: "شركاء" },
     hero: {
-      greeting: "!Bari Ekeq",
+      greeting: "¡Bienvenido!",
       title1: "ادخل — كن",
       title2: "جزءاً من عائلة",
       title3: "أرمينية كبيرة",
@@ -810,7 +810,7 @@ const t: Record<LangCode, Translations> = {
   zh: {
     nav: { findFamily: "寻找家庭", hostGuests: "接待客人", about: "关于我们", login: "登录", register: "注册", logout: "退出", partner: "合作伙伴" },
     hero: {
-      greeting: "欢迎！Bari Ekeq!",
+      greeting: "مرحباً!",
       title1: "加入我们——成为",
       title2: "亚美尼亚大家庭",
       title3: "的一份子",
@@ -884,7 +884,7 @@ const t: Record<LangCode, Translations> = {
   fa: {
     nav: { findFamily: "یافتن خانواده", hostGuests: "پذیرش مهمان", about: "درباره ما", login: "ورود", register: "ثبت‌نام", logout: "خروج", partner: "همکاران" },
     hero: {
-      greeting: "!Bari Ekeq",
+      greeting: "خوش آمدید!",
       title1: "بیایید — بخشی از",
       title2: "یک خانواده بزرگ",
       title3: "ارمنی شوید",

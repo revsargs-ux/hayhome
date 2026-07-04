@@ -93,6 +93,9 @@ const jsonLd = {
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 const YM_ID = process.env.NEXT_PUBLIC_YM_ID;
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="hy" className={`h-full ${inter.variable}`}>
