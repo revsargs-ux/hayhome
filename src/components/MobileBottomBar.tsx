@@ -38,11 +38,11 @@ export default function MobileBottomBar() {
       match: (p: string) => p.startsWith("/requests"),
     },
     {
-      href: "/profile",
+      href: "/dashboard",
       icon: "👤",
       labelRu: "Профиль",
       labelEn: "Profile",
-      match: (p: string) => p.startsWith("/profile"),
+      match: (p: string) => p.startsWith("/dashboard") || p.startsWith("/profile"),
     },
   ];
 
