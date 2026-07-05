@@ -42,7 +42,7 @@ function RegisterContent() {
     });
     if (res.ok) {
       await refresh(); // обновить AuthContext до навигации
-      router.push(redirect || "/hosts");
+      router.push(redirect || "/welcome");
     } else {
       const d = await res.json();
       setError(d.error || a.wrongCreds);

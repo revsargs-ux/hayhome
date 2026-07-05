@@ -9,6 +9,7 @@ import { Host, Review } from "@/lib/types";
 import { getHistory } from "@/lib/viewHistory";
 import getUI from "@/lib/ui";
 import Recommendations from "@/components/Recommendations";
+import JsonLd from "@/components/JsonLd";
 
 export default function HomePage() {
   const { lang, tr } = useLang();
@@ -45,8 +46,43 @@ export default function HomePage() {
     });
   }, []);
 
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "HayHome",
+    url: "https://hay-home.com",
+    logo: "https://hay-home.com/icon-512.png",
+    description: "Armenian homestay marketplace — experience Armenia through the heart of a family.",
+    email: "info@hayhome.am",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Yerevan",
+      addressCountry: "AM",
+    },
+    sameAs: [
+      "https://www.instagram.com/hayhome",
+      "https://www.facebook.com/hayhome",
+    ],
+  };
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "HayHome",
+    url: "https://hay-home.com",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://hay-home.com/hosts?q={search_term_string}",
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <div className="min-h-screen bg-white">
+      <JsonLd data={[organizationJsonLd, websiteJsonLd]} />
       {/* Hero */}
       <section className="relative overflow-hidden flex items-center md:min-h-[600px]" style={{ minHeight: "520px" }}>
         <Image

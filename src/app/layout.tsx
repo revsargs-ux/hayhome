@@ -90,8 +90,10 @@ const jsonLd = {
   ],
 };
 
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
-const YM_ID = process.env.NEXT_PUBLIC_YM_ID;
+// замените на реальный GA4 ID (или установите переменную NEXT_PUBLIC_GA_ID)
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX';
+// замените на реальный Яндекс.Метрика ID (или установите переменную NEXT_PUBLIC_YM_ID)
+const YM_ID = process.env.NEXT_PUBLIC_YM_ID || '12345678';
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -106,41 +108,35 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-full flex flex-col font-sans" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-        {GA_ID && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`window.dataLayer = window.dataLayer || [];
+        {/* Google Analytics GA4 — замените G-XXXXXXXXXX на реальный ID */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', '${GA_ID}');`}
-            </Script>
-          </>
-        )}
-        {YM_ID && (
-          <>
-            <Script id="yandex-metrica" strategy="afterInteractive">
-              {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+  gtag('config', '${GA_ID}', { send_page_view: true });`}
+        </Script>
+        {/* Яндекс.Метрика — замените 12345678 на реальный ID */}
+        <Script id="yandex-metrica" strategy="afterInteractive">
+          {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
   m[i].l=1*new Date();
   for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r)return;}
   k=e.createElement(t);k.async=1;k.src=r;a=e.getElementsByTagName(t)[0];a.parentNode.insertBefore(k,a);})
   (window,document,'script','https://mc.yandex.ru/metrika/tag.js','ym');
   ym(${YM_ID},'init',{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});`}
-            </Script>
-            <noscript>
-              <div>
-                <img
-                  src={`https://mc.yandex.ru/watch/${YM_ID}`}
-                  style={{ position: "absolute", left: -9999 }}
-                  alt=""
-                />
-              </div>
-            </noscript>
-          </>
-        )}
+        </Script>
+        <noscript>
+          <div>
+            <img
+              src={`https://mc.yandex.ru/watch/${YM_ID}`}
+              style={{ position: "absolute", left: -9999 }}
+              alt=""
+            />
+          </div>
+        </noscript>
         <AuthProvider>
           <LanguageProvider>
             <LightboxWrapper>

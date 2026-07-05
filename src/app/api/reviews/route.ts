@@ -57,10 +57,11 @@ export async function POST(req: NextRequest) {
     .select("id, status")
     .eq("hostId", hostId)
     .eq("guestEmail", user.email)
+    .eq("status", "completed")
     .limit(1);
 
   if (!userBooking || userBooking.length === 0) {
-    return NextResponse.json({ error: "You can only review hosts you have booked with" }, { status: 403 });
+    return NextResponse.json({ error: "Только гости с завершённым бронированием могут оставлять отзыв" }, { status: 403 });
   }
 
   // ── Check for duplicate review (1 user = 1 review per host) ──

@@ -14,6 +14,7 @@ import ChatWidget from "@/components/ChatWidget";
 import getUI from "@/lib/ui";
 import { addToHistory } from "@/lib/viewHistory";
 import Recommendations from "@/components/Recommendations";
+import JsonLd from "@/components/JsonLd";
 
 export default function HostProfilePage() {
   const { id } = useParams<{ id: string }>();
@@ -26,6 +27,7 @@ export default function HostProfilePage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [canReview, setCanReview] = useState(false);
+  const [hasCompletedBooking, setHasCompletedBooking] = useState(false);
   const [hostBookings, setHostBookings] = useState<Booking[]>([]);
 
   // Review form state
@@ -78,7 +80,8 @@ export default function HostProfilePage() {
         const hasCompleted = bookings && bookings.some(
           (b) => b.hostId === id && b.status === "completed"
         );
-        setCanReview(true); // Allow all logged-in users to review (demo)
+        setHasCompletedBooking(!!hasCompleted);
+        setCanReview(!!hasCompleted);
         // Check if user has a confirmed/paid booking → unlock contacts
         const hasConfirmed = bookings && bookings.some(
           (b) => b.hostId === id && (b.status === "confirmed" || b.status === "completed")
@@ -263,8 +266,30 @@ export default function HostProfilePage() {
     </div>
   );
 
+  const lodgingJsonLd = host ? {
+    "@context": "https://schema.org",
+    "@type": "LodgingBusiness",
+    name: getLocalizedField(host.familyName, host.i18n, 'familyName', lang) || host.familyName,
+    description: getLocalizedField(host.description, host.i18n, 'description', lang) || host.description,
+    url: `https://hay-home.com/hosts/${host.id}`,
+    image: host.photos?.[0] || host.coverPhoto,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: host.city || "Yerevan",
+      addressCountry: "AM",
+    },
+    priceRange: host.price_per_night ? `$${host.price_per_night}` : "$$",
+    telephone: host.phone,
+    aggregateRating: reviews.length > 0 ? {
+      "@type": "AggregateRating",
+      ratingValue: (reviews.reduce((acc: number, r: Review) => acc + r.rating, 0) / reviews.length).toFixed(1),
+      reviewCount: reviews.length,
+    } : undefined,
+  } : null;
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {lodgingJsonLd && <JsonLd data={lodgingJsonLd} />}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <Link href="/hosts" className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium">
           <ChevronLeft size={16} /> {h.backToList}
@@ -491,6 +516,18 @@ export default function HostProfilePage() {
               )}
 
               {/* Review form */}
+              {!user && (
+                <div className="mt-6 pt-6 border-t border-gray-200 text-center">
+                  <a href="/auth/login" className="inline-block px-6 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition text-sm">
+                    Войти чтобы оставить отзыв
+                  </a>
+                </div>
+              )}
+              {user && !hasCompletedBooking && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <p className="text-gray-500 text-sm text-center py-2">Отзыв можно оставить после завершения пребывания</p>
+                </div>
+              )}
               {user && canReview && (
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">{h.writeReview}</h3>

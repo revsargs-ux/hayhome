@@ -486,33 +486,89 @@ export default function DashboardPage() {
           </div>
         )}
         {tab === "profile" && !myProfile && (
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              {u.guestProfile}
-            </h2>
-            <p className="text-gray-500 text-sm mb-4">
-              {u.accountDetails}
-            </p>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <p className="text-gray-400 text-xs mb-1">{u.nameLabel}</p>
-                <span className="font-semibold text-gray-900">{user?.name}</span>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <p className="text-gray-400 text-xs mb-1">Email</p>
-                <span className="font-semibold text-gray-900 text-xs break-all">{user?.email}</span>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <p className="text-gray-400 text-xs mb-1">{u.roleLabel}</p>
-                <span className="font-semibold text-gray-900 capitalize">{user?.role}</span>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <p className="text-gray-400 text-xs mb-1">{u.wantToHost}</p>
-                <Link href="/become-host" className="font-semibold text-sm" style={{ color: "#D4001A" }}>
-                  {u.registerCta}
-                </Link>
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                {u.guestProfile}
+              </h2>
+              <p className="text-gray-500 text-sm mb-4">
+                {u.accountDetails}
+              </p>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <p className="text-gray-400 text-xs mb-1">{u.nameLabel}</p>
+                  <span className="font-semibold text-gray-900">{user?.name}</span>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <p className="text-gray-400 text-xs mb-1">Email</p>
+                  <span className="font-semibold text-gray-900 text-xs break-all">{user?.email}</span>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <p className="text-gray-400 text-xs mb-1">{u.roleLabel}</p>
+                  <span className="font-semibold text-gray-900 capitalize">{user?.role}</span>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <p className="text-gray-400 text-xs mb-1">{u.wantToHost}</p>
+                  <Link href="/become-host" className="font-semibold text-sm" style={{ color: "#D4001A" }}>
+                    {u.registerCta}
+                  </Link>
+                </div>
               </div>
             </div>
+
+            {/* Guest: My Bookings */}
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-50">
+                <h3 className="text-lg font-bold text-gray-900">📅 Мои бронирования</h3>
+              </div>
+              {loading ? (
+                <div className="p-10 text-center text-gray-400">{tr.common.loading}</div>
+              ) : myBookings.length === 0 ? (
+                <div className="p-10 text-center">
+                  <div className="text-4xl mb-3">📭</div>
+                  <p className="text-gray-500 mb-4">У вас пока нет бронирований</p>
+                  <Link href="/hosts" className="inline-block px-5 py-2 rounded-full text-white text-sm font-semibold hover:opacity-90 transition" style={{ background: "#D4001A" }}>
+                    Найти семью
+                  </Link>
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-50">
+                  {myBookings.map((b) => (
+                    <div key={b.id} className="p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="font-semibold text-gray-900">{b.hostName}</span>
+                          <span className={`text-xs rounded-full px-2.5 py-0.5 font-semibold ${
+                            b.status === "pending" ? "bg-yellow-100 text-yellow-700" :
+                            b.status === "confirmed" ? "bg-green-100 text-green-700" :
+                            b.status === "completed" ? "bg-blue-100 text-blue-700" :
+                            "bg-gray-100 text-gray-500"
+                          }`}>{statusLabels[b.status]}</span>
+                        </div>
+                        <p className="text-sm text-gray-500">{b.checkIn} → {b.checkOut} · {b.guests} гостей</p>
+                        {b.totalPrice > 0 && <p className="text-sm font-semibold text-gray-700 mt-0.5">${b.totalPrice}</p>}
+                      </div>
+                      <div className="flex gap-2 flex-shrink-0">
+                        <Link href={`/hosts/${b.hostId}`}
+                          className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 transition">
+                          Профиль
+                        </Link>
+                        {b.status === "completed" && (
+                          <Link href={`/hosts/${b.hostId}#reviews`}
+                            className="px-3 py-1.5 rounded-lg text-xs font-medium text-white transition"
+                            style={{ background: "#D4001A" }}>
+                            Оставить отзыв
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Guest: My Service Bookings */}
+            <GuestServiceHistory lang={lang} tr={tr} />
           </div>
         )}
 
@@ -877,6 +933,68 @@ function DashboardMessages({ lang, onOpenChat }: { lang: string; onOpenChat: (us
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+// ── Guest Service History ──
+function GuestServiceHistory({ lang, tr }: { lang: string; tr: any }) {
+  const u = getUI(lang as any);
+  const [svcBookings, setSvcBookings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/service-bookings", { credentials: "include" })
+      .then(r => r.ok ? r.json() : [])
+      .then(data => { setSvcBookings(Array.isArray(data) ? data : []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const STATUS_BADGE: Record<string, string> = {
+    pending: "bg-yellow-100 text-yellow-700",
+    confirmed: "bg-green-100 text-green-700",
+    cancelled: "bg-gray-100 text-gray-500",
+    completed: "bg-blue-100 text-blue-700",
+  };
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div className="px-6 py-4 border-b border-gray-50">
+        <h3 className="text-lg font-bold text-gray-900">✨ Мои бронирования услуг</h3>
+      </div>
+      {loading ? (
+        <div className="p-10 text-center text-gray-400">{tr.common.loading}</div>
+      ) : svcBookings.length === 0 ? (
+        <div className="p-10 text-center">
+          <div className="text-4xl mb-3">🎭</div>
+          <p className="text-gray-500 mb-4">У вас пока нет заказанных услуг</p>
+          <Link href="/hosts" className="inline-block px-5 py-2 rounded-full text-white text-sm font-semibold hover:opacity-90 transition" style={{ background: "#D4001A" }}>
+            Найти семью
+          </Link>
+        </div>
+      ) : (
+        <div className="divide-y divide-gray-50">
+          {svcBookings.map((sb: any) => {
+            const catIcon: Record<string, string> = {
+              photo: "📸", video: "🎥", music: "🎵", costume: "👗", decor: "🎨", dance: "💃", guide: "🗺️", chef: "👨‍🍳", custom: "✨",
+            };
+            const cat = sb.service?.category || "custom";
+            return (
+              <div key={sb.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="text-lg">{catIcon[cat] || "✨"}</span>
+                    <span className="font-semibold text-gray-900">{sb.service?.title || "Услуга"}</span>
+                    <span className={`text-xs rounded-full px-2.5 py-0.5 font-semibold ${STATUS_BADGE[sb.status] || "bg-gray-100 text-gray-500"}`}>{sb.status}</span>
+                  </div>
+                  <p className="text-sm text-gray-500">{sb.date}{sb.start_time ? ` · ${sb.start_time}` : ""}</p>
+                  {sb.total_price > 0 && <p className="text-sm font-semibold text-gray-700 mt-0.5">${sb.total_price}</p>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

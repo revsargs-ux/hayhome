@@ -4,14 +4,39 @@ import Link from "next/link";
 import { ArrowRight, Heart, Globe, Shield, Star } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import { getAboutTexts } from "@/lib/aboutTexts";
+import JsonLd from "@/components/JsonLd";
 
 export default function AboutPage() {
   const { lang, tr } = useLang();
   const a = getAboutTexts(lang);
   const n = tr.nav;
 
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "HayHome",
+    url: "https://hay-home.com",
+    logo: "https://hay-home.com/icon-512.png",
+    description: "HayHome — платформа для проживания в армянских семьях. Откройте Армению через сердце семьи: домашняя еда, традиции и тёплый приём.",
+    email: "info@hayhome.am",
+    foundingLocation: {
+      "@type": "Place",
+      name: "Yerevan, Armenia",
+    },
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Yerevan",
+      addressCountry: "AM",
+    },
+    sameAs: [
+      "https://www.instagram.com/hayhome",
+      "https://www.facebook.com/hayhome",
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-white">
+      <JsonLd data={orgJsonLd} />
 
       {/* Hero */}
       <section className="relative overflow-hidden min-h-[420px] flex items-center">
