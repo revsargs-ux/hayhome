@@ -278,7 +278,7 @@ export default function HostProfilePage() {
       addressLocality: host.city || "Yerevan",
       addressCountry: "AM",
     },
-    priceRange: host.price_per_night ? `$${host.price_per_night}` : "$$",
+    priceRange: host.pricePerNight ? `$${host.pricePerNight}` : "$$",
     telephone: host.phone,
     aggregateRating: reviews.length > 0 ? {
       "@type": "AggregateRating",
