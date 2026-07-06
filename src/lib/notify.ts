@@ -131,3 +131,22 @@ export function buildServiceEmailHtml(data: {
       </div>
     </div>`;
 }
+
+export async function sendContractEmail(data: { hostId: string; familyName: string; name: string; email: string; lang: string; }) {
+  const transporter = getTransporter();
+  if (!transporter) return;
+  const contractUrl = `https://hay-home.com/contract/print?hostId=${data.hostId}&lang=${data.lang}`;
+  const html = `
+    <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+      <div style="background:linear-gradient(135deg,#D4001A,#F2A900);padding:30px;text-align:center">
+        <h1 style="color:#fff;margin:0;font-size:24px">📄 Договор о сотрудничестве</h1>
+        <p style="color:rgba(255,255,255,0.8);margin:8px 0 0">HayHome</p>
+      </div>
+      <div style="padding:30px">
+        <p>Здравствуйте, <strong>${data.name}</strong>!</p>
+        <p style="color:#666;line-height:1.6;margin-top:16px">Ваша заявка принята. <a href="${contractUrl}" style="color:#D4001A;font-weight:bold">Откройте договор о сотрудничестве</a>, распечатайте или отправьте через мессенджер.</p>
+      </div>
+      <div style="background:#f9f9f9;padding:20px;text-align:center;color:#999;font-size:12px">© 2026 HayHome</div>
+    </div>`;
+  await transporter.sendMail({ from: process.env.GMAIL_USER, to: data.email, subject: `HayHome — Договор о сотрудничестве`, html });
+}

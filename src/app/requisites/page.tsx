@@ -18,12 +18,10 @@ export default function RequisitesPage() {
           {/* Header */}
           <div
             className="px-8 py-10 text-center"
-            style={{
-              background: "linear-gradient(135deg, #D4001A, #F2A900)",
-            }}
+            style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
           >
             <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2">
-              Реквизиты
+              Ռեկվիզիտներ / Реквизиты
             </h1>
             <p className="text-white/80 text-sm">HayHome · hay-home.com</p>
           </div>
@@ -33,23 +31,38 @@ export default function RequisitesPage() {
             {/* Entity */}
             <section>
               <h2 className="text-xs font-bold uppercase tracking-wider text-amber-700 mb-3">
-                Реквизиты юридического лица
+                Реквизиты индивидуального предпринимателя
               </h2>
               <div className="bg-amber-50/50 rounded-xl p-5 space-y-2">
                 <p className="text-lg font-bold text-gray-900">
-                  ИП САРГСЯН РЕВИК СЕРГЕЕВИЧ
+                  ИП Саргсян Ревик Сергеевич (ՍԱՐԳՍՅԱՆ ՐԵՎԻՔ ՍԵՐԳԵԵՎԻՉ)
+                </p>
+                <p className="text-sm text-gray-500">
+                  Регистрационный номер: 772872487
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                   <div className="flex justify-between sm:justify-start sm:gap-2">
-                    <span className="text-gray-500">ИНН:</span>
+                    <span className="text-gray-500">ՀՎՀՀ / УНП:</span>
                     <span className="font-mono font-medium text-gray-900">
-                      410102126296
+                      20336085, 286.1594303
                     </span>
                   </div>
                   <div className="flex justify-between sm:justify-start sm:gap-2">
-                    <span className="text-gray-500">ОГРНИП:</span>
+                    <span className="text-gray-500">Рег. номер:</span>
                     <span className="font-mono font-medium text-gray-900">
-                      325410000011701
+                      269608863
+                    </span>
+                  </div>
+                  <div className="flex justify-between sm:justify-start sm:gap-2">
+                    <span className="text-gray-500">Код деятельности:</span>
+                    <span className="font-mono font-medium text-gray-900">
+                      62.01.0
+                    </span>
+                  </div>
+                  <div className="flex justify-between sm:justify-start sm:gap-2">
+                    <span className="text-gray-500">Дата регистрации:</span>
+                    <span className="font-mono font-medium text-gray-900">
+                      06.07.2026
                     </span>
                   </div>
                 </div>
@@ -64,42 +77,31 @@ export default function RequisitesPage() {
               <div className="bg-amber-50/50 rounded-xl p-5 space-y-3 text-sm">
                 <div className="flex flex-col">
                   <span className="text-gray-500">Расчётный счёт</span>
-                  <span className="font-mono font-medium text-gray-900">
-                    40802810836710000838
+                  <span className="font-mono font-medium text-gray-900 italic">
+                    (указать после открытия счёта)
                   </span>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-gray-500">Банк</span>
-                  <span className="font-medium text-gray-900">
-                    СЕВЕРО-ВОСТОЧНОЕ ОТДЕЛЕНИЕ N8645 ПАО СБЕРБАНК
+                  <span className="font-medium text-gray-900 italic">
+                    (указать после открытия счёта)
                   </span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="flex flex-col">
-                    <span className="text-gray-500">БИК</span>
-                    <span className="font-mono font-medium text-gray-900">
-                      044442607
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-gray-500">Корсчёт</span>
-                    <span className="font-mono font-medium text-gray-900">
-                      30101810300000000607
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-gray-500">ИНН банка</span>
-                    <span className="font-mono font-medium text-gray-900">
-                      7707083893
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-gray-500">КПП банка</span>
-                    <span className="font-mono font-medium text-gray-900">
-                      410132026
-                    </span>
-                  </div>
-                </div>
+              </div>
+            </section>
+
+            {/* Legal address */}
+            <section>
+              <h2 className="text-xs font-bold uppercase tracking-wider text-amber-700 mb-3">
+                Адрес
+              </h2>
+              <div className="bg-amber-50/50 rounded-xl p-5 space-y-2 text-sm">
+                <p className="font-medium text-gray-900">
+                  Գյունյակ / Город Ереван
+                </p>
+                <p className="text-gray-600">
+                  Котайкская обл., Наири, г. Егвард, ул. Арапня, д. 2
+                </p>
               </div>
             </section>
 
@@ -110,11 +112,18 @@ export default function RequisitesPage() {
               </h2>
               <div className="flex flex-col gap-2 text-sm">
                 <a
-                  href="mailto:info@hayhome.am"
+                  href="tel:+37477712268"
+                  className="inline-flex items-center gap-2 text-gray-700 hover:text-amber-700 transition-colors"
+                >
+                  <span className="text-gray-400">📱</span>
+                  <span className="font-medium">+374 77-712-268</span>
+                </a>
+                <a
+                  href="mailto:oooplus.ru@yandex.ru"
                   className="inline-flex items-center gap-2 text-gray-700 hover:text-amber-700 transition-colors"
                 >
                   <span className="text-gray-400">✉️</span>
-                  <span className="font-medium">info@hayhome.am</span>
+                  <span className="font-medium">oooplus.ru@yandex.ru</span>
                 </a>
                 <a
                   href="https://hay-home.com"
@@ -129,7 +138,7 @@ export default function RequisitesPage() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          © 2025 HayHome — ИП САРГСЯН РЕВИК СЕРГЕЕВИЧ
+          © 2026 HayHome — ИП Саргсян Ревик Сергеевич
         </p>
       </main>
     </div>

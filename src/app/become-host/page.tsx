@@ -22,18 +22,73 @@ interface AiState { loading: boolean; original: string | null; }
 
 export default function BecomeHostPage() {
   const router = useRouter();
-  const { tr } = useLang();
+  const { tr, lang } = useLang();
   const b = tr.become;
   const steps = [b.step0, b.step1, b.step2, b.step3];
 
+  const [langWarning, setLangWarning] = useState("");
+
+  // Language scripts for detection
+  const langScripts: Record<string, RegExp> = {
+    ru: /[а-яА-ЯёЁ]/,
+    en: /[a-zA-Z]/,
+    hy: /[ա-ֆԱ-Ֆ]/,
+    fr: /[àâçéèêëîïôùûüÿœæÀÂÇÉÈÊËÎÏÔÙÛÜŸŒÆ]/,
+    de: /[äöüßÄÖÜ]/,
+    es: /[ñ¿¡áéíóúÁÉÍÓÚ]/,
+    it: /[àèéìòùÀÈÉÌÒÙ]/,
+    ar: /[\u0600-\u06FF]/,
+    zh: /[\u4e00-\u9fff]/,
+    fa: /[\u0600-\u06FF\uFB8A\u067E\u0686\u06AF]/,
+  };
+
+  // Map which input languages are expected for each UI language
+  const expectedScripts: Record<string, string[]> = {
+    ru: ["ru"],
+    en: ["en"],
+    hy: ["hy"],
+    fr: ["fr"],
+    de: ["de"],
+    es: ["es"],
+    it: ["it"],
+    ar: ["ar"],
+    zh: ["zh"],
+    fa: ["fa"],
+  };
+
+  const checkLanguage = (text: string): string => {
+    if (!text || text.length < 3) return "";
+    const allowed = expectedScripts[lang] || ["en"];
+    // Check for disallowed scripts
+    for (const [script, regex] of Object.entries(langScripts)) {
+      if (regex.test(text) && !allowed.includes(script)) {
+        const scriptNames: Record<string, string> = {
+          ru: "русский", en: "английский", hy: "армянский",
+          fr: "французский", de: "немецкий", es: "испанский",
+          it: "итальянский", ar: "арабский", zh: "китайский", fa: "персидский",
+        };
+        const langNames: Record<string, string> = {
+          ru: "русском", en: "английском", hy: "армянском",
+          fr: "французском", de: "немецком", es: "испанском",
+          it: "итальянском", ar: "арабском", zh: "китайском", fa: "персидском",
+        };
+        return `⚠️ Обнаружен ${scriptNames[script]} текст. Пожалуйста, заполняйте форму на ${langNames[lang]} языке.`;
+      }
+    }
+    return "";
+  };
+
   const [step, setStep] = useState(0);
+  const goToStep = (n: number) => { setStep(n); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [aiDesc, setAiDesc] = useState<AiState>({ loading: false, original: null });
   const [aiLong, setAiLong] = useState<AiState>({ loading: false, original: null });
 
   const [form, setForm] = useState({
-    familyName: "", name: "", phone: "", email: "",
+    familyName: "", name: "", patronymic: "", phone: "", email: "",
+    passportSeries: "", passportNumber: "", passportDate: "", passportIssued: "",
+    inn: "", bankAccount: "", bankName: "",
     city: "", region: "", location: "",
     pricePerNight: 30, maxGuests: 2, availableRooms: 1,
     description: "", longDescription: "",
@@ -44,7 +99,18 @@ export default function BecomeHostPage() {
   const [customExp, setCustomExp] = useState("");
   const [customAmenity, setCustomAmenity] = useState("");
 
-  const set = (field: string, value: unknown) => setForm(f => ({ ...f, [field]: value }));
+  const set = (field: string, value: unknown) => {
+    setForm(f => ({ ...f, [field]: value }));
+    // Check language for text fields
+    const textFields = ["familyName", "name", "patronymic", "location", "city", "description", "longDescription", "passportIssued"];
+  const numericFields = ["passportSeries", "passportNumber", "inn", "bankAccount", "phone", "pricePerNight", "maxGuests", "availableRooms"];
+  if (textFields.includes(field) && typeof value === "string") {
+    setLangWarning(checkLanguage(value));
+  }
+  if (numericFields.includes(field) && typeof value === "string" && /[а-яА-ЯёЁա-ֆԱ-Ֆa-zA-Z]/.test(value.replace(/[\s\-\/]/g, ''))) {
+    setLangWarning("⚠️ В этом поле можно вводить только цифры");
+  }
+  };
   const toggle = (field: "amenities" | "experiences" | "languages", val: string) =>
     setForm(f => ({ ...f, [field]: f[field].includes(val) ? f[field].filter(x => x !== val) : [...f[field], val] }));
 
@@ -97,10 +163,10 @@ export default function BecomeHostPage() {
     try {
       const res = await fetch("/api/hosts", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, stars: 1, photos: [], coverPhoto: "" }),
+        body: JSON.stringify({ ...form, stars: 1, photos: [], coverPhoto: "", lang }),
       });
       if (!res.ok) throw new Error();
-      setStep(4);
+      goToStep(4);
     } catch { setError(tr.common.error); }
     finally { setLoading(false); }
   };
@@ -139,9 +205,37 @@ export default function BecomeHostPage() {
               {[
                 { label: b.familyName, field: "familyName", placeholder: "Семья Арутюнян" },
                 { label: b.yourName, field: "name", placeholder: "Арутюн Арутюнян" },
+                { label: b.patronymic, field: "patronymic", placeholder: "Арутюнович" },
                 { label: b.phone, field: "phone", placeholder: "+374 91 ..." },
                 { label: b.email, field: "email", placeholder: "family@example.com", type: "email" },
-              ].map(f => (
+              ].map((f: any) => (
+                <div key={f.field}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">{f.label} *</label>
+                  <input type={f.type || "text"} value={(form as any)[f.field]} onChange={e => set(f.field, e.target.value)}
+                    placeholder={f.placeholder} className={inputCls} />
+                </div>
+              ))}
+              <hr className="my-4 border-gray-200" />
+              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-3">{b.passportTitle}</p>
+              {[
+                { label: b.passportSeries, field: "passportSeries", placeholder: "AN" },
+                { label: b.passportNumber, field: "passportNumber", placeholder: "123456" },
+                { label: b.passportDate, field: "passportDate", placeholder: "15.05.2010", type: "date" },
+                { label: b.passportIssued, field: "passportIssued", placeholder: "Մեծի Երևանի ..." },
+                { label: b.inn, field: "inn", placeholder: "20336085" },
+              ].map((f: any) => (
+                <div key={f.field}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">{f.label} *</label>
+                  <input type={f.type || "text"} value={(form as any)[f.field]} onChange={e => set(f.field, e.target.value)}
+                    placeholder={f.placeholder} className={inputCls} />
+                </div>
+              ))}
+              <hr className="my-4 border-gray-200" />
+              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-3">{b.bankTitle}</p>
+              {[
+                { label: b.bankAccount, field: "bankAccount", placeholder: "1234 5678 9012 3456" },
+                { label: b.bankName, field: "bankName", placeholder: "Ամերիաբանկ / Ameriabank" },
+              ].map((f: any) => (
                 <div key={f.field}>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">{f.label} *</label>
                   <input type={f.type || "text"} value={(form as any)[f.field]} onChange={e => set(f.field, e.target.value)}
@@ -335,13 +429,19 @@ export default function BecomeHostPage() {
           {error && <p className="text-red-600 text-sm mt-4">{error}</p>}
 
           {step < 4 && (
+            <>
+            {langWarning && (
+              <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+                {langWarning}
+              </div>
+            )}
             <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
-              <button onClick={() => setStep(s => s - 1)} disabled={step === 0}
+              <button onClick={() => goToStep(step - 1)} disabled={step === 0}
                 className="flex items-center gap-1 px-4 py-2 text-gray-600 font-medium disabled:opacity-30 hover:text-gray-900 transition-colors">
                 <ChevronLeft size={18} /> {b.back}
               </button>
               {step < 3 ? (
-                <button onClick={() => setStep(s => s + 1)}
+                <button onClick={() => goToStep(step + 1)}
                   className="flex items-center gap-1 px-6 py-3 rounded-full text-white font-semibold hover:opacity-90 transition"
                   style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
                   {b.next} <ChevronRight size={18} />
@@ -354,6 +454,7 @@ export default function BecomeHostPage() {
                 </button>
               )}
             </div>
+            </>
           )}
         </div>
       </div>

@@ -288,9 +288,9 @@ function CompareContent() {
               </div>
               <button
                 onClick={() => removeHost(h.id)}
-                className="w-7 h-7 rounded-full bg-red-50 hover:bg-red-100 flex items-center justify-center text-red-600"
+                className="relative z-10 w-8 h-8 -m-1 rounded-full bg-red-50 hover:bg-red-100 active:bg-red-200 flex items-center justify-center text-red-600 flex-shrink-0"
               >
-                <X size={14} />
+                <X size={16} />
               </button>
             </div>
 

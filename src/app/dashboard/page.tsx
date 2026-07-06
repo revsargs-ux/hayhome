@@ -383,6 +383,16 @@ export default function DashboardPage() {
               )}
             </div>
 
+            {/* Contract download */}
+            <div className="mt-4">
+              <a href={`/contract/print?hostId=${myProfile.id}`}
+                target="_blank"
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm font-medium text-white rounded-xl transition"
+                style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
+                📄 Скачать договор о сотрудничестве
+              </a>
+            </div>
+
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="p-3 bg-gray-50 rounded-xl">

@@ -42,6 +42,24 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
   const { lang } = useLang();
   const u = getUI(lang);
   const isRu = lang === "ru";
+  const L = (ru: string, en: string, hy: string, fr: string, de: string, es: string, it: string, ar: string, zh: string, fa: string) =>
+    ({ ru, en, hy, fr, de, es, it, ar, zh, fa })[lang] || en;
+  const notFound = L("Запрос не найден", "Request not found", "Հայցը չի գտնվել", "Demande introuvable", "Anfrage nicht gefunden", "Solicitud no encontrada", "Richiesta non trovata", "الطلب غير موجود", "请求未找到", "درخواست یافت نشد");
+  const back = L("Назад", "Back", "Հետ", "Retour", "Zurück", "Volver", "Indietro", "رجوع", "返回", "بازگشت");
+  const allRequests = L("Все запросы", "All Requests", "Բոլոր հայցերը", "Toutes les demandes", "Alle Anfragen", "Todas las solicitudes", "Tutte le richieste", "جميع الطلبات", "所有请求", "همه درخواست‌ها");
+  const statusOpen = L("Открыт", "Open", "Բաց", "Ouvert", "Offen", "Abierto", "Aperto", "مفتوح", "开放", "باز");
+  const guests = L("гостей", "guests", "հյուր", "invités", "Gäste", "huéspedes", "ospiti", "ضيوف", "位客人", "مهمان");
+  const mightLike = L("🎯 Вам может подойти", "🎯 You might like", "🎯 Ձեզ կարելի է", "🎯 Cela pourrait vous intéresser", "🎯 Das könnte Ihnen gefallen", "🎯 Te podría gustar", "🎯 Potrebbe piacerti", "🎯 قد يناسبك", "🎯 您可能感兴趣", "🎯 ممکن است برایتان جالب باشد");
+  const night = L("ночь", "night", "գիշեր", "nuit", "Nacht", "noche", "notte", "ليلة", "晚", "شب");
+  const responses = L("Отклики", "Responses", "Արձագանքներ", "Réponses", "Antworten", "Respuestas", "Risposte", "الردود", "回复", "پاسخ‌ها");
+  const respond = L("Откликнуться", "Respond", "Արձագանցել", "Répondre", "Antworten", "Responder", "Rispondere", "الرد", "回复", "پاسخ دادن");
+  const message = L("Сообщение", "Message", "Հաղորդագրություն", "Message", "Nachricht", "Mensaje", "Messaggio", "رسالة", "消息", "پیام");
+  const msgPh = L("Расскажите что можете предложить...", "Describe what you can offer...", "Նկարագրեք ինչ կարող եք առաջարկել...", "Décrivez ce que vous pouvez offrir...", "Beschreiben Sie was Sie anbieten können...", "Describa lo que puede ofrecer...", "Descrivi cosa puoi offrire...", "صف ما يمكنك تقديمه...", "描述您可以提供的服务...", "توضیح دهید چه میتوانید پیشنهاد دهید...");
+  const priceOpt = L("Цена (опционально)", "Price (optional)", "Գին (ընտրանքային)", "Prix (facultatif)", "Preis (optional)", "Precio (opcional)", "Prezzo (opzionale)", "السعر (اختياري)", "价格（可选）", "قیمت (اختیاری)");
+  const pricePh = L("Напр: $50/ночь", "E.g.: $50/night", "Օրինակ՝ $50/գիշեր", "Ex: $50/nuit", "Z.B.: $50/Nacht", "Ej: $50/noche", "Es: $50/notte", "مثال: $50/ليلة", "例如: $50/晚", "مثال: $50/شب");
+  const sending = L("Отправка...", "Sending...", "Ուղարկում...", "Envoi en cours...", "Wird gesendet...", "Enviando...", "Invio in corso...", "جاري الإرسال...", "发送中...", "در حال ارسال...");
+  const send = L("Отправить", "Send", "Ուղարկել", "Envoyer", "Senden", "Enviar", "Invia", "إرسال", "发送", "ارسال");
+  const noResponses = L("Пока нет откликов", "No responses yet", "Առանձնացած արձագանքներ չկան", "Aucune réponse", "Noch keine Antworten", "Sin respuestas", "Nessuna risposta", "لا توجد ردود", "暂无回复", "هنوز پاسخی نیست");
 
   const [request, setRequest] = useState<GuestRequest | null>(null);
   const [loading, setLoading] = useState(true);
@@ -106,9 +124,9 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-400 text-lg">{isRu ? "Запрос не найден" : "Request not found"}</p>
+          <p className="text-gray-400 text-lg">{notFound}</p>
           <Link href="/requests" className="text-red-600 text-sm mt-2 inline-block">
-            ← {isRu ? "Назад" : "Back"}
+            ← {back}
           </Link>
         </div>
       </div>
@@ -119,7 +137,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-6">
         <Link href="/requests" className="text-sm text-gray-500 hover:text-gray-700">
-          ← {isRu ? "Все запросы" : "All Requests"}
+          ← {allRequests}
         </Link>
 
         {/* Request card */}
@@ -130,7 +148,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
               className="text-xs px-3 py-1 rounded-full text-white flex-shrink-0"
               style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
             >
-              {request.status === "open" ? (isRu ? "Открыт" : "Open") : request.status}
+              {request.status === "open" ? statusOpen : request.status}
             </span>
           </div>
 
@@ -147,7 +165,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
             )}
             {request.guests_count > 0 && (
               <span className="flex items-center gap-1">
-                <Users size={14} /> {request.guests_count} {isRu ? "гостей" : "guests"}
+                <Users size={14} /> {request.guests_count} {guests}
               </span>
             )}
             {request.date_from && (
@@ -166,7 +184,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
         {recommendations && (recommendations.services?.length > 0 || recommendations.hosts?.length > 0) && (
           <div className="mb-6">
             <h2 className="text-lg font-bold text-gray-900 mb-3">
-              {isRu ? "🎯 Вам может подойти" : "🎯 You might like"}
+              {mightLike}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {recommendations.services?.map((s) => (
@@ -186,7 +204,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                     </div>
                     <div className="min-w-0">
                       <h4 className="font-semibold text-gray-900 text-sm truncate">{h.familyName}</h4>
-                      <p className="text-sm font-bold text-red-600">${h.pricePerNight}<span className="text-xs text-gray-400 font-normal">/{isRu ? "ночь" : "night"}</span></p>
+                      <p className="text-sm font-bold text-red-600">${h.pricePerNight}<span className="text-xs text-gray-400 font-normal">/{night}</span></p>
                     </div>
                   </div>
                 </Link>
@@ -198,7 +216,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
         {/* Responses */}
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-gray-900">
-            {isRu ? "Отклики" : "Responses"}
+            {responses}
             {request.responses && request.responses.length > 0 && (
               <span className="text-gray-400 font-normal ml-1">({request.responses.length})</span>
             )}
@@ -208,7 +226,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
             className="px-4 py-2 rounded-full text-white text-sm font-medium"
             style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
           >
-            {isRu ? "Откликнуться" : "Respond"}
+            {respond}
           </button>
         </div>
 
@@ -217,26 +235,26 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
           <form onSubmit={handleRespond} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4 space-y-3">
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">
-                {isRu ? "Сообщение" : "Message"} *
+                {message} *
               </label>
               <textarea
                 required
                 rows={3}
                 value={responseText}
                 onChange={(e) => setResponseText(e.target.value)}
-                placeholder={isRu ? "Расскажите что можете предложить..." : "Describe what you can offer..."}
+                placeholder={msgPh}
                 className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400 resize-y"
               />
             </div>
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">
-                {isRu ? "Цена (опционально)" : "Price (optional)"}
+                {priceOpt}
               </label>
               <input
                 type="text"
                 value={responsePrice}
                 onChange={(e) => setResponsePrice(e.target.value)}
-                placeholder={isRu ? "Напр: $50/ночь" : "E.g.: $50/night"}
+                placeholder={pricePh}
                 className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400"
               />
             </div>
@@ -246,7 +264,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
               className="w-full py-2.5 rounded-xl text-white font-medium text-sm disabled:opacity-50"
               style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
             >
-              {submitting ? (isRu ? "Отправка..." : "Sending...") : (isRu ? "Отправить" : "Send")}
+              {submitting ? sending : send}
             </button>
           </form>
         )}
@@ -268,7 +286,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
           </div>
         ) : (
           <p className="text-gray-400 text-sm text-center py-6">
-            {isRu ? "Пока нет откликов" : "No responses yet"}
+            {noResponses}
           </p>
         )}
       </div>

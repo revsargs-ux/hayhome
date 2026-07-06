@@ -17,6 +17,9 @@ const REGIONS_LIST = ["Ереван", "Тавуш", "Ширак", "Арарат"
 function HostsContent() {
   const { tr, lang } = useLang();
   const isRu = lang === "ru";
+  const priceRange = { ru: "Диапазон цен", en: "Price range", hy: "Գների միջակայք", fr: "Fourchette de prix", de: "Preisspanne", es: "Rango de precios", it: "Fascia di prezzo", ar: "نطاق السعر", zh: "价格范围", fa: "محدوده قیمت" }[lang] || "Price range";
+  const fromLabel = { ru: "От", en: "From", hy: "Ից", fr: "De", de: "Von", es: "Desde", it: "Da", ar: "من", zh: "从", fa: "از" }[lang] || "From";
+  const toLabel = { ru: "До", en: "To", hy: "Մինչև", fr: "À", de: "Bis", es: "Hasta", it: "A", ar: "إلى", zh: "到", fa: "تا" }[lang] || "To";
   const h = tr.hosts;
   const u = getUI(lang);
   const searchParams = useSearchParams();
@@ -134,7 +137,7 @@ function HostsContent() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
-                  {isRu ? "Диапазон цен" : "Price range"}: ${minPrice} — ${maxPrice}/night
+                  {priceRange}: ${minPrice} — ${maxPrice}/night
                 </label>
                 <div className="flex items-center gap-2">
                   <input type="range" min={0} max={200} step={5} value={minPrice}
@@ -212,18 +215,18 @@ function HostsContent() {
           <div>
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-gray-700">{isRu ? "Диапазон цен" : "Price range"}</span>
+                <span className="text-sm font-semibold text-gray-700">{priceRange}</span>
                 <span className="text-sm font-bold text-red-600">${minPrice} — ${maxPrice}</span>
               </div>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">{isRu ? "От" : "From"}</label>
+                  <label className="block text-xs text-gray-500 mb-1">{fromLabel}</label>
                   <input type="range" min={0} max={200} step={5} value={minPrice}
                     onChange={(e) => setMinPrice(Math.min(Number(e.target.value), maxPrice - 5))}
                     className="w-full accent-red-600" />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">{isRu ? "До" : "To"}</label>
+                  <label className="block text-xs text-gray-500 mb-1">{toLabel}</label>
                   <input type="range" min={0} max={200} step={5} value={maxPrice}
                     onChange={(e) => setMaxPrice(Math.max(Number(e.target.value), minPrice + 5))}
                     className="w-full accent-red-600" />

@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
   const hostData = {
     name: stripHtml(String(body.name)).slice(0, 100),
     familyName: stripHtml(String(body.familyName)).slice(0, 200),
+    patronymic: sanitize(body.patronymic, 100),
     location: sanitize(body.location, 300),
     city: String(body.city).slice(0, 100),
     region: String(body.region).slice(0, 100),
@@ -69,6 +70,14 @@ export async function POST(req: NextRequest) {
     experiences: Array.isArray(body.experiences) ? body.experiences.slice(0, 30) : [],
     maxGuests: typeof body.maxGuests === "number" ? Math.min(body.maxGuests, 50) : 1,
     availableRooms: typeof body.availableRooms === "number" ? Math.min(body.availableRooms, 20) : 1,
+    passportSeries: sanitize(body.passportSeries, 20),
+    passportNumber: sanitize(body.passportNumber, 30),
+    passportDate: sanitize(body.passportDate, 20),
+    passportIssued: sanitize(body.passportIssued, 200),
+    inn: sanitize(body.inn, 20),
+    bankAccount: sanitize(body.bankAccount, 50),
+    bankName: sanitize(body.bankName, 100),
+    lang: String(body.lang || "en").slice(0, 5),
     phone: String(body.phone).slice(0, 50),
     email: String(body.email).slice(0, 255),
   };
@@ -86,6 +95,17 @@ export async function POST(req: NextRequest) {
     pricePerNight: hostData.pricePerNight,
     description: hostData.description,
   }).catch((err) => console.error("[Email] Host application notification failed:", err));
+
+  // Send contract email (async, non-blocking)
+  import("@/lib/notify").then(({ sendContractEmail }) => {
+    sendContractEmail({
+      hostId: host.id,
+      familyName: hostData.familyName,
+      name: hostData.name,
+      email: hostData.email,
+      lang: String(body.lang || "en").slice(0, 5),
+    }).catch((err) => console.error("[Email] Contract email failed:", err));
+  });
 
   // Log to application history
   try {
