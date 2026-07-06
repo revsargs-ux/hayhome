@@ -24,11 +24,14 @@ interface AddressAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  className?: string;
+  lang?: string;
+  type?: "city" | "address";
   onSelect?: (result: NominatimResult) => void;
   onCityDetected?: (city: string, region: string, country: string) => void;
 }
 
-export default function AddressAutocomplete({ value, onChange, placeholder, onSelect, onCityDetected }: AddressAutocompleteProps) {
+export default function AddressAutocomplete({ value, onChange, placeholder, className, lang, type = "address", onSelect, onCityDetected }: AddressAutocompleteProps) {
   const [query, setQuery] = useState(value);
   const [results, setResults] = useState<NominatimResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -52,10 +55,10 @@ export default function AddressAutocomplete({ value, onChange, placeholder, onSe
     debounceRef.current = setTimeout(async () => {
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&accept-language=ru,en,hy&addressdetails=1`,
-          { headers: { "Accept-Language": "ru,en,hy" } }
+          `/api/geocode/suggest?q=${encodeURIComponent(q)}&lang=${lang || "en"}&type=${type}`
         );
-        const data: NominatimResult[] = await res.json();
+        const json = await res.json() as { results: NominatimResult[] };
+        const data = json.results || [];
         setResults(data);
       } catch {
         setResults([]);
@@ -141,7 +144,7 @@ export default function AddressAutocomplete({ value, onChange, placeholder, onSe
           onChange={(e) => handleInput(e.target.value)}
           onFocus={() => { if (results.length > 0) setOpen(true); }}
           placeholder={placeholder || ""}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900"
+          className={className || "w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900"}
           autoComplete="off"
         />
         <button

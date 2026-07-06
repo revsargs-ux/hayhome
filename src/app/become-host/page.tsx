@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { Check, ChevronRight, ChevronLeft, Sparkles, RotateCcw, Loader2, Languages } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import { stripInvalidChars, stripNonPhone, scriptErrorMsg, phoneErrorMsg } from "@/lib/inputValidation";
+import AddressAutocomplete from "@/components/AddressAutocomplete";
+import BankAutocomplete from "@/components/BankAutocomplete";
 
 const AMENITIES = [
   "Wi-Fi", "Отдельная комната", "Завтрак", "Ужин", "Полное питание",
@@ -42,10 +44,13 @@ export default function BecomeHostPage() {
   const [aiDesc, setAiDesc] = useState<AiState>({ loading: false, original: null });
   const [aiLong, setAiLong] = useState<AiState>({ loading: false, original: null });
 
+  const [binLoading, setBinLoading] = useState(false);
+  const binTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [form, setForm] = useState({
     familyName: "", name: "", patronymic: "", phone: "", email: "",
     passportSeries: "", passportNumber: "", passportDate: "", passportIssued: "",
-    inn: "", bankAccount: "", bankName: "",
+    inn: "", bankAccount: "", bankBic: "", bankName: "",
     city: "", region: "", location: "",
     pricePerNight: 30, maxGuests: 2, availableRooms: 1,
     description: "", longDescription: "",
@@ -59,6 +64,21 @@ export default function BecomeHostPage() {
   const setField = useCallback((key: string, value: string) => {
     setForm(f => ({ ...f, [key]: value }));
   }, []);
+
+  const lookupBin = (raw: string) => {
+    const digits = raw.replace(/\D/g, "");
+    if (binTimer.current) clearTimeout(binTimer.current);
+    if (digits.length < 6) return;
+    binTimer.current = setTimeout(async () => {
+      setBinLoading(true);
+      try {
+        const res = await fetch(`/api/bank/bin?bin=${digits.slice(0, 8)}`);
+        if (!res.ok) return;
+        const d = await res.json() as { bank?: string; scheme?: string; country?: string };
+        if (d.bank) setForm(f => ({ ...f, bankName: f.bankName || d.bank! }));
+      } catch { /* ignore */ } finally { setBinLoading(false); }
+    }, 600);
+  };
 
   const set = (field: string, value: unknown) => {
     if (TEXT_FIELDS.includes(field) && typeof value === "string") {
@@ -229,18 +249,41 @@ export default function BecomeHostPage() {
               ))}
               <hr className="my-4 border-gray-200" />
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-3">{b.bankTitle}</p>
-              {[
-                { label: b.bankAccount, field: "bankAccount", placeholder: "1234 5678 9012 3456" },
-                { label: b.bankName, field: "bankName", placeholder: "Ամերիաբանկ / Ameriabank" },
-              ].map((f: any) => (
-                <div key={f.field}>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">{f.label} *</label>
-                  <input type={f.type || "text"} value={(form as any)[f.field]} onChange={e => set(f.field, e.target.value)}
-                    placeholder={f.placeholder}
-                    className={`${inputCls} ${fieldErrors[f.field] ? "border-amber-400 bg-amber-50" : ""}`} />
-                  {fieldErrors[f.field] && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors[f.field]}</p>}
+              {/* Card / account number — BIN auto-detection */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">{b.bankAccount} *</label>
+                <div className="relative">
+                  <input value={form.bankAccount}
+                    onChange={e => { set("bankAccount", e.target.value); lookupBin(e.target.value); }}
+                    placeholder="1234 5678 9012 3456 / IBAN"
+                    className={inputCls} />
+                  {binLoading && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <Loader2 size={15} className="animate-spin text-gray-400" />
+                    </div>
+                  )}
                 </div>
-              ))}
+              </div>
+              {/* BIC / SWIFT — autocomplete from local dataset */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">BIC / SWIFT</label>
+                <BankAutocomplete
+                  value={form.bankBic}
+                  onChange={v => setForm(f => ({ ...f, bankBic: v }))}
+                  onSelect={(bic, name) => setForm(f => ({ ...f, bankBic: bic, bankName: f.bankName || name }))}
+                  className={inputCls}
+                />
+                <p className="text-xs text-gray-400 mt-1">Введите BIC или название банка — мы подберём автоматически</p>
+              </div>
+              {/* Bank name — auto-filled from BIN or BIC, editable */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">{b.bankName} *</label>
+                <input value={form.bankName}
+                  onChange={e => set("bankName", e.target.value)}
+                  placeholder="Ameriabank"
+                  className={`${inputCls} ${fieldErrors.bankName ? "border-amber-400 bg-amber-50" : ""}`} />
+                {fieldErrors.bankName && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors.bankName}</p>}
+              </div>
             </div>
           )}
 
@@ -250,8 +293,13 @@ export default function BecomeHostPage() {
               <h2 className="text-xl font-bold text-gray-900 mb-6">{b.step1}</h2>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">{b.city} *</label>
-                <input value={form.city} onChange={e => set("city", e.target.value)} placeholder="Ереван"
-                  className={`${inputCls} ${fieldErrors.city ? "border-amber-400 bg-amber-50" : ""}`} />
+                <AddressAutocomplete
+                  value={form.city} lang={lang} type="city"
+                  onChange={v => set("city", v)}
+                  onCityDetected={(city, region) => setForm(f => ({ ...f, city, region: region || f.region }))}
+                  placeholder="Ереван"
+                  className={`${inputCls} ${fieldErrors.city ? "border-amber-400 bg-amber-50" : ""}`}
+                />
                 {fieldErrors.city && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors.city}</p>}
               </div>
               <div>
@@ -263,8 +311,12 @@ export default function BecomeHostPage() {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">{b.address}</label>
-                <input value={form.location} onChange={e => set("location", e.target.value)} placeholder="ул. Абовяна 12"
-                  className={`${inputCls} ${fieldErrors.location ? "border-amber-400 bg-amber-50" : ""}`} />
+                <AddressAutocomplete
+                  value={form.location} lang={lang} type="address"
+                  onChange={v => set("location", v)}
+                  placeholder="ул. Абовяна 12"
+                  className={`${inputCls} ${fieldErrors.location ? "border-amber-400 bg-amber-50" : ""}`}
+                />
                 {fieldErrors.location && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors.location}</p>}
               </div>
             </div>
