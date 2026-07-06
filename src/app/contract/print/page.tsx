@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Printer, Share2, MessageCircle } from "lucide-react";
@@ -15,18 +15,18 @@ function Ct(key: string, lang: string): string {
   const T: Record<string, Record<string, string>> = {
     title: { ru:"ДОГОВОР О СОТРУДНИЧЕСТВЕ", en:"COOPERATION AGREEMENT", hy:"ՀԱՄԱԳՈՐԾՈՒԹՅԱՆ ՊԱՅՏԱԳՐՈՒԹՅՈՒՆ", fr:"ACCORD DE COOPÉRATION", de:"KOOPERATIONSVERTRAG", es:"ACUERDO DE COOPERACIÓN", it:"ACCORDO DI COOPERAZIONE", ar:"عقد تعاون", zh:"合作协议", fa:"قرارداد همکاری" },
     subtitle: { ru:"по оказанию услуг приёма гостей в Армении", en:"on guest hospitality services in Armenia", hy:"հյուրերի ընդունելու ծառայություններ Հայաստանում", fr:"de services d'hospitalité en Arménie", de:"über Gastfreundschaftsdienste in Armenien", es:"sobre servicios de hospitalidad en Armenia", it:"sui servizi di ospitalità in Armenia", ar:"على خدمات الضيافة في أرمينيا", zh:"关于亚美尼亚的接待服务", fa:"درباره خدمات مهمانداری در ارمنستان" },
-    platform: { ru:"ИП Саркисян Ревик Сергеевич", en:"Individual Entrepreneur Sargisyan Revik Sergeevich", hy:"Սարգսյան Ռեվիկ Սերգեյի ԻԱ\Ԁ", fr:"Entrepreneur individuel Sargisyan Revik Sergeevich", de:"Einzelunternehmer Sargisyan Revik Sergeevich", es:"Empresario individual Sargisyan Revik Sergeevich", it:"Imprenditore individuale Sargisyan Revik Sergeevich", ar:"رجل أعمال فردي سارغيسيان ريفيك سيرجيفيتش", zh:"个体经营者 Sargisyan Revik Sergeevich", fa:"فرد کارآفرین Sargisyan Revik Sergeevich" },
+    platform: { ru:"ИП Саргсян Ревик Сергеевич", en:"Individual Entrepreneur Sargsyan Revik Sergeevich", hy:"Սարգսյան Ռեվիկ Սերգեյի ԻԱ\Ԁ", fr:"Entrepreneur individuel Sargsyan Revik Sergeevich", de:"Einzelunternehmer Sargsyan Revik Sergeevich", es:"Empresario individual Sargsyan Revik Sergeevich", it:"Imprenditore individuale Sargsyan Revik Sergeevich", ar:"رجل أعمال فردي سارغسيان ريفيك سيرجيفيتش", zh:"个体经营者 Sargsyan Revik Sergeevich", fa:"فرد کارآفرین Sargsyan Revik Sergeevich" },
     partyPlatform: { ru:"«Платформа»", en:"«Platform»", hy:"«հարթակ»", fr:"«Plateforme»", de:"«Plattform»", es:"«Plataforma»", it:"«Piattaforma»", ar:"«المنصة»", zh:"«平台»", fa:"«پلتفرم»" },
     partyPartner: { ru:"«Партнёр»", en:"«Partner»", hy:"«Գործընկեր»", fr:"«Partenaire»", de:"«Partner»", es:"«Socio»", it:"«Partner»", ar:"«الشريك»", zh:"«合作伙伴»", fa:"«شریک»" },
     actingAs: { ru:"действующий в качестве индивидуального предпринимателя", en:"acting as an individual entrepreneur", hy:"գործող որպես ձինված ձեռնարկային", fr:"agissant en tant qu'entrepreneur individuel", de:"handelnd als Einzelunternehmer", es:"actuando como empresario individual", it:"agendo come imprenditore individuale", ar:"كرجل أعمال فردي", zh:"以个体经营者身份", fa:"به عنوان کارآفرین فردی" },
     actingAsPerson: { ru:"действующий в качестве физического лица", en:"acting as an individual", hy:"գործող որպես ֆիզիկական անձ", fr:"agissant en tant que personne physique", de:"handelnd als natürliche Person", es:"actuando como persona física", it:"agendo come persona fisica", ar:"كشخص طبيعي", zh:"以个人身份", fa:"به عنوان شخص حقیقی" },
     together: { ru:"совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:", en:"hereinafter jointly referred to as the «Parties», have concluded this Agreement:", hy:"միաստակաբանված որպես «Կողմեր», կնքել են այս պայտագրությունը.", fr:"ci-après dénommés conjointement les «Parties», ont conclu le présent Accord:", de:"gemeinsam als «Vertragsparteien» bezeichnet, haben folgenden Vertrag geschlossen:", es:"en adelante denominados conjuntamente las «Partes», han concluido el presente Acuerdo:", it:"di seguito denominati congiuntamente le «Parti», hanno concluso il seguente Accordo:", ar:"المشار إليهما معاً بـ «الطرفان»، وافقا على هذا العقد:", zh:"以下简称为「双方」，订立本协议：", fa:"که در ادامه به صورت مشترک «طرفین» نامیده می‌شوند، این قرارداد را منعقد کرده‌اند:" },
     oneSide: { ru:"с одной стороны, и", en:"on the one hand, and", hy:"մի կողմից, և", fr:"d'une part, et", de:"einerseits, und", es:"por una parte, y", it:"da una parte, e", ar:"من جهة، و", zh:"一方，和", fa:"از یک طرف، و" },
-    s1_1: { ru:"Платформа предоставляет Партнёру доступ к онлайн-платформе HayHome (hay-home.com hay-home.com) для размещения информации об услугах приёма гостей.", en:"The Platform provides the Partner with access to the online platform HayHome (hay-home.com) for posting information about guest hospitality services.", hy:"հարթակը գործընկերուհին տրամադրում է HayHome (hay-home.com) օնլայն հարթակի հասանելիություն՝ հյուրերի ընդունելու ծառայությունների մասին տեղեկատվություն տեղադրելու համար.", fr:"La Plateforme fournit au Partenaire l'accès à la plateforme en ligne HayHome (hay-home.com) pour publier des informations sur les services d'hospitalité.", de:"Die Plattform gewährt dem Partner Zugang zur Online-Plattform HayHome (hay-home.com) zur Veröffentlichung von Informationen über Gastfreundschaftsdienste.", es:"La Plataforma proporciona al Socio acceso a la plataforma en línea HayHome (hay-home.com) para publicar información sobre servicios de hospitalidad.", it:"La Piattaforma fornisce al Partner l'accesso alla piattaforma online HayHome (hay-home.com) per pubblicare informazioni sui servizi di ospitalità.", ar:"توفر المنصة للشريك الوصول إلى منصة HayHome عبر الإنترنت لنشر معلومات عن خدمات الضيافة.", zh:"平台向合作伙伴提供在线平台HayHome (hay-home.com)的访问权限，用于发布接待服务信息。", fa:"پلتفرم به شریک دسترسی به پلتفرم آنلاین HayHome (hay-home.com) را برای انتشار اطلاعات خدمات مهمانداری ارائه می‌دهد." },
+    s1_1: { ru:"Платформа предоставляет Партнёру доступ к онлайн-платформе HayHome (hay-home.com) для размещения информации об услугах приёма гостей.", en:"The Platform provides the Partner with access to the online platform HayHome (hay-home.com) for posting information about guest hospitality services.", hy:"հարթակը գործընկերուհին տրամադրում է HayHome (hay-home.com) օնլայն հարթակի հասանելիություն՝ հյուրերի ընդունելու ծառայությունների մասին տեղեկատվություն տեղադրելու համար.", fr:"La Plateforme fournit au Partenaire l'accès à la plateforme en ligne HayHome (hay-home.com) pour publier des informations sur les services d'hospitalité.", de:"Die Plattform gewährt dem Partner Zugang zur Online-Plattform HayHome (hay-home.com) zur Veröffentlichung von Informationen über Gastfreundschaftsdienste.", es:"La Plataforma proporciona al Socio acceso a la plataforma en línea HayHome (hay-home.com) para publicar información sobre servicios de hospitalidad.", it:"La Piattaforma fornisce al Partner l'accesso alla piattaforma online HayHome (hay-home.com) per pubblicare informazioni sui servizi di ospitalità.", ar:"توفر المنصة للشريك الوصول إلى منصة HayHome عبر الإنترنت لنشر معلومات عن خدمات الضيافة.", zh:"平台向合作伙伴提供在线平台HayHome (hay-home.com)的访问权限，用于发布接待服务信息。", fa:"پلتفرم به شریک دسترسی به پلتفرم آنلاین HayHome (hay-home.com) را برای انتشار اطلاعات خدمات مهمانداری ارائه می‌دهد." },
     s1_2: { ru:"Партнёр обязуется предоставлять услуги приёма гостей на территории Республики Армения.", en:"The Partner undertakes to provide guest hospitality services on the territory of the Republic of Armenia.", hy:"Գործընկերը պարտավորվում է տրամադրել հյուրերի ընդունելու ծառայություններ Հայաստանի Հանրապետության տարածքում.", fr:"Le Partenaire s'engage à fournir des services d'hospitalité sur le territoire de la République d'Arménie.", de:"Der Partner verpflichtet sich, Gastfreundschaftsdienste auf dem Gebiet der Republik Armenien anzubieten.", es:"El Socio se compromete a proporcionar servicios de hospitalidad en el territorio de la República de Armenia.", it:"Il Partner si impegna a fornire servizi di ospitalità sul territorio della Repubblica di Armenia.", ar:"يلتزم الشريك بتقديم خدمات الضيافة على أراضي جمهورية أرمينيا.", zh:"合作伙伴承诺在亚美尼亚共和国境内提供接待服务。", fa:"شریک متعهد است خدمات مهمانداری را در قلمرو جمهوری ارمنستان ارائه دهد." },
     s1_3: { ru:"Платформа обеспечивает техническое сопровождение, продвижение и обработку бронирований.", en:"The Platform provides technical support, promotion and booking processing.", hy:"հարթակը ապահովում է տեխնիկական աջակցություն, խթանգնդում և ամրագրումների մշակում.", fr:"La Plateforme assure le support technique, la promotion et le traitement des réservations.", de:"Die Plattform bietet technische Unterstützung, Werbung und Buchungsverarbeitung.", es:"La Plataforma proporciona soporte técnico, promoción y procesamiento de reservas.", it:"La Piattaforma fornisce supporto tecnico, promozione e elaborazione delle prenotazioni.", ar:"توفر المنصة الدعم الفني والترويج ومعالجة الحجوزات.", zh:"平台提供技术支持、推广和预订处理。", fa:"پلتفرم پشتیبانی فنی، تبلیغات و پردازش رزرو را فراهم می‌کند." },
     s2_1: { ru:"Предоставить Партнёру доступ к личному кабинету на платформе.", en:"Provide the Partner with access to the personal account on the platform.", hy:"Տրամադրել գործընկերուհին հասանելիություն անձնական հաշվին հարթակում.", fr:"Fournir au Partenaire l'accès au compte personnel sur la plateforme.", de:"Dem Partner Zugang zum persönlichen Konto auf der Plattform gewähren.", es:"Proporcionar al Socio acceso a la cuenta personal en la plataforma.", it:"Fornire al Partner l'accesso all'account personale sulla piattaforma.", ar:"توفير للشريك الوصول إلى الحساب الشخصي على المنصة.", zh:"向合作伙伴提供平台上个人账户的访问权限。", fa:"به شریک دسترسی به حساب شخصی در پلتفرم را ارائه دهد." },
-    s2_2: { ru:"Обеспечивать техническую работоспособность платформы hay-home.com hay-home.com.", en:"Ensure the technical operability of the platform hay-home.com.", hy:"Ապահովել hay-home.com հարթակի տեխնիկական աշխատանքը.", fr:"Assurer le fonctionnement technique de la plateforme hay-home.com.", de:"Die technische Funktionsfähigkeit der Plattform hay-home.com sicherstellen.", es:"Garantizar el funcionamiento técnico de la plataforma hay-home.com.", it:"Garantire il funzionamento tecnico della piattaforma hay-home.com.", ar:"ضمان التشغيل الفني لمنصة hay-home.com.", zh:"确保平台hay-home.com的技术运行。", fa:"عملکرد فنی پلتفرم hay-home.com را تضمین کند." },
+    s2_2: { ru:"Обеспечивать техническую работоспособность платформы hay-home.com.", en:"Ensure the technical operability of the platform hay-home.com.", hy:"Ապահովել hay-home.com հարթակի տեխնիկական աշխատանքը.", fr:"Assurer le fonctionnement technique de la plateforme hay-home.com.", de:"Die technische Funktionsfähigkeit der Plattform hay-home.com sicherstellen.", es:"Garantizar el funcionamiento técnico de la plataforma hay-home.com.", it:"Garantire il funzionamento tecnico della piattaforma hay-home.com.", ar:"ضمان التشغيل الفني لمنصة hay-home.com.", zh:"确保平台hay-home.com的技术运行。", fa:"عملکرد فنی پلتفرم hay-home.com را تضمین کند." },
     s2_3: { ru:"Осуществлять продвижение платформы и услуг Партнёра.", en:"Promote the platform and the Partner's services.", hy:"Կատարել հարթակի և գործընկերուհի ծառայությունների խթանգնդումը.", fr:"Promouvoir la plateforme et les services du Partenaire.", de:"Die Plattform und die Dienste des Partners bewerben.", es:"Promocionar la plataforma y los servicios del Socio.", it:"Promuovere la piattaforma e i servizi del Partner.", ar:"الترويج للمنصة وخدمات الشريك.", zh:"推广平台及合作伙伴的服务。", fa:"تبلیغ پلتفرم و خدمات شریک." },
     s2_4: { ru:"Обрабатывать и передавать Партнёру информацию о бронированиях.", en:"Process and forward booking information to the Partner.", hy:"Մշակել և փոխանցել գործընկերուհին ամրագրման տեղեկատվությունը.", fr:"Traiter et transmettre les informations de réservation au Partenaire.", de:"Buchungsinformationen verarbeiten und an den Partner weiterleiten.", es:"Procesar y transmitir al Socio la información de reservas.", it:"Elaborare e inoltrare le informazioni di prenotazione al Partner.", ar:"معالجة وإرسال معلومات الحجوزات إلى الشريك.", zh:"处理并向合作伙伴转达预订信息。", fa:"پردازش و ارسال اطلاعات رزرو به شریک." },
     s2_5: { ru:"Производить выплаты Партнёру в размере 84% от суммы каждого бронирования.", en:"Pay the Partner 84% of each booking amount.", hy:"Վճարել գործընկերուհին յուրաքանչյուր ամրագրման գումարի 84%-ը.", fr:"Payer au Partenaire 84% du montant de chaque réservation.", de:"Dem Partner 84% jedes Buchungsbetrages auszahlen.", es:"Pagar al Socio el 84% del monto de cada reserva.", it:"Pagare al Partner il 84% dell'importo di ogni prenotazione.", ar:"دفع للشريك 84% من مبلغ كل حجز.", zh:"向合作伙伴支付每笔预订金额的84%。", fa:"به شریک 84% مبلغ هر رزرو را پرداخت کند." },
@@ -71,6 +71,26 @@ function Ct(key: string, lang: string): string {
     emailLabel: { ru:"Email", en:"Email", hy:"Էլ. փոստ", fr:"Email", de:"E-Mail", es:"Email", it:"Email", ar:"البريد", zh:"邮箱", fa:"ایمیل" },
     website: { ru:"Сайт", en:"Website", hy:"Կայք", fr:"Site", de:"Website", es:"Sitio", it:"Sito", ar:"الموقع", zh:"网站", fa:"وب‌سایت" },
     account: { ru:"Счёт", en:"Account", hy:"Հաշվեիվ", fr:"Compte", de:"Konto", es:"Cuenta", it:"Conto", ar:"حساب", zh:"账号", fa:"حساب" },
+    bank: { ru:"Банк", en:"Bank", hy:"Բank", fr:"Banque", de:"Bank", es:"Banco", it:"Banca", ar:"البنك", zh:"银行", fa:"بانک" },
+    h1: { ru:"ПРЕДМЕТ ДОГОВОРА", en:"SUBJECT OF AGREEMENT", hy:"PAYMANAGRUTYAN ARDYUNQ", fr:"OBJET DU CONTRAT", de:"VERTRAGSGEGENSTAND", es:"OBJETO DEL CONTRATO", it:"OGGETTO DEL CONTRATTO", ar:"موضوع العقد", zh:"合同标的", fa:"موضوع قرارداد" },
+    h2: { ru:"ПРАВА И ОБЯЗАННОСТИ ПЛАТФОРМЫ", en:"RIGHTS AND OBLIGATIONS OF THE PLATFORM", fr:"DROITS ET OBLIGATIONS DE LA PLATEFORME", de:"RECHTE UND PFLICHTEN DER PLATTFORM", es:"DERECHOS Y OBLIGACIONES DE LA PLATAFORMA", it:"DIRITTI E OBBLIGHI DELLA PIATTAFORMA", ar:"حقوق والتزامات المنصة", zh:"平台的权利和义务", fa:"حقوق و تکالیف پلتفرم", hy:"HARTAKI IRAVUNQNER" },
+    h3: { ru:"ПРАВА И ОБЯЗАННОСТИ ПАРТНЁРА", en:"RIGHTS AND OBLIGATIONS OF THE PARTNER", fr:"DROITS ET OBLIGATIONS DU PARTENAIRE", de:"RECHTE UND PFLICHTEN DES PARTNERS", es:"DERECHOS Y OBLIGACIONES DEL SOCIO", it:"DIRITTI E OBBLIGHI DEL PARTNER", ar:"حقوق والتزامات الشريك", zh:"合作伙伴的权利和义务", fa:"حقوق و تکالیف شریک", hy:"GORCHENKERI IRAVUNQNER" },
+    h4: { ru:"ФИНАНСОВЫЕ УСЛОВИЯ", en:"FINANCIAL TERMS", fr:"CONDITIONS FINANCIÈRES", de:"FINANZIELLE BEDINGUNGEN", es:"CONDICIONES FINANCIERAS", it:"CONDIZIONI FINANZIARIE", ar:"الشروط المالية", zh:"财务条款", fa:"شرایط مالی", hy:"FINANSAKAN PAYMANANNER" },
+    h5: { ru:"ОТВЕТСТВЕННОСТЬ СТОРОН", en:"LIABILITY OF THE PARTIES", fr:"RESPONSABILITÉ DES PARTIES", de:"HAFTUNG DER PARTEIEN", es:"RESPONSABILIDAD DE LAS PARTES", it:"RESPONSABILITÀ DELLE PARTI", ar:"مسؤولية الأطراف", zh:"各方责任", fa:"مسئولیت طرفین", hy:"KOLMERI PATASKHANATVOTYUN" },
+    h6: { ru:"СРОК ДЕЙСТВИЯ ДОГОВОРА", en:"TERM OF AGREEMENT", fr:"DURÉE DU CONTRAT", de:"LAUFZEIT DES VERTRAGES", es:"VIGENCIA DEL CONTRATO", it:"DURATA DEL CONTRATTO", ar:"مدة العقد", zh:"合同期限", fa:"مدت قرارداد", hy:"PAYMANAGRUTYAN JADKROGHUTYUN" },
+    h7: { ru:"КОНФИДЕНЦИАЛЬНОСТЬ", en:"CONFIDENTIALITY", fr:"CONFIDENTIALITÉ", de:"VERTRAULICHKEIT", es:"CONFIDENCIALIDAD", it:"RISERVATEZZA", ar:"السرية", zh:"保密条款", fa:"محرمانگی", hy:"GAXTNAPAT PAHELU" },
+    h8: { ru:"ФОРС-МАЖОР", en:"FORCE MAJEURE", fr:"FORCE MAJEURE", de:"HÖHERE GEWALT", es:"FUERZA MAYOR", it:"FORZA MAGGIORE", ar:"القوة القاهرة", zh:"不可抗力", fa:"فورس ماژور", hy:"ANPRELIT HANKAMANNER" },
+    h9: { ru:"РАЗРЕШЕНИЕ СПОРОВ", en:"DISPUTE RESOLUTION", fr:"RÉSOLUTION DES LITIGES", de:"STREITBEILEGUNG", es:"RESOLUCIÓN DE DISPUTAS", it:"RISOLUZIONE DELLE CONTROVERSIE", ar:"تسوية النزاعات", zh:"争议解决", fa:"حل اختلافات", hy:"VETCH LUZUM" },
+    h10: { ru:"ПРОЧИЕ УСЛОВИЯ", en:"MISCELLANEOUS", fr:"DISPOSITIONS DIVERSES", de:"SONSTIGE BESTIMMUNGEN", es:"DISPOSICIONES GENERALES", it:"DISPOSIZIONI VARIE", ar:"أحكام عامة", zh:"其他条款", fa:"مفاد متفرقه", hy:"AYL PAYMANANNER" },
+    s3_4b: { ru:"В случае нарушения — Платформа вправе приостановить действие Договора без компенсации.", en:"In case of violation — the Platform may suspend the Agreement without compensation.", fr:"En cas de violation — la Plateforme peut suspendre l'Accord sans compensation.", de:"Bei Verstoss — Plattform kann Vertrag ohne Entschaedigung aussetzen.", es:"En caso de infraccion — la Plataforma puede suspender el Acuerdo.", it:"In caso di violazione — la Piattaforma puo sospendere l'Accordo.", ar:"في حالة المخالفة — يحق للمنصة تعليق العقد دون تعويض.", zh:"违约情况下 — 平台有权暂停协议。", fa:"در صورت تخلف — پلتفرم حق دارد قرارداد را تعلیق کند.", hy:"Khakhtman depqum — Hartaky iravunq uni kasakel paymanagrutyune." },
+    s3_6: { ru:"При отмене подтверждённого бронирования по инициативе Партнёра — гость получает полный возврат средств.", en:"If the Partner cancels a confirmed booking — the guest receives a full refund.", fr:"Si le Partenaire annule une reservation confirmee — remboursement complet.", de:"Storniert der Partner eine bestaеtigte Buchung — volle Erstattung.", es:"Si el Socio cancela una reserva confirmada — reembolso completo.", it:"Se il Partner annulla una prenotazione confermata — rimborso completo.", ar:"اذا ألغى الشريك حجزاً مؤكداً — استرداد كامل.", zh:"若合作伙伴取消已确认的预订 — 全额退款。", fa:"در صورت لغو رزرو تأیید شده توسط شریک — بازپرداخت کامل.", hy:"Gorchenkeri kadamagortsutyan depqum hasтаtаgvаd aqragrutyany lagumnelу — liakatar vardvum." },
+    s4_5: { ru:"При отмене гостем более чем за 48 часов — возврат 100%. При отмене менее чем за 48 часов — удерживается комиссия платформы (16%).", en:"Guest cancellation 48+ hours before — full refund (100%). Less than 48 hours — platform commission (16%) is retained.", fr:"Annulation 48h+ — remboursement 100%. Moins de 48h — commission (16%) retenue.", de:"Stornierung 48+ Std. — 100% Erstattung. Weniger als 48 Std. — 16% Gebuehr.", es:"Cancelacion 48h+ — reembolso 100%. Menos de 48h — comision (16%).", it:"Cancellazione 48h+ — rimborso 100%. Meno di 48h — commissione (16%).", ar:"الغاء 48 ساعة+ — استرداد 100%. اقل من 48 — عمولة (16%).", zh:"提前48小时以上取消 — 全额退款。不足48小时 — 扣留佣金16%。", fa:"لغو 48 ساعت قبل — بازپرداخت 100%. کمتر — کارمزد 16%.", hy:"Lgnum aveli 48 jam araj — 100% vardvum. Petq che — komisyon (16%) petaka." },
+    s8_1: { ru:"Стороны освобождаются от ответственности при обстоятельствах непреодолимой силы: стихийных бедствиях, военных действиях, эпидемиях, действиях государственных органов.", en:"The Parties are released from liability in force majeure: natural disasters, military actions, epidemics, government actions.", fr:"Les Parties sont exonerees en cas de force majeure: catastrophes, actions militaires, epidemies.", de:"Parteien haftungsbefreit bei hoehrer Gewalt: Naturkatastrophen, Krieg, Epidemien.", es:"Las Partes exentas ante fuerza mayor: desastres, acciones militares, epidemias.", it:"Le Parti esonerate in caso di forza maggiore: calamita, azioni militari, epidemie.", ar:"الطرفان معفيان من المسؤولية في القوة القاهرة.", zh:"在不可抗力情况下双方免责。", fa:"طرفین در موارد فورس ماژور از مسئولیت معاف هستند.", hy:"Kolmery azatvoum en pataskhanatvotyunits anprelit hankamannerum." },
+    s8_2: { ru:"Сторона, для которой наступили обстоятельства форс-мажора, обязана уведомить другую Сторону в течение 3 рабочих дней.", en:"The affected Party must notify the other Party within 3 business days.", fr:"La Partie affectee doit notifier l'autre Partie dans les 3 jours ouvrables.", de:"Die betroffene Partei benachrichtigt die andere innerhalb von 3 Werktagen.", es:"La Parte afectada notifica a la otra en 3 dias habiles.", it:"La Parte interessata notifica l'altra entro 3 giorni lavorativi.", ar:"الطرف المتضرر يخطر الطرف الاخر خلال 3 ايام.", zh:"受影响方必须在3个工作日内通知另一方。", fa:"طرف آسیب‌دیده باید ظرف 3 روز کاری مطلع کند.", hy:"Anprelit hankamannerov khafvats kolme petq e tsanoochatsnel myu kolmin 3 ashkhatanqayin orin." },
+    s8_3: { ru:"При наступлении форс-мажора срок исполнения обязательств переносится соразмерно времени его действия.", en:"During force majeure, the performance deadline is extended for the duration of the circumstances.", fr:"En cas de force majeure, le delai d'execution est prolonge.", de:"Bei hoehrer Gewalt verlaengert sich die Erfuellungsfrist entsprechend.", es:"Durante fuerza mayor el plazo se extiende por la duracion.", it:"Durante forza maggiore il termine si estende per la durata.", ar:"خلال القوة القاهرة يمدد موعد التنفيذ.", zh:"在不可抗力期间，履约期限相应延长。", fa:"در طول فورس ماژور مهلت اجرا تمدید می‌شود.", hy:"Anprelit hankamanner nastelu kntrum pahanjavorutyunner katarelu jamanetaky kandgaradz e." },
+    s9_1b: { ru:"Все споры решаются путём переговоров между Сторонами в течение 30 дней.", en:"All disputes are resolved through negotiations between the Parties within 30 days.", fr:"Tous les litiges sont resolus par negociation dans les 30 jours.", de:"Streitigkeiten durch Verhandlungen innerhalb von 30 Tagen beigelegt.", es:"Disputas mediante negociacion en 30 dias.", it:"Controversie risolte mediante negoziazione entro 30 giorni.", ar:"النزاعات تُحل بالتفاوض في 30 يوماً.", zh:"争议通过协商在30天内解决。", fa:"اختلافات از طریق مذاکره ظرف 30 روز حل می‌شود.", hy:"Bardzr k vetchery luzvoum en banaktsuthyunnerov 30 orva kntrum." },
+    s9_2b: { ru:"При невозможности достижения соглашения споры передаются в суд Республики Армения.", en:"If no agreement is reached, disputes are submitted to the court of the Republic of Armenia.", fr:"Si aucun accord, les litiges sont soumis au tribunal armenien.", de:"Bei keiner Einigung Streitigkeiten vor armenischem Gericht.", es:"Sin acuerdo las disputas van al tribunal de Armenia.", it:"Senza accordo le controversie vanno al tribunale armeno.", ar:"اذا تعذر الاتفاق تُحال النزاعات للمحكمة.", zh:"如无法达成协议，提交亚美尼亚法院。", fa:"در صورت عدم توافق اختلافات به دادگاه ارجاع می‌شود.", hy:"Anhajarutyun depqum vetcher hanetvoum en HH dataran." },
+    s10_3: { ru:"Во всём, что не предусмотрено настоящим Договором, Стороны руководствуются законодательством Республики Армения.", en:"For all matters not covered by this Agreement, the Parties are governed by Armenian legislation.", fr:"Pour tout non prevu, les Parties se referent a la legislation armenienne.", de:"Fuer alles nicht Geregelte gilt armenisches Recht.", es:"Para lo no previsto rige la legislacion de Armenia.", it:"Per quanto non previsto vale la legislazione armena.", ar:"لكل ما لم يرد يسترشد الطرفان بتشريعات ارمينيا.", zh:"未规定事项依照亚美尼亚法律处理。", fa:"هر آنچه پیش‌بینی نشده تابع قوانین ارمنستان.", hy:"Amen inch vor nakhatasvats che kolmery karatsvum en HH orensdrutyamb." },
     loading: { ru:"Загрузка...", en:"Loading...", hy:"Բեռնում...", fr:"Chargement...", de:"Laden...", es:"Cargando...", it:"Caricamento...", ar:"جاري التحميل...", zh:"加载中...", fa:"در حال بارگذاری..." },
   };
   return (T[key] && T[key][lang]) || T[key]?.en || key;
@@ -139,52 +159,61 @@ export default function ContractPrint() {
 
         <hr className="my-6" />
 
-        <h2 className="text-base font-bold mt-6 mb-3">1.</h2>
+        <h2 className="text-base font-bold mt-6 mb-3">1. {Ct("h1", lang)}</h2>
         <p>1.1. {Ct("s1_1", lang)}</p>
         <p>1.2. {Ct("s1_2", lang)}</p>
         <p>1.3. {Ct("s1_3", lang)}</p>
 
-        <h2 className="text-base font-bold mt-6 mb-3">2.</h2>
+        <h2 className="text-base font-bold mt-6 mb-3">2. {Ct("h2", lang)}</h2>
         <p>2.1. {Ct("s2_1", lang)}</p>
         <p>2.2. {Ct("s2_2", lang)}</p>
         <p>2.3. {Ct("s2_3", lang)}</p>
         <p>2.4. {Ct("s2_4", lang)}</p>
         <p>2.5. {Ct("s2_5", lang)}</p>
 
-        <h2 className="text-base font-bold mt-6 mb-3">3.</h2>
+        <h2 className="text-base font-bold mt-6 mb-3">3. {Ct("h3", lang)}</h2>
         <p>3.1. {Ct("s3_1", lang)}</p>
         <p>3.2. {Ct("s3_2", lang)}</p>
         <p>3.3. {Ct("s3_3", lang)}</p>
-        <p>3.4. {Ct("s3_4", lang)}</p>
+        <p>3.4. {Ct("s3_4", lang)} {Ct("s3_4b", lang)}</p>
         <p>3.5. {Ct("s3_5", lang)}</p>
+        <p>3.6. {Ct("s3_6", lang)}</p>
 
-        <h2 className="text-base font-bold mt-6 mb-3">4.</h2>
+        <h2 className="text-base font-bold mt-6 mb-3">4. {Ct("h4", lang)}</h2>
         <p>4.1. {Ct("s4_1", lang)}</p>
         <p>4.2. {Ct("s4_2", lang)}</p>
         <p>4.3. {Ct("s4_3", lang)}</p>
         <p>4.4. {Ct("s4_4", lang)}</p>
+        <p>4.5. {Ct("s4_5", lang)}</p>
 
-        <h2 className="text-base font-bold mt-6 mb-3">5.</h2>
+        <h2 className="text-base font-bold mt-6 mb-3">5. {Ct("h5", lang)}</h2>
         <p>5.1. {Ct("s5_1", lang)}</p>
         <p>5.2. {Ct("s5_2", lang)}</p>
         <p>5.3. {Ct("s5_3", lang)}</p>
 
-        <h2 className="text-base font-bold mt-6 mb-3">6.</h2>
+        <h2 className="text-base font-bold mt-6 mb-3">6. {Ct("h6", lang)}</h2>
         <p>6.1. {Ct("s6_1", lang)}</p>
         <p>6.2. {Ct("s6_2", lang)}</p>
         <p>6.3. {Ct("s6_3", lang)}</p>
         <p>6.4. {Ct("s6_4", lang)}</p>
 
-        <h2 className="text-base font-bold mt-6 mb-3">7.</h2>
+        <h2 className="text-base font-bold mt-6 mb-3">7. {Ct("h7", lang)}</h2>
         <p>7.1. {Ct("s7_1", lang)}</p>
         <p>7.2. {Ct("s7_2", lang)}</p>
 
-        <h2 className="text-base font-bold mt-6 mb-3">8.</h2>
-        <p>8. {Ct("s8", lang)}</p>
+        <h2 className="text-base font-bold mt-6 mb-3">8. {Ct("h8", lang)}</h2>
+        <p>8.1. {Ct("s8_1", lang)}</p>
+        <p>8.2. {Ct("s8_2", lang)}</p>
+        <p>8.3. {Ct("s8_3", lang)}</p>
 
-        <h2 className="text-base font-bold mt-6 mb-3">9.</h2>
-        <p>9.1. {Ct("s9_1", lang)}</p>
-        <p>9.2. {Ct("s9_2", lang)}</p>
+        <h2 className="text-base font-bold mt-6 mb-3">9. {Ct("h9", lang)}</h2>
+        <p>9.1. {Ct("s9_1b", lang)}</p>
+        <p>9.2. {Ct("s9_2b", lang)}</p>
+
+        <h2 className="text-base font-bold mt-6 mb-3">10. {Ct("h10", lang)}</h2>
+        <p>10.1. {Ct("s9_1", lang)}</p>
+        <p>10.2. {Ct("s9_2", lang)}</p>
+        <p>10.3. {Ct("s10_3", lang)}</p>
 
         <hr className="my-8" />
 
@@ -196,7 +225,7 @@ export default function ContractPrint() {
             <p>{Ct("address", lang)}: {Ct("platformAddress", lang)}</p>
             <p>{Ct("phone", lang)} +374 77-712-268</p>
             <p>{Ct("emailLabel", lang)} oooplus.ru@yandex.ru</p>
-            <p>hay-home.com hay-home.com</p>
+            <p>hay-home.com</p>
             <p className="mt-8">{Ct("signature", lang)}</p>
           </div>
           <div>
@@ -218,3 +247,6 @@ export default function ContractPrint() {
     </div>
   );
 }
+
+
+
