@@ -19,6 +19,10 @@ export const SWIFT_BANKS: Record<string, SwiftBank> = {
   FASAAMMX: { name: "Fast Bank", country: "AM", countryName: "Armenia" },
   MOSHAMMX: { name: "Byblos Bank Armenia", country: "AM", countryName: "Armenia" },
   INEAAM22: { name: "Inecobank", country: "AM", countryName: "Armenia" },
+  AKBAAM22: { name: "Akba Bank", country: "AM", countryName: "Armenia" },
+  ARENAM22: { name: "Arenadata Bank", country: "AM", countryName: "Armenia" },
+  HCBAAM22: { name: "HayPost Bank", country: "AM", countryName: "Armenia" },
+  ARTSAM22: { name: "Araratbank", country: "AM", countryName: "Armenia" },
   ACBAAM22: { name: "Armeconombank", country: "AM", countryName: "Armenia" },
 
   // ── Russia ───────────────────────────────────────────────────────────────
