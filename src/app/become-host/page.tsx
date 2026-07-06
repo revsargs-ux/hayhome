@@ -1,8 +1,9 @@
-"use client";
-import { useState } from "react";
+﻿"use client";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronRight, ChevronLeft, Sparkles, RotateCcw, Loader2 } from "lucide-react";
+import { Check, ChevronRight, ChevronLeft, Sparkles, RotateCcw, Loader2, Languages } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
+import { stripInvalidChars, stripNonPhone, scriptErrorMsg, phoneErrorMsg } from "@/lib/inputValidation";
 
 const AMENITIES = [
   "Wi-Fi", "Отдельная комната", "Завтрак", "Ужин", "Полное питание",
@@ -26,57 +27,13 @@ export default function BecomeHostPage() {
   const b = tr.become;
   const steps = [b.step0, b.step1, b.step2, b.step3];
 
-  const [langWarning, setLangWarning] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [translatedBanner, setTranslatedBanner] = useState(false);
+  const prevLang = useRef(lang);
 
-  // Language scripts for detection
-  const langScripts: Record<string, RegExp> = {
-    ru: /[а-яА-ЯёЁ]/,
-    en: /[a-zA-Z]/,
-    hy: /[ա-ֆԱ-Ֆ]/,
-    fr: /[àâçéèêëîïôùûüÿœæÀÂÇÉÈÊËÎÏÔÙÛÜŸŒÆ]/,
-    de: /[äöüßÄÖÜ]/,
-    es: /[ñ¿¡áéíóúÁÉÍÓÚ]/,
-    it: /[àèéìòùÀÈÉÌÒÙ]/,
-    ar: /[\u0600-\u06FF]/,
-    zh: /[\u4e00-\u9fff]/,
-    fa: /[\u0600-\u06FF\uFB8A\u067E\u0686\u06AF]/,
-  };
-
-  // Map which input languages are expected for each UI language
-  const expectedScripts: Record<string, string[]> = {
-    ru: ["ru"],
-    en: ["en"],
-    hy: ["hy"],
-    fr: ["fr"],
-    de: ["de"],
-    es: ["es"],
-    it: ["it"],
-    ar: ["ar"],
-    zh: ["zh"],
-    fa: ["fa"],
-  };
-
-  const checkLanguage = (text: string): string => {
-    if (!text || text.length < 3) return "";
-    const allowed = expectedScripts[lang] || ["en"];
-    // Check for disallowed scripts
-    for (const [script, regex] of Object.entries(langScripts)) {
-      if (regex.test(text) && !allowed.includes(script)) {
-        const scriptNames: Record<string, string> = {
-          ru: "русский", en: "английский", hy: "армянский",
-          fr: "французский", de: "немецкий", es: "испанский",
-          it: "итальянский", ar: "арабский", zh: "китайский", fa: "персидский",
-        };
-        const langNames: Record<string, string> = {
-          ru: "русском", en: "английском", hy: "армянском",
-          fr: "французском", de: "немецком", es: "испанском",
-          it: "итальянском", ar: "арабском", zh: "китайском", fa: "персидском",
-        };
-        return `⚠️ Обнаружен ${scriptNames[script]} текст. Пожалуйста, заполняйте форму на ${langNames[lang]} языке.`;
-      }
-    }
-    return "";
-  };
+  const TEXT_FIELDS = ["familyName", "name", "patronymic", "city", "location", "description", "longDescription", "passportIssued", "bankName"];
+  const TRANSLATABLE = ["description", "longDescription", "city", "location"];
 
   const [step, setStep] = useState(0);
   const goToStep = (n: number) => { setStep(n); window.scrollTo({ top: 0, behavior: 'smooth' }); };
@@ -99,18 +56,54 @@ export default function BecomeHostPage() {
   const [customExp, setCustomExp] = useState("");
   const [customAmenity, setCustomAmenity] = useState("");
 
+  const setField = useCallback((key: string, value: string) => {
+    setForm(f => ({ ...f, [key]: value }));
+  }, []);
+
   const set = (field: string, value: unknown) => {
+    if (TEXT_FIELDS.includes(field) && typeof value === "string") {
+      const stripped = stripInvalidChars(value, lang);
+      const errMsg = stripped !== value ? scriptErrorMsg(lang) : "";
+      setFieldErrors(e => ({ ...e, [field]: errMsg }));
+      setForm(f => ({ ...f, [field]: stripped }));
+      return;
+    }
+    if (field === "phone" && typeof value === "string") {
+      const stripped = stripNonPhone(value);
+      const errMsg = stripped !== value ? phoneErrorMsg(lang) : "";
+      setFieldErrors(e => ({ ...e, [field]: errMsg }));
+      setForm(f => ({ ...f, [field]: stripped }));
+      return;
+    }
     setForm(f => ({ ...f, [field]: value }));
-    // Check language for text fields
-    const textFields = ["familyName", "name", "patronymic", "location", "city", "description", "longDescription", "passportIssued"];
-  const numericFields = ["passportSeries", "passportNumber", "inn", "bankAccount", "phone", "pricePerNight", "maxGuests", "availableRooms"];
-  if (textFields.includes(field) && typeof value === "string") {
-    setLangWarning(checkLanguage(value));
-  }
-  if (numericFields.includes(field) && typeof value === "string" && /[а-яА-ЯёЁա-ֆԱ-Ֆa-zA-Z]/.test(value.replace(/[\s\-\/]/g, ''))) {
-    setLangWarning("⚠️ В этом поле можно вводить только цифры");
-  }
   };
+
+  // Auto-translate text fields when UI language changes
+  useEffect(() => {
+    const fromLang = prevLang.current;
+    if (fromLang === lang) return;
+    prevLang.current = lang;
+    // Clear script errors since lang changed
+    setFieldErrors({});
+    const toTranslate = TRANSLATABLE.filter(k => (form as any)[k]?.trim().length > 2);
+    if (toTranslate.length === 0) return;
+    const texts = toTranslate.map(k => (form as any)[k]);
+    setIsTranslating(true);
+    setTranslatedBanner(false);
+    fetch("/api/ai/translate", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ texts, fromLang, toLang: lang }),
+    })
+      .then(r => r.json())
+      .then(({ translations }: { translations: string[] }) => {
+        if (!Array.isArray(translations)) return;
+        translations.forEach((t, i) => { if (t && toTranslate[i]) setForm(f => ({ ...f, [toTranslate[i]]: t })); });
+        setTranslatedBanner(true);
+      })
+      .catch(console.error)
+      .finally(() => setIsTranslating(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
   const toggle = (field: "amenities" | "experiences" | "languages", val: string) =>
     setForm(f => ({ ...f, [field]: f[field].includes(val) ? f[field].filter(x => x !== val) : [...f[field], val] }));
 
@@ -212,7 +205,9 @@ export default function BecomeHostPage() {
                 <div key={f.field}>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">{f.label} *</label>
                   <input type={f.type || "text"} value={(form as any)[f.field]} onChange={e => set(f.field, e.target.value)}
-                    placeholder={f.placeholder} className={inputCls} />
+                    placeholder={f.placeholder}
+                    className={`${inputCls} ${fieldErrors[f.field] ? "border-amber-400 bg-amber-50" : ""}`} />
+                  {fieldErrors[f.field] && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors[f.field]}</p>}
                 </div>
               ))}
               <hr className="my-4 border-gray-200" />
@@ -227,7 +222,9 @@ export default function BecomeHostPage() {
                 <div key={f.field}>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">{f.label} *</label>
                   <input type={f.type || "text"} value={(form as any)[f.field]} onChange={e => set(f.field, e.target.value)}
-                    placeholder={f.placeholder} className={inputCls} />
+                    placeholder={f.placeholder}
+                    className={`${inputCls} ${fieldErrors[f.field] ? "border-amber-400 bg-amber-50" : ""}`} />
+                  {fieldErrors[f.field] && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors[f.field]}</p>}
                 </div>
               ))}
               <hr className="my-4 border-gray-200" />
@@ -239,7 +236,9 @@ export default function BecomeHostPage() {
                 <div key={f.field}>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">{f.label} *</label>
                   <input type={f.type || "text"} value={(form as any)[f.field]} onChange={e => set(f.field, e.target.value)}
-                    placeholder={f.placeholder} className={inputCls} />
+                    placeholder={f.placeholder}
+                    className={`${inputCls} ${fieldErrors[f.field] ? "border-amber-400 bg-amber-50" : ""}`} />
+                  {fieldErrors[f.field] && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors[f.field]}</p>}
                 </div>
               ))}
             </div>
@@ -251,7 +250,9 @@ export default function BecomeHostPage() {
               <h2 className="text-xl font-bold text-gray-900 mb-6">{b.step1}</h2>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">{b.city} *</label>
-                <input value={form.city} onChange={e => set("city", e.target.value)} placeholder="Ереван" className={inputCls} />
+                <input value={form.city} onChange={e => set("city", e.target.value)} placeholder="Ереван"
+                  className={`${inputCls} ${fieldErrors.city ? "border-amber-400 bg-amber-50" : ""}`} />
+                {fieldErrors.city && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors.city}</p>}
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">{b.region} *</label>
@@ -262,7 +263,9 @@ export default function BecomeHostPage() {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">{b.address}</label>
-                <input value={form.location} onChange={e => set("location", e.target.value)} placeholder="ул. Абовяна 12" className={inputCls} />
+                <input value={form.location} onChange={e => set("location", e.target.value)} placeholder="ул. Абовяна 12"
+                  className={`${inputCls} ${fieldErrors.location ? "border-amber-400 bg-amber-50" : ""}`} />
+                {fieldErrors.location && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors.location}</p>}
               </div>
             </div>
           )}
@@ -318,7 +321,8 @@ export default function BecomeHostPage() {
                 </div>
                 <textarea value={form.description} onChange={e => set("description", e.target.value)}
                   rows={2} placeholder={b.shortDesc}
-                  className={`w-full px-4 py-3 rounded-xl border outline-none text-gray-900 resize-none ${aiDesc.loading ? "border-amber-300 bg-amber-50" : "border-gray-200 focus:border-red-400"}`} />
+                  className={`w-full px-4 py-3 rounded-xl border outline-none text-gray-900 resize-none ${aiDesc.loading ? "border-amber-300 bg-amber-50" : fieldErrors.description ? "border-amber-400 bg-amber-50" : "border-gray-200 focus:border-red-400"}`} />
+                {fieldErrors.description && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors.description}</p>}
                 {aiDesc.original && !aiDesc.loading && (
                   <p className="text-xs text-amber-600 mt-1 flex items-center gap-1"><Sparkles size={10} /> {b.aiImproved}</p>
                 )}
@@ -343,7 +347,8 @@ export default function BecomeHostPage() {
                 </div>
                 <textarea value={form.longDescription} onChange={e => set("longDescription", e.target.value)}
                   rows={5} placeholder={b.longDesc}
-                  className={`w-full px-4 py-3 rounded-xl border outline-none text-gray-900 resize-none ${aiLong.loading ? "border-amber-300 bg-amber-50" : "border-gray-200 focus:border-red-400"}`} />
+                  className={`w-full px-4 py-3 rounded-xl border outline-none text-gray-900 resize-none ${aiLong.loading ? "border-amber-300 bg-amber-50" : fieldErrors.longDescription ? "border-amber-400 bg-amber-50" : "border-gray-200 focus:border-red-400"}`} />
+                {fieldErrors.longDescription && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors.longDescription}</p>}
                 {aiLong.original && !aiLong.loading && (
                   <p className="text-xs text-amber-600 mt-1 flex items-center gap-1"><Sparkles size={10} /> {b.aiImprovedLong}</p>
                 )}
@@ -430,9 +435,22 @@ export default function BecomeHostPage() {
 
           {step < 4 && (
             <>
-            {langWarning && (
+            {isTranslating && (
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-800 flex items-center gap-2">
+                <Loader2 size={14} className="animate-spin" />
+                <Languages size={14} />
+                {lang === "ru" ? "Перевод текста..." : lang === "hy" ? "Թարգմանություն..." : lang === "ar" ? "جارٍ الترجمة..." : lang === "zh" ? "正在翻译..." : lang === "fa" ? "در حال ترجمه..." : "Translating..."}
+              </div>
+            )}
+            {translatedBanner && !isTranslating && (
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-800 flex items-center gap-2 cursor-pointer" onClick={() => setTranslatedBanner(false)}>
+                <Languages size={14} />
+                {lang === "ru" ? "✓ Текст переведён на выбранный язык" : lang === "hy" ? "✓ Տեքստը թարգմանված է" : lang === "ar" ? "✓ تمت ترجمة النص" : lang === "zh" ? "✓ 文本已翻译" : lang === "fa" ? "✓ متن ترجمه شد" : "✓ Text translated to selected language"}
+              </div>
+            )}
+            {Object.values(fieldErrors).some(Boolean) && (
               <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
-                {langWarning}
+                {Object.values(fieldErrors).find(Boolean)}
               </div>
             )}
             <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">

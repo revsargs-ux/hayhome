@@ -8,6 +8,7 @@ import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { SocialLogin } from "@/components/SocialLogin";
 import Captcha from "@/components/Captcha";
+import { stripInvalidChars, scriptErrorMsg } from "@/lib/inputValidation";
 
 function RegisterContent() {
   const router = useRouter();
@@ -26,6 +27,7 @@ function RegisterContent() {
   const [captchaToken, setCaptchaToken] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [nameError, setNameError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,9 +71,14 @@ function RegisterContent() {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">{a.name}</label>
             <input required value={form.name}
-              onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+              onChange={e => {
+                const stripped = stripInvalidChars(e.target.value, lang);
+                setNameError(stripped !== e.target.value ? scriptErrorMsg(lang) : "");
+                setForm(f => ({ ...f, name: stripped }));
+              }}
               placeholder="John Smith"
-              className={inputCls} />
+              className={`${inputCls} ${nameError ? "border-amber-400 bg-amber-50" : ""}`} />
+            {nameError && <p className="text-xs text-amber-700 mt-1">⚠️ {nameError}</p>}
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>

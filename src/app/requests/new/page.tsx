@@ -1,9 +1,10 @@
-"use client";
-import { useState } from "react";
+﻿"use client";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";
 import { regionName } from "@/lib/i18n-utils";
+import { stripInvalidChars, scriptErrorMsg } from "@/lib/inputValidation";
 
 const CATEGORY_KEYS = ["events", "food", "tour", "culture", "music", "custom"];
 const REGIONS = [
@@ -55,6 +56,37 @@ export default function NewRequestPage() {
   const [created, setCreated] = useState<{ id: string; title: string } | null>(null);
   const [recommendations, setRecommendations] = useState<Recommendation | null>(null);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isTranslating, setIsTranslating] = useState(false);
+  const prevLang = useRef(lang);
+
+  const setTextField = (field: "title" | "description", raw: string) => {
+    const stripped = stripInvalidChars(raw, lang);
+    setFieldErrors(e => ({ ...e, [field]: stripped !== raw ? scriptErrorMsg(lang) : "" }));
+    setForm(f => ({ ...f, [field]: stripped }));
+  };
+
+  useEffect(() => {
+    const fromLang = prevLang.current;
+    if (fromLang === lang) return;
+    prevLang.current = lang;
+    setFieldErrors({});
+    const fields = ["title", "description"].filter(k => (form as any)[k]?.trim().length > 2);
+    if (!fields.length) return;
+    setIsTranslating(true);
+    fetch("/api/ai/translate", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ texts: fields.map(k => (form as any)[k]), fromLang, toLang: lang }),
+    })
+      .then(r => r.json())
+      .then(({ translations }: { translations: string[] }) => {
+        if (!Array.isArray(translations)) return;
+        translations.forEach((t, i) => { if (t) setForm(f => ({ ...f, [fields[i]]: t })); });
+      })
+      .catch(console.error)
+      .finally(() => setIsTranslating(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   const req = (tr as any).requests || {};
 
@@ -158,17 +190,24 @@ export default function NewRequestPage() {
         </div>
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
           {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">{error}</div>}
+          {isTranslating && <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-2 text-sm text-blue-700 flex items-center gap-2">
+            <span className="animate-spin">⏳</span> {lang === "ru" ? "Перевод..." : "Translating..."}
+          </div>}
 
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 block">{l.title} *</label>
-            <input type="text" required maxLength={200} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder={l.titlePh} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400" />
+            <input type="text" required maxLength={200} value={form.title} onChange={(e) => setTextField("title", e.target.value)}
+              placeholder={l.titlePh}
+              className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:border-red-400 ${fieldErrors.title ? "border-amber-400 bg-amber-50" : "border-gray-200"}`} />
+            {fieldErrors.title && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors.title}</p>}
           </div>
 
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 block">{l.description} *</label>
-            <textarea required rows={4} maxLength={3000} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-              placeholder={l.descPh} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-red-400 resize-y" />
+            <textarea required rows={4} maxLength={3000} value={form.description} onChange={(e) => setTextField("description", e.target.value)}
+              placeholder={l.descPh}
+              className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:border-red-400 resize-y ${fieldErrors.description ? "border-amber-400 bg-amber-50" : "border-gray-200"}`} />
+            {fieldErrors.description && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors.description}</p>}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
