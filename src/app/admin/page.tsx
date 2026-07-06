@@ -3,11 +3,12 @@ import { useState, useEffect } from "react";
 import { Host, Booking } from "@/lib/types";
 import { Check, X, Star, Users, DollarSign, Home, RefreshCw } from "lucide-react";
 import AdminCalendarView from "@/components/AdminCalendarView";
+import AdminContracts from "./contracts/page";
 import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";
 import type { LangCode } from "@/lib/translations";
 
-type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar" | "users" | "services" | "promocodes";
+type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar" | "users" | "services" | "promocodes" | "contracts";
 
 // Full 10-language status labels
 const STATUS_LABELS: Record<string, Record<string, string>> = {
@@ -165,6 +166,7 @@ export default function AdminPage() {
     { key: "users", label: u.usersTab, badge: users.length || undefined },
     { key: "services", label: u.servicesTab },
     { key: "promocodes", label: u.promocodesTab },
+    { key: "contracts", label: "📄 Договоры" },
   ];
 
   return (
@@ -452,6 +454,7 @@ export default function AdminPage() {
             )}
 
             {/* Promocodes tab */}
+            {tab === "contracts" && <AdminContracts />}
             {tab === "promocodes" && (
               <div className="space-y-4">
                 {/* Create form */}
