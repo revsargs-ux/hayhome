@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     role,
     region: region || null,
     code,
-    status: "active",
+    status: "pending",
     balance: 0,
     total_earned: 0,
     total_withdrawn: 0,

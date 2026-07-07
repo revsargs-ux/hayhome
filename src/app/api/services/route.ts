@@ -6,7 +6,7 @@ import { rateLimit } from "@/lib/rateLimit";
 const VALID_CATEGORIES = ["photo", "video", "music", "costume", "decor", "dance", "guide", "chef", "custom"];
 const VALID_UNITS = ["per_hour", "per_event", "per_person"];
 
-// GET /api/services?category=X&region=Y  — public list
+// GET /api/services?category=X&region=Y  — public list (only available=true)
 // GET /api/services?provider=X           — list by provider
 // GET /api/services?id=ID                 — single service by id
 export async function GET(req: NextRequest) {
@@ -44,12 +44,12 @@ export async function GET(req: NextRequest) {
       }
       query = query.eq("provider_id", user.id);
     } else if (provider === "all") {
-      // Admin/provider listing — return all (no filter)
+      // Admin listing — return all
     } else {
       query = query.eq("provider_id", provider);
     }
   } else {
-    // Public listing: only available services
+    // Public listing: only available (approved) services
     query = query.eq("available", true);
     if (category && VALID_CATEGORIES.includes(category)) {
       query = query.eq("category", category);
@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(data ?? []);
 }
 
-// POST /api/services — create (provider only)
+// POST /api/services — create (provider only) — starts as unavailable (needs admin approval)
 export async function POST(req: NextRequest) {
   const blocked = rateLimit(req);
   if (blocked) return blocked;
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
     max_duration: typeof body.max_duration === "number" ? body.max_duration : 8,
     photos: Array.isArray(body.photos) ? body.photos.slice(0, 10) : [],
     region: typeof body.region === "string" ? body.region.slice(0, 100) : "",
-    available: body.available !== false,
+    available: false, // NEW: requires admin approval
   };
 
   const { data, error } = await supabase
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(data, { status: 201 });
 }
 
-// PATCH /api/services — update own service
+// PATCH /api/services — update own service (provider) or approve/reject (admin)
 export async function PATCH(req: NextRequest) {
   const user = await getAuthUser(req);
   if (!user) {

@@ -60,7 +60,7 @@ export interface Partner {
   user_id: string;
   role: "ambassador" | "hunter" | "regional";
   region: string | null;
-  status: "active" | "frozen" | "suspended";
+  status: "active" | "frozen" | "suspended" | "pending";
   balance: number;
   total_earned: number;
   total_withdrawn: number;

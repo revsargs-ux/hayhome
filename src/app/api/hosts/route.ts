@@ -27,6 +27,9 @@ export async function POST(req: NextRequest) {
   const blocked = rateLimit(req);
   if (blocked) return blocked;
 
+  // Optional auth — link host to user account if logged in
+  const user = await getAuthUser(req).catch(() => null);
+
   const body = await req.json();
 
   // Validate required fields
