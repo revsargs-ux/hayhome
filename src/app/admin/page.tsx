@@ -4,11 +4,17 @@ import { Host, Booking } from "@/lib/types";
 import { Check, X, Star, Users, DollarSign, Home, RefreshCw } from "lucide-react";
 import AdminCalendarView from "@/components/AdminCalendarView";
 import AdminContracts from "./contracts/page";
+import AdminFinance from "./AdminFinance";
+import AdminLogs from "./AdminLogs";
+import AdminReviews from "./AdminReviews";
+import AdminSettings from "./AdminSettings";
+import AdminNotifications from "./AdminNotifications";
+import AdminGuestRequests from "./AdminGuestRequests";
 import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";
 import type { LangCode } from "@/lib/translations";
 
-type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar" | "users" | "services" | "promocodes" | "contracts";
+type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar" | "users" | "services" | "promocodes" | "contracts" | "finance" | "logs" | "reviews" | "settings" | "notifications" | "guest-requests";
 
 // Full 10-language status labels
 const STATUS_LABELS: Record<string, Record<string, string>> = {
@@ -91,6 +97,12 @@ export default function AdminPage() {
   const [promoForm, setPromoForm] = useState({ code: "", discount_type: "percent", discount_value: 10, min_amount: 0, max_uses: 100, expires_at: "" });
   const [promoLoading, setPromoLoading] = useState(false);
 
+  // New tabs state
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [hostHistory, setHostHistory] = useState<any[]>([]);
+  const [guestRequests, setGuestRequests] = useState<any[]>([]);
+  const [platformSettings, setPlatformSettings] = useState({ commissionPercent: 16, iban: "", bankName: "", legalName: "HayHome LLC", legalAddress: "", supportPhone: "", supportEmail: "info@hay-home.com" });
+
   const { lang } = useLang();
   const u = getUI(lang);
 
@@ -98,18 +110,30 @@ export default function AdminPage() {
 
   const load = async () => {
     setLoading(true);
-    const [h, b, p, usr, promos] = await Promise.all([
+    const [h, b, p, usr, promos, rev, gr] = await Promise.all([
       fetch("/api/hosts?all=1", { credentials: "include" }).then((r) => r.json()),
       fetch("/api/bookings", { credentials: "include" }).then((r) => r.json()),
       fetch("/api/partners/payout/", { credentials: "include" }).then((r) => r.json()).catch(() => []),
       fetch("/api/auth/users", { credentials: "include" }).then((r) => r.json()).catch(() => []),
       fetch("/api/promocodes", { credentials: "include" }).then((r) => r.json()).catch(() => []),
+      fetch("/api/reviews", { credentials: "include" }).then((r) => r.json()).catch(() => []),
+      fetch("/api/requests", { credentials: "include" }).then((r) => r.json()).catch(() => []),
     ]);
     setHosts(h);
     setBookings(b);
     setPayouts(Array.isArray(p) ? p : []);
     setUsers(Array.isArray(usr) ? usr : []);
     setPromocodes(Array.isArray(promos) ? promos : []);
+    setReviews(Array.isArray(rev) ? rev : []);
+    setGuestRequests(Array.isArray(gr) ? gr : []);
+    // Load host history
+    try {
+      const histPromises = h.filter((host: any) => host.status === "active" || host.status === "pending").map((host: any) =>
+        fetch(`/api/hosts/${host.id}/notes`, { credentials: "include" }).then(r => r.json()).catch(() => [])
+      );
+      const histResults = await Promise.all(histPromises);
+      setHostHistory(histResults.flat());
+    } catch { setHostHistory([]); }
     setLoading(false);
   };
 
@@ -167,6 +191,12 @@ export default function AdminPage() {
     { key: "services", label: u.servicesTab },
     { key: "promocodes", label: u.promocodesTab },
     { key: "contracts", label: "📄 Договоры" },
+    { key: "finance", label: "💰 Финансы" },
+    { key: "logs", label: "📋 Логи" },
+    { key: "reviews", label: "⭐ Отзывы" },
+    { key: "settings", label: "⚙️ Настройки" },
+    { key: "notifications", label: "✉️ Уведом." },
+    { key: "guest-requests", label: "📨 Запросы", badge: guestRequests.filter((r: any) => r.status === "pending").length || undefined },
   ];
 
   return (
@@ -606,6 +636,13 @@ export default function AdminPage() {
                 )}
               </div>
             )}
+            {/* ── Extra tabs ── */}
+            {tab === "finance" && <AdminFinance bookings={bookings} commission={platformSettings.commissionPercent} />}
+            {tab === "logs" && <AdminLogs history={hostHistory} />}
+            {tab === "reviews" && <AdminReviews reviews={reviews} onDelete={async (id) => { await fetch("/api/reviews", { method: "DELETE", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) }); load(); }} />}
+            {tab === "settings" && <AdminSettings settings={platformSettings} onChange={setPlatformSettings} />}
+            {tab === "notifications" && <AdminNotifications hosts={hosts} users={users} />}
+            {tab === "guest-requests" && <AdminGuestRequests requests={guestRequests} />}
           </>
         )}
       </div>
