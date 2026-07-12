@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
 
   // Header
   page.drawText("HayHome", { x: 50, y, size: 28, font: fontBold, color: red });
-  page.drawText("Armenian Hospitality", { x: 50, y: y - 22, size: 11, font, color: gold });
+  page.drawText("Armenian Homestay", { x: 50, y: y - 22, size: 11, font, color: gold });
   page.drawText("Receipt", { x: width - 150, y: y, size: 20, font: fontBold, color: dark });
   y -= 60;
 
@@ -104,7 +104,7 @@ export async function GET(req: NextRequest) {
 
   // Footer
   page.drawText("This document confirms payment for services rendered by HayHome.", { x: 50, y: 80, size: 8, font, color: gray });
-  page.drawText("Thank you for choosing Armenian hospitality!", { x: 50, y: 66, size: 8, font, color: gray });
+  page.drawText("Thank you for choosing HayHome!", { x: 50, y: 66, size: 8, font, color: gray });
   page.drawText("IP Sargsyan · hay-home.com", { x: 50, y: 52, size: 8, font, color: gray });
 
   const pdfBytes = await pdfDoc.save();

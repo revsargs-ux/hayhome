@@ -21,9 +21,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "HayHome — Гостеприимство в Армении",
-  description: "HayHome — платформа для проживания в армянских семьях. Откройте Армению через сердце семьи: домашняя еда, традиции и тёплый приём. / Experience Armenia through the heart of a family — unique homestays, home cooking and traditions. / Բացահայտիր Հայաստանը հայ ընտանիքի սրտով — տնական ուտեստ, ավանդույթներ եւ ջերմ ընդունելություն।",
-  keywords: "Armenia, hospitality, family, tourism, homestay, Yerevan, hay-home, Armenian culture, Armenian food, lavash, khorovats, wine tasting, Հայաստան, հյուրընկալություն, армянское гостеприимство",
+  title: "HayHome — бесплатное размещение у армянских семей",
+  description: "HayHome — сеть гостеприимных армянских семей. Бесплатное размещение, домашняя еда, традиции и тёплый приём.",
+  keywords: "Armenia, гостеприимство, family, tourism, homestay, Yerevan, hay-home, Armenian culture, Armenian food, lavash, khorovats, wine tasting, Հայաստան, հյուրընկալություն, армянское гостеприимство, найти дом, остановиться у местных, free stay",
   manifest: "/manifest.json",
   robots: {
     index: true,
@@ -34,15 +34,15 @@ export const metadata: Metadata = {
     description: "Experience Armenia through the heart of a family. Unique homestays, home cooking, traditions and warm welcome.",
     url: "https://hay-home.com",
     siteName: "HayHome",
-    images: [{ url: "https://hay-home.com/og-image.png", width: 1200, height: 630, alt: "HayHome — Armenian Hospitality" }],
+    images: [{ url: "https://hay-home.com/og-image.png", width: 1200, height: 630, alt: "HayHome — бесплатное размещение у армянских семей" }],
     locale: "ru_RU",
     alternateLocale: ["en_US", "hy_AM", "fr_FR", "de_DE", "es_ES", "it_IT", "ar_AR", "zh_CN", "fa_IR"],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "HayHome — Гостеприимство в Армении",
-    description: "Experience Armenia through the heart of a family. Unique homestays, home cooking, traditions and warm welcome.",
+    title: "HayHome — бесплатное размещение у армянских семей",
+    description: "HayHome — сеть гостеприимных армянских семей. Бесплатное размещение, домашняя еда, традиции и тёплый приём.",
     images: ["https://hay-home.com/og-image.png"],
   },
   icons: {
@@ -74,7 +74,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   name: "HayHome",
-  description: "Armenian homestay marketplace — experience Armenia through the heart of a family.",
+  description: "HayHome — сеть гостеприимных армянских семей. Бесплатное размещение для путешественников.",
   url: "https://hay-home.com",
   logo: "https://hay-home.com/icon-512.png",
   image: "https://hay-home.com/hero-bg.jpg",

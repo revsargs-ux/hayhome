@@ -74,7 +74,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     card3t: "Pride in the Country", card3d: "Armenian families earn the status of 'Tradition Keeper' — community recognition they wear with pride.",
     storyLabel: "How It Started",
     storyTitle: "An idea born over dinner",
-    story1: "It all started with a simple observation: hundreds of Armenian families are ready to welcome guests and show real hospitality — but had no tool to tell the world about it.",
+    story1: "It all started with a simple observation: hundreds of Armenian families are ready to welcome guests — but had no tool to tell the world about it.",
     story2: "And tourists from around the world want exactly this — not a hotel service, but a living experience. Real stories around a big table.",
     story3: "HayHome was created to connect these people. It is a platform of trust, culture and warmth. Not just a business — a movement.",
     valuesLabel: "Our Values", valuesTitle: "Why We Are Not Airbnb",
