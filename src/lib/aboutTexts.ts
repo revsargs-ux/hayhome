@@ -59,8 +59,8 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     secTitle: "Безопасность и доверие",
     secDesc: "Каждая семья проходит верификацию документов. Первый гостевой визит — под контролем платформы. Страхование и поддержка 24/7.",
     secFeatures: ["✅ Проверка документов", "🔒 Безопасные платежи", "📞 Поддержка 24/7", "⭐ Рейтинг и отзывы"],
-    ctaTitle: "Войди — стань частью большой армянской семьи",
-    ctaSub: "Не важно откуда вы. Важно что вы готовы открыться новому.",
+    ctaTitle: "Присоединяйтесь к нашей семье",
+    ctaSub: "Неважно, откуда вы. Армянская семья всегда рада гостям.",
   },
   en: {
     heroTitle: "About Us",
@@ -104,8 +104,8 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     secTitle: "Safety & Trust",
     secDesc: "Every family goes through document verification. The first guest visit is monitored by the platform. Insurance and 24/7 support.",
     secFeatures: ["✅ Document verification", "🔒 Secure payments", "📞 24/7 support", "⭐ Ratings & reviews"],
-    ctaTitle: "Come in — become part of one big Armenian family",
-    ctaSub: "It doesn't matter where you are from. What matters is that you are ready to open up to something new.",
+    ctaTitle: "Join our family",
+    ctaSub: "An Armenian family is always happy to welcome guests, no matter where you come from.",
   },
   fr: {
     heroTitle: "À propos", heroSub: "Nous ne construisons pas une plateforme de location.\nNous construisons un réseau culturel vivant.",
@@ -179,7 +179,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     ],
     secTitle: "Sicherheit & Vertrauen", secDesc: "Jede Familie wird überprüft. Versicherung und 24/7-Support.",
     secFeatures: ["✅ Dokumentenprüfung", "🔒 Sichere Zahlungen", "📞 24/7 Support", "⭐ Bewertungen"],
-    ctaTitle: "Komm rein — werde Teil einer großen armenischen Familie",
+    ctaTitle: "Werden Sie Teil unserer Familie",
     ctaSub: "Es spielt keine Rolle, woher Sie kommen. Was zählt, ist Ihre Offenheit.",
   },
   es: {
@@ -215,7 +215,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     ],
     secTitle: "Seguridad y confianza", secDesc: "Cada familia es verificada. Seguro y soporte 24/7.",
     secFeatures: ["✅ Verificación de documentos", "🔒 Pagos seguros", "📞 Soporte 24/7", "⭐ Calificaciones"],
-    ctaTitle: "Entra — conviértete en parte de una gran familia armenia",
+    ctaTitle: "Únete a nuestra familia",
     ctaSub: "No importa de dónde vengas. Lo que importa es tu apertura a lo nuevo.",
   },
   ar: {
@@ -251,7 +251,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     ],
     secTitle: "الأمان والثقة", secDesc: "كل عائلة تخضع للتحقق من الوثائق. تأمين ودعم 24/7.",
     secFeatures: ["✅ التحقق من الوثائق", "🔒 مدفوعات آمنة", "📞 دعم 24/7", "⭐ تقييمات ومراجعات"],
-    ctaTitle: "تفضل — كن جزءاً من عائلة أرمينية كبيرة",
+    ctaTitle: "انضم إلى عائلتنا",
     ctaSub: "لا يهم من أين أنت. المهم أنك مستعد للانفتاح على شيء جديد.",
   },
   zh: {
@@ -287,7 +287,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     ],
     secTitle: "安全与信任", secDesc: "每个家庭都经过文件验证。保险和24/7支持。",
     secFeatures: ["✅ 文件验证", "🔒 安全支付", "📞 24/7支持", "⭐ 评分和评价"],
-    ctaTitle: "进来——成为一个大亚美尼亚家庭的一员",
+    ctaTitle: "加入我们的家庭",
     ctaSub: "不管你来自哪里。重要的是你愿意向新事物敞开心扉。",
   },
   fa: {
@@ -323,7 +323,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     ],
     secTitle: "امنیت و اعتماد", secDesc: "هر خانواده تأیید اسناد می‌گذرد. بیمه و پشتیبانی ۲۴/۷.",
     secFeatures: ["✅ تأیید اسناد", "🔒 پرداخت‌های امن", "📞 پشتیبانی ۲۴/۷", "⭐ امتیازات و نظرات"],
-    ctaTitle: "بیا — بخشی از یک خانواده بزرگ ارمنی شو",
+    ctaTitle: "به خانواده ما بپیوندید",
     ctaSub: "مهم نیست از کجا می‌آیید. مهم این است که آماده باشید.",
   },
   it: {
@@ -359,7 +359,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     ],
     secTitle: "Sicurezza e fiducia", secDesc: "Ogni famiglia viene verificata. Assicurazione e supporto 24/7.",
     secFeatures: ["✅ Verifica documenti", "🔒 Pagamenti sicuri", "📞 Supporto 24/7", "⭐ Valutazioni"],
-    ctaTitle: "Entra — diventa parte di una grande famiglia armena",
+    ctaTitle: "Unisciti alla nostra famiglia",
     ctaSub: "Non importa da dove vieni. Ciò che conta è la tua apertura al nuovo.",
   },
   hy: {
@@ -404,7 +404,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     secTitle: "Անվտանգություն և վստահություն",
     secDesc: "Յուրաքանչյուր ընտանիք անցնում է փաստաթղթերի ստուգում: Ապահովագրություն և աջակցություն 24/7:",
     secFeatures: ["✅ Փաստաթղթերի ստուգում", "🔒 Անվտանգ վճարումներ", "📞 Աջակցություն 24/7", "⭐ Վարկանիշ և կարծիքներ"],
-    ctaTitle: "Արի՝ դարձիր մեծ հայկական ընտանիքի մաս",
+    ctaTitle: "Միացիր մեր ընտանիքին",
     ctaSub: "Կարևոր չէ որտեղից եք: Կարևոր է՝ պատրաստ եք նորին:",
   },
 };
