@@ -105,7 +105,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     secDesc: "Every family goes through document verification. The first guest visit is monitored by the platform. Insurance and 24/7 support.",
     secFeatures: ["✅ Document verification", "🔒 Secure payments", "📞 24/7 support", "⭐ Ratings & reviews"],
     ctaTitle: "Join our family",
-    ctaSub: "An Armenian family is always happy to welcome guests, no matter where you come from.",
+    ctaSub: "It doesn't matter where you're from. An Armenian family is always happy to welcome guests.",
   },
   fr: {
     heroTitle: "À propos", heroSub: "Nous ne construisons pas une plateforme de location.\nNous construisons un réseau culturel vivant.",
@@ -142,8 +142,8 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     ],
     secTitle: "Sécurité et confiance", secDesc: "Chaque famille est vérifiée. Assurance et support 24/7.",
     secFeatures: ["✅ Vérification des documents", "🔒 Paiements sécurisés", "📞 Support 24/7", "⭐ Notes & avis"],
-    ctaTitle: "Entrez — devenez membre d'une grande famille arménienne",
-    ctaSub: "Peu importe d'où vous venez. Ce qui compte, c'est votre ouverture au nouveau.",
+    ctaTitle: "Rejoignez notre famille",
+    ctaSub: "Peu importe d'où vous venez. Une famille arménienne est toujours heureuse d'accueillir ses hôtes.",
   },
   de: {
     heroTitle: "Über uns", heroSub: "Wir bauen keine Vermietungsplattform.\nWir bauen ein lebendiges Kulturnetzwerk.",
@@ -180,7 +180,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     secTitle: "Sicherheit & Vertrauen", secDesc: "Jede Familie wird überprüft. Versicherung und 24/7-Support.",
     secFeatures: ["✅ Dokumentenprüfung", "🔒 Sichere Zahlungen", "📞 24/7 Support", "⭐ Bewertungen"],
     ctaTitle: "Werden Sie Teil unserer Familie",
-    ctaSub: "Es spielt keine Rolle, woher Sie kommen. Was zählt, ist Ihre Offenheit.",
+    ctaSub: "Es spielt keine Rolle, woher Sie kommen. Eine armenische Familie freut sich immer, Gäste willkommen zu heißen.",
   },
   es: {
     heroTitle: "Sobre nosotros", heroSub: "No construimos una plataforma de alquiler.\nConstruimos una red cultural viva.",
@@ -216,7 +216,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     secTitle: "Seguridad y confianza", secDesc: "Cada familia es verificada. Seguro y soporte 24/7.",
     secFeatures: ["✅ Verificación de documentos", "🔒 Pagos seguros", "📞 Soporte 24/7", "⭐ Calificaciones"],
     ctaTitle: "Únete a nuestra familia",
-    ctaSub: "No importa de dónde vengas. Lo que importa es tu apertura a lo nuevo.",
+    ctaSub: "No importa de dónde vengas. Una familia armenia siempre está feliz de recibir a sus huéspedes.",
   },
   ar: {
     heroTitle: "من نحن", heroSub: "لا نبني منصة إيجار.\nنبني شبكة ثقافية حية.",
@@ -252,7 +252,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     secTitle: "الأمان والثقة", secDesc: "كل عائلة تخضع للتحقق من الوثائق. تأمين ودعم 24/7.",
     secFeatures: ["✅ التحقق من الوثائق", "🔒 مدفوعات آمنة", "📞 دعم 24/7", "⭐ تقييمات ومراجعات"],
     ctaTitle: "انضم إلى عائلتنا",
-    ctaSub: "لا يهم من أين أنت. المهم أنك مستعد للانفتاح على شيء جديد.",
+    ctaSub: "لا يهم من أين أنت. العائلة الأرمينية تسعد دائمًا باستضافة ضيوفها.",
   },
   zh: {
     heroTitle: "关于我们", heroSub: "我们不是在建一个租赁平台。\n我们在建一个有生命力的文化网络。",
@@ -288,7 +288,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     secTitle: "安全与信任", secDesc: "每个家庭都经过文件验证。保险和24/7支持。",
     secFeatures: ["✅ 文件验证", "🔒 安全支付", "📞 24/7支持", "⭐ 评分和评价"],
     ctaTitle: "加入我们的家庭",
-    ctaSub: "不管你来自哪里。重要的是你愿意向新事物敞开心扉。",
+    ctaSub: "无论你来自哪里。一个亚美尼亚家庭总是乐意欢迎客人。",
   },
   fa: {
     heroTitle: "درباره ما", heroSub: "ما یک پلتفرم اجاره نمی‌سازیم.\nما یک شبکه فرهنگی زنده می‌سازیم.",
@@ -324,7 +324,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     secTitle: "امنیت و اعتماد", secDesc: "هر خانواده تأیید اسناد می‌گذرد. بیمه و پشتیبانی ۲۴/۷.",
     secFeatures: ["✅ تأیید اسناد", "🔒 پرداخت‌های امن", "📞 پشتیبانی ۲۴/۷", "⭐ امتیازات و نظرات"],
     ctaTitle: "به خانواده ما بپیوندید",
-    ctaSub: "مهم نیست از کجا می‌آیید. مهم این است که آماده باشید.",
+    ctaSub: "مهم نیست از کجا می‌آیید. یک خانواده ارمنی همیشه از مهمانان خود با خوشحالی پذیرایی می‌کند.",
   },
   it: {
     heroTitle: "Chi siamo", heroSub: "Non stiamo costruendo una piattaforma di affitti.\nStiamo costruendo una rete culturale vivente.",
@@ -360,7 +360,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     secTitle: "Sicurezza e fiducia", secDesc: "Ogni famiglia viene verificata. Assicurazione e supporto 24/7.",
     secFeatures: ["✅ Verifica documenti", "🔒 Pagamenti sicuri", "📞 Supporto 24/7", "⭐ Valutazioni"],
     ctaTitle: "Unisciti alla nostra famiglia",
-    ctaSub: "Non importa da dove vieni. Ciò che conta è la tua apertura al nuovo.",
+    ctaSub: "Non importa da dove vieni. Una famiglia armeniana è sempre felice di accogliere i propri ospiti.",
   },
   hy: {
     heroTitle: "Մեր մասին",
@@ -405,7 +405,7 @@ const texts: Partial<Record<LangCode, AboutTexts>> = {
     secDesc: "Յուրաքանչյուր ընտանիք անցնում է փաստաթղթերի ստուգում: Ապահովագրություն և աջակցություն 24/7:",
     secFeatures: ["✅ Փաստաթղթերի ստուգում", "🔒 Անվտանգ վճարումներ", "📞 Աջակցություն 24/7", "⭐ Վարկանիշ և կարծիքներ"],
     ctaTitle: "Միացիր մեր ընտանիքին",
-    ctaSub: "Կարևոր չէ որտեղից եք: Կարևոր է՝ պատրաստ եք նորին:",
+    ctaSub: "Կարևոր չէ, թե որտեղից եք: Հայկական ընտանիքը միշտ ուրախությամբ է ընդունում հյուրերին:",
   },
 };
 

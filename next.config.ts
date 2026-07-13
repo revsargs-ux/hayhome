@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { execSync } from "child_process";
 
 const securityHeaders = [
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
@@ -48,3 +49,13 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+export function generateBuildId(): string {
+  const ts = Date.now().toString(36);
+  try {
+    const hash = execSync("git rev-parse --short HEAD").toString().trim();
+    return `${ts}-${hash}`;
+  } catch {
+    return ts;
+  }
+}
