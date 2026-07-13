@@ -140,6 +140,11 @@ export interface Translations {
     becomeSub: string;
     becomeCta: string;
     browseBtn: string;
+    freeStay: string;
+    freeStayDesc: string;
+    bookForFree: string;
+    paidServices: string;
+    experiencesLabel: string;
   };
   become: {
     title: string;
@@ -273,6 +278,11 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Зарегистрируйтесь бесплатно. Первые 12 месяцев — без комиссии.",
       becomeCta: "Принять гостей",
       browseBtn: "Посмотреть семьи",
+      freeStay: "Бесплатное проживание",
+      freeStayDesc: "Живите в армянской семье бесплатно",
+      bookForFree: "Забронировать бесплатно",
+      paidServices: "Платные услуги",
+      experiencesLabel: "Впечатления",
     },
     become: {
       title: "Принять гостей в HayHome",
@@ -350,6 +360,11 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Register for free. First 12 months — no commission.",
       becomeCta: "Host Guests",
       browseBtn: "Browse Families",
+      freeStay: "Free stay",
+      freeStayDesc: "Stay with an Armenian family for free",
+      bookForFree: "Book for free",
+      paidServices: "Paid services",
+      experiencesLabel: "Experiences",
     },
     become: {
       title: "Host Guests in HayHome",
@@ -427,6 +442,11 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Գրանցվեք անվճար:",
       becomeCta: "Ընդունել հյուրեր",
       browseBtn: "Դիտել ընտանիքները",
+      freeStay: "Անվճար կացարան",
+      freeStayDesc: "Անվճար բնակվել հայկական ընտանիքի հետ",
+      bookForFree: "Ամրագրել անվճար",
+      paidServices: "Վճարովի ծառայություններ",
+      experiencesLabel: "Փորձությունների",
     },
     become: {
       title: "Առաջարկել հյուրընկալություն HayHome-ում",
@@ -504,6 +524,11 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Inscrivez-vous gratuitement. 12 premiers mois sans commission.",
       becomeCta: "Accueillir des hôtes",
       browseBtn: "Voir les familles",
+      freeStay: "Séjour gratuit",
+      freeStayDesc: "Séjournez chez une famille arménienne gratuitement",
+      bookForFree: "Réserver gratuitement",
+      paidServices: "Services payants",
+      experiencesLabel: "Expériences",
     },
     become: {
       title: "Accueillir des hôtes sur HayHome",
@@ -581,6 +606,11 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Kostenlos registrieren. Erste 12 Monate ohne Provision.",
       becomeCta: "Gäste empfangen",
       browseBtn: "Familien ansehen",
+      freeStay: "Kostenloser Aufenthalt",
+      freeStayDesc: "Kostenlos bei einer armenischen Familie wohnen",
+      bookForFree: "Kostenlos buchen",
+      paidServices: "Kostenpflichtige Dienste",
+      experiencesLabel: "Erlebnisse",
     },
     become: {
       title: "Gäste in HayHome empfangen",
@@ -658,6 +688,11 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Regístrate gratis. Primeros 12 meses sin comisión.",
       becomeCta: "Recibir huéspedes",
       browseBtn: "Ver familias",
+      freeStay: "Alojamiento gratuito",
+      freeStayDesc: "Alójate con una familia armenia de forma gratuita",
+      bookForFree: "Reservar gratis",
+      paidServices: "Servicios de pago",
+      experiencesLabel: "Experiencias",
     },
     become: {
       title: "Recibir huéspedes en HayHome",
@@ -735,6 +770,11 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Registrati gratis. Primi 12 mesi senza commissioni.",
       becomeCta: "Ospita viaggiatori",
       browseBtn: "Vedi le famiglie",
+      freeStay: "Soggiorno gratuito",
+      freeStayDesc: "Soggiorna con una famiglia armena gratuitamente",
+      bookForFree: "Prenota gratis",
+      paidServices: "Servizi a pagamento",
+      experiencesLabel: "Esperienze",
     },
     become: {
       title: "Ospita su HayHome",
@@ -812,6 +852,11 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "سجل مجاناً. أول 12 شهراً بدون عمولة.",
       becomeCta: "استقبال الضيوف مجاناً",
       browseBtn: "عرض العائلات",
+      freeStay: "إقامة مجانية",
+      freeStayDesc: "أقم مع عائلة أرمينية مجاناً",
+      bookForFree: "احجز مجاناً",
+      paidServices: "الخدمات المدفوعة",
+      experiencesLabel: "التجارب",
     },
     become: {
       title: "استقبال الضيوف في HayHome",
@@ -889,6 +934,11 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "免费注册。前12个月无佣金。",
       becomeCta: "免费接待客人",
       browseBtn: "浏览家庭",
+      freeStay: "免费住宿",
+      freeStayDesc: "免费入住亚美尼亚家庭",
+      bookForFree: "免费预订",
+      paidServices: "付费服务",
+      experiencesLabel: "体验",
     },
     become: {
       title: "在HayHome接待客人",
@@ -966,6 +1016,11 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "رایگان ثبت‌نام کنید. ۱۲ ماه اول بدون کمیسیون.",
       becomeCta: "پذیرش مهمان رایگان",
       browseBtn: "مشاهده خانواده‌ها",
+      freeStay: "اقامت رایگان",
+      freeStayDesc: "در خانواده ارمنی به صورت رایگان زندگی کنید",
+      bookForFree: "رزرو رایگان",
+      paidServices: "خدمات پولی",
+      experiencesLabel: "تجربیات",
     },
     become: {
       title: "پذیرش مهمان در HayHome",

@@ -3,7 +3,7 @@ import { getHost, updateHost } from "@/lib/data";
 import { getAuthUser } from "@/lib/auth";
 
 const ALLOWED_FIELDS = [
-  "familyName", "name", "description", "longDescription", "pricePerNight",
+  "familyName", "name", "description", "longDescription",
   "coverPhoto", "photos", "amenities", "experiences", "languages",
   "maxGuests", "availableRooms", "i18n", "location", "city", "region",
   "phone", "email",

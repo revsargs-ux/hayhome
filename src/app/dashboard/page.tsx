@@ -47,7 +47,7 @@ export default function DashboardPage() {
   const [tab, setTab] = useState<"bookings" | "profile" | "calendar" | "messages" | "favorites">("bookings");
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [editForm, setEditForm] = useState({ description: "", phone: "", pricePerNight: 30 });
+  const [editForm, setEditForm] = useState({ description: "", phone: "" });
   const [partnerCode, setPartnerCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
@@ -83,7 +83,7 @@ export default function DashboardPage() {
       const profile = hData.find((h: Host) => h.email === user.email);
       if (profile) {
         setMyProfile(profile);
-        setEditForm({ description: profile.description, phone: profile.phone, pricePerNight: profile.pricePerNight });
+        setEditForm({ description: profile.description, phone: profile.phone });
       }
     }
     // Check partner status
@@ -326,7 +326,7 @@ export default function DashboardPage() {
                         }`}>{statusLabels[b.status]}</span>
                       </div>
                       <p className="text-sm text-gray-600">
-                        {b.hostName} · {b.checkIn} → {b.checkOut} · {b.guests} {u.guestsLabel} · <strong>${b.totalPrice}</strong>
+                        {b.hostName} · {b.checkIn} → {b.checkOut} · {b.guests} {u.guestsLabel}
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">{b.guestEmail} · {b.guestPhone}</p>
                       {b.message && <p className="text-xs text-gray-500 italic mt-1">"{b.message}"</p>}
@@ -431,18 +431,7 @@ export default function DashboardPage() {
                     <p className="text-gray-600 text-sm">{myProfile.phone}</p>
                   )}
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    {u.pricePerNight}
-                  </label>
-                  {editing ? (
-                    <input type="number" min={10} max={500} value={editForm.pricePerNight}
-                      onChange={e => setEditForm(f => ({ ...f, pricePerNight: Number(e.target.value) }))}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
-                  ) : (
-                    <p className="text-gray-600 text-sm">${myProfile.pricePerNight}</p>
-                  )}
-                </div>
+
               </div>
             </div>
           </div>
@@ -556,7 +545,7 @@ export default function DashboardPage() {
                           }`}>{statusLabels[b.status]}</span>
                         </div>
                         <p className="text-sm text-gray-500">{b.checkIn} → {b.checkOut} · {b.guests} гостей</p>
-                        {b.totalPrice > 0 && <p className="text-sm font-semibold text-gray-700 mt-0.5">${b.totalPrice}</p>}
+                
                       </div>
                       <div className="flex gap-2 flex-shrink-0">
                         <Link href={`/hosts/${b.hostId}`}
@@ -1072,7 +1061,7 @@ function DashboardFavorites({ lang }: { lang: string }) {
                 <h3 className="font-bold text-gray-900 text-sm mb-1">{host.familyName}</h3>
                 <p className="text-xs text-gray-500 mb-2">{host.city}, {host.region}</p>
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-gray-900">${host.pricePerNight}</span>
+                  <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">🆓 Бесплатно</span>
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <Star size={12} fill="#F2A900" color="#F2A900" />
                     {host.rating > 0 ? host.rating.toFixed(1) : "New"}

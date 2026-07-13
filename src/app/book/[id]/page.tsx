@@ -193,9 +193,9 @@ export default function BookPage() {
     return Math.max(0, Math.round((new Date(form.checkOut).getTime() - new Date(form.checkIn).getTime()) / 86400000));
   })();
 
-  const total = host ? nights * host.pricePerNight : 0;
-  const commission = Math.round((total + extraTotal) * 0.15 * 100) / 100;
-  const finalTotal = total;
+  // Проживание бесплатно
+  const total = 0;
+  const finalTotal = 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -223,19 +223,7 @@ export default function BookPage() {
       // Clear draft on successful booking
       try { localStorage.removeItem(`hayhome_booking_draft_${id}`); } catch {}
 
-      if (bookingId) {
-        try {
-          const payRes = await fetch("/api/payments/create", {
-            method: "POST", credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ booking_id: bookingId, method: "yookassa", currency: "RUB" }),
-          });
-          if (payRes.ok) {
-            const payData = await payRes.json();
-            if (payData.url) { window.location.href = payData.url; return; }
-          }
-        } catch (e) {}
-      }
+      // Проживание бесплатно — оплата не требуется, сразу показываем успех
       setSuccess(true);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Unknown error";
@@ -472,7 +460,7 @@ export default function BookPage() {
 <button type="submit" disabled={loading}
                   className="w-full py-4 rounded-xl text-white font-bold text-lg hover:opacity-90 transition disabled:opacity-70"
                   style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  {loading ? u.sendingText : (nights > 0 ? `${lang === "ru" ? "Оплатить (комиссия 15%)" : "Pay (15% commission)"} · $${commission}` : t("submit"))}
+                  {loading ? u.sendingText : (lang === "ru" ? "Забронировать бесплатно" : lang === "hy" ? "Անվարկագին արից պայմանագրել" : "Book for Free")}
                 </button>
                 <p className="text-center text-xs text-gray-400">{t("cancel")}</p>
               </form>
@@ -497,15 +485,16 @@ export default function BookPage() {
               {nights > 0 ? (
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between text-gray-700">
-                    <span>${host.pricePerNight} × {nights} {t("nights")}</span>
-                    <span>${total}</span>
+                    <span>{lang === "ru" ? "Проживание" : lang === "hy" ? "Կացելություն" : "Accommodation"}</span>
+                    <span className="text-green-600 font-semibold">{t("free")}</span>
                   </div>
                   <div className="flex justify-between text-gray-500 text-xs">
                     <span>{t("service")}</span>
                     <span className="text-green-600 font-medium">{t("free")}</span>
                   </div>
                   <div className="flex justify-between font-bold text-gray-900 text-base pt-2 border-t border-gray-100">
-                    <span>{t("total")}</span><span>${finalTotal}</span>
+                    <span>{t("total")}</span>
+                    <span className="text-green-600">{t("free")}</span>
                   </div>
                 </div>
               ) : (

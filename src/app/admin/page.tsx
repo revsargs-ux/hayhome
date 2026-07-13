@@ -307,7 +307,7 @@ export default function AdminPage() {
                         </div>
                         <p className="text-sm text-gray-600">
                           {booking.hostName} · {booking.checkIn} → {booking.checkOut}
-                          · {booking.guests} {u.guestsLabel} · <strong>${booking.totalPrice}</strong>
+                          · {booking.guests} {u.guestsLabel}
                         </p>
                         {booking.message && (
                           <p className="text-xs text-gray-400 mt-1 italic">"{booking.message}"</p>
@@ -699,7 +699,7 @@ function HostRow({ host, updating, onUpdate, onLogAction, lang }: {
           </div>
           <p className="text-sm text-gray-600">{host.description}</p>
           <p className="text-xs text-gray-400 mt-1">
-            {host.phone} · {host.email} · {"★".repeat(host.stars)} · ${host.pricePerNight}{"/night"}
+            {host.phone} · {host.email} · {"★".repeat(host.stars)} · 🆓 Бесплатное проживание
           </p>
           {host.admin_notes && (
             <p className="text-xs text-amber-600 mt-1 bg-amber-50 rounded px-2 py-1">📝 {host.admin_notes}</p>

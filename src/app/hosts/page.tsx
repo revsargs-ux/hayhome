@@ -17,9 +17,7 @@ const REGIONS_LIST = ["Ереван", "Тавуш", "Ширак", "Арарат"
 function HostsContent() {
   const { tr, lang } = useLang();
   const isRu = lang === "ru";
-  const priceRange = { ru: "Диапазон цен", en: "Price range", hy: "Գների միջակայք", fr: "Fourchette de prix", de: "Preisspanne", es: "Rango de precios", it: "Fascia di prezzo", ar: "نطاق السعر", zh: "价格范围", fa: "محدوده قیمت" }[lang] || "Price range";
-  const fromLabel = { ru: "От", en: "From", hy: "Ից", fr: "De", de: "Von", es: "Desde", it: "Da", ar: "من", zh: "从", fa: "از" }[lang] || "From";
-  const toLabel = { ru: "До", en: "To", hy: "Մինչև", fr: "À", de: "Bis", es: "Hasta", it: "A", ar: "إلى", zh: "到", fa: "تا" }[lang] || "To";
+
   const h = tr.hosts;
   const u = getUI(lang);
   const searchParams = useSearchParams();
@@ -30,11 +28,10 @@ function HostsContent() {
   const [search, setSearch] = useState(searchParams.get("q") || "");
   const [region, setRegion] = useState("");
   const [minStars, setMinStars] = useState(0);
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(200);
+
   const [experience, setExperience] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState<"rating" | "price_asc" | "price_desc" | "value">("rating");
+  const [sortBy, setSortBy] = useState<"rating" | "value">("rating");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [valueRanks, setValueRanks] = useState<Record<string, number>>({});
 
@@ -71,14 +68,11 @@ function HostsContent() {
     }
     if (region) result = result.filter((h) => h.region === region || h.city === region);
     if (minStars > 0) result = result.filter((h) => h.stars >= minStars);
-    result = result.filter((h) => h.pricePerNight >= minPrice && h.pricePerNight <= maxPrice);
     if (experience) result = result.filter((h) => h.experiences?.some(e => e.toLowerCase().includes(experience.toLowerCase())));
     if (sortBy === "rating") result.sort((a, b) => b.rating - a.rating);
-    else if (sortBy === "price_asc") result.sort((a, b) => a.pricePerNight - b.pricePerNight);
-    else if (sortBy === "price_desc") result.sort((a, b) => b.pricePerNight - a.pricePerNight);
     else if (sortBy === "value") result.sort((a, b) => (valueRanks[a.id] || 999) - (valueRanks[b.id] || 999));
     setFiltered(result);
-  }, [hosts, search, region, minStars, minPrice, maxPrice, sortBy, experience, valueRanks]);
+  }, [hosts, search, region, minStars, sortBy, experience, valueRanks]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -109,8 +103,6 @@ function HostsContent() {
             >
               <option value="rating">{h.byRating}</option>
               <option value="value">🏆 {u.bestValue}</option>
-              <option value="price_asc">{h.byPriceAsc}</option>
-              <option value="price_desc">{h.byPriceDesc}</option>
             </select>
           </div>
 
@@ -135,22 +127,7 @@ function HostsContent() {
                   <span>{h.anyStars}</span><span>⭐⭐⭐⭐⭐</span>
                 </div>
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
-                  {priceRange}: ${minPrice} — ${maxPrice}/night
-                </label>
-                <div className="flex items-center gap-2">
-                  <input type="range" min={0} max={200} step={5} value={minPrice}
-                    onChange={(e) => setMinPrice(Math.min(Number(e.target.value), maxPrice - 5))}
-                    className="flex-1 accent-red-600" />
-                  <input type="range" min={0} max={200} step={5} value={maxPrice}
-                    onChange={(e) => setMaxPrice(Math.max(Number(e.target.value), minPrice + 5))}
-                    className="flex-1 accent-red-600" />
-                </div>
-                <div className="flex justify-between text-xs text-gray-400 mt-1">
-                  <span>$0</span><span>$200</span>
-                </div>
-              </div>
+
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
                   {u.experience}
@@ -213,26 +190,6 @@ function HostsContent() {
           </div>
         ) : viewMode === "map" && filtered.length > 0 ? (
           <div>
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-gray-700">{priceRange}</span>
-                <span className="text-sm font-bold text-red-600">${minPrice} — ${maxPrice}</span>
-              </div>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">{fromLabel}</label>
-                  <input type="range" min={0} max={200} step={5} value={minPrice}
-                    onChange={(e) => setMinPrice(Math.min(Number(e.target.value), maxPrice - 5))}
-                    className="w-full accent-red-600" />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">{toLabel}</label>
-                  <input type="range" min={0} max={200} step={5} value={maxPrice}
-                    onChange={(e) => setMaxPrice(Math.max(Number(e.target.value), minPrice + 5))}
-                    className="w-full accent-red-600" />
-                </div>
-              </div>
-            </div>
             <Map hosts={filtered} />
           </div>
         ) : filtered.length === 0 ? (
@@ -241,7 +198,7 @@ function HostsContent() {
             <h3 className="text-xl font-bold text-gray-900 mb-2">{h.notFound}</h3>
             <p className="text-gray-500 mb-6">{h.notFoundSub}</p>
             <button
-              onClick={() => { setSearch(""); setRegion(""); setMinStars(0); setMinPrice(0); setMaxPrice(200); }}
+              onClick={() => { setSearch(""); setRegion(""); setMinStars(0); }}
               className="px-6 py-2.5 rounded-full text-white font-medium"
               style={{ background: "#D4001A" }}
             >

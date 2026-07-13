@@ -89,18 +89,17 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // ── Server-side price calculation ──
+  // ── Verify host exists ──
   const { data: host } = await supabase
     .from("hayhome_hosts")
-    .select("pricePerNight")
+    .select("id")
     .eq("id", body.hostId)
     .single();
-  if (!host || !host.pricePerNight) {
-    return NextResponse.json({ error: "Host not found or price not set" }, { status: 400 });
+  if (!host) {
+    return NextResponse.json({ error: "Host not found" }, { status: 400 });
   }
-  const nights = dateRange.length;
-  const serverTotalPrice = Math.round(host.pricePerNight * nights * 100) / 100;
 
+  // ── Проживание БЕСПЛАТНО — totalPrice всегда 0 ──
   const booking = await createBooking({
     hostId: body.hostId,
     hostName: String(body.hostName || "").slice(0, 200),
@@ -111,7 +110,7 @@ export async function POST(req: NextRequest) {
     checkIn: body.checkIn,
     checkOut: body.checkOut,
     guests: body.guests,
-    totalPrice: serverTotalPrice,
+    totalPrice: 0,
     message: String(body.message || "").slice(0, 2000),
   });
 
@@ -183,6 +182,7 @@ export async function POST(req: NextRequest) {
       if (guestUser?.referred_by_code) {
         const { data: partner } = await sb.from("hayhome_partners").select("id, status").eq("code", guestUser.referred_by_code).eq("status", "active").single();
         if (partner) {
+          // totalPrice=0 для бесплатного проживания → комиссия=0
           const commission = Math.round(booking.totalPrice * 0.05 * 100) / 100;
           // Update booking with commission
           await sb.from("hayhome_bookings").update({ commission_partner: commission, partner_id: partner.id }).eq("id", booking.id);

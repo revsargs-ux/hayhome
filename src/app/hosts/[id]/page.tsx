@@ -278,7 +278,7 @@ export default function HostProfilePage() {
       addressLocality: host.city || "Yerevan",
       addressCountry: "AM",
     },
-    priceRange: host.pricePerNight ? `$${host.pricePerNight}` : "$$",
+    priceRange: "Free",
     telephone: host.phone,
     aggregateRating: reviews.length > 0 ? {
       "@type": "AggregateRating",
@@ -671,9 +671,10 @@ export default function HostProfilePage() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 lg:sticky lg:top-24">
               <div className="text-center mb-6">
-                <div className="text-4xl font-extrabold text-gray-900">
-                  ${host.pricePerNight}
-                  <span className="text-lg font-normal text-gray-500">{h.perNight}</span>
+                <div className="flex justify-center mb-1">
+                  <span className="inline-flex items-center gap-2 bg-green-500 text-white text-xl font-bold px-5 py-2 rounded-2xl shadow">
+                    🆓 Бесплатное проживание
+                  </span>
                 </div>
                 {host.rating > 0 && (
                   <div className="flex items-center justify-center gap-1 mt-1 text-sm text-gray-500">

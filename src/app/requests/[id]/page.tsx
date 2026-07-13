@@ -34,7 +34,7 @@ interface GuestRequest {
 
 interface Recommendation {
   services: Array<{ id: string; title: string; description: string; price: number; category: string; region: string; }>;
-  hosts: Array<{ id: string; familyName: string; pricePerNight: number; region: string; city: string; coverPhoto: string; rating: number; maxGuests: number; }>;
+  hosts: Array<{ id: string; familyName: string; region: string; city: string; coverPhoto: string; rating: number; maxGuests: number; }>;
 }
 
 export default function RequestDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -204,7 +204,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                     </div>
                     <div className="min-w-0">
                       <h4 className="font-semibold text-gray-900 text-sm truncate">{h.familyName}</h4>
-                      <p className="text-sm font-bold text-red-600">${h.pricePerNight}<span className="text-xs text-gray-400 font-normal">/{night}</span></p>
+                      <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">🆓 Бесплатно</span>
                     </div>
                   </div>
                 </Link>

@@ -77,12 +77,8 @@ export async function POST(req: NextRequest) {
             .eq("id", paymentId)
             .single();
 
-          if (payment?.booking_id) {
-            await supabase
-              .from("hayhome_bookings")
-              .update({ status: "confirmed" })
-              .eq("id", payment.booking_id);
-          }
+          // Проживание бесплатно — статус уже confirmed при создании бронирования
+          // Webhook обновляет только платные услуги (service_bookings)
           if (payment?.service_booking_id) {
             await supabase
               .from("hayhome_service_bookings")
@@ -141,12 +137,8 @@ export async function POST(req: NextRequest) {
             .eq("id", paymentId)
             .single();
 
-          if (payRecord?.booking_id) {
-            await supabase
-              .from("hayhome_bookings")
-              .update({ status: "confirmed" })
-              .eq("id", payRecord.booking_id);
-          }
+          // Проживание бесплатно — статус уже confirmed при создании
+          // Webhook обновляет только платные услуги (service_bookings)
           if (payRecord?.service_booking_id) {
             await supabase
               .from("hayhome_service_bookings")

@@ -14,8 +14,6 @@ type Host = {
   email: string;
   status: string;
   verified: boolean;
-  pricePerNight: number;
-  createdAt: string;
 };
 
 const T: Record<string, Record<string, string>> = {
@@ -161,7 +159,7 @@ export default function AdminContractsPage() {
                     <div className="text-xs text-gray-500">{host.name}{host.patronymic ? ` ${host.patronymic}` : ""}</div>
                   </td>
                   <td className="px-4 py-3 text-gray-600">{host.city}, {host.region}</td>
-                  <td className="px-4 py-3 text-gray-600">${host.pricePerNight}</td>
+                  <td className="px-4 py-3"><span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">🆓 Бесплатно</span></td>
                   <td className="px-4 py-3">
                     {host.verified ? (
                       <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">

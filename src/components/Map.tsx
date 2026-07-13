@@ -142,7 +142,6 @@ export interface MapHost {
   city: string;
   region: string;
   coverPhoto: string;
-  pricePerNight: number;
   rating: number;
   stars: number;
 }
@@ -172,7 +171,6 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
     city: h.city,
     region: h.region,
     coverPhoto: h.coverPhoto,
-    pricePerNight: h.pricePerNight,
     rating: h.rating,
     stars: h.stars,
   }));
@@ -250,8 +248,8 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
                     <span style={{ fontSize: "12px" }}>
                       {host.rating > 0 ? `⭐ ${host.rating}` : ""}
                     </span>
-                    <span style={{ fontWeight: 700, color: "#D4001A", fontSize: "14px" }}>
-                      ${host.pricePerNight}/night
+                    <span style={{ fontWeight: 700, color: "#16a34a", fontSize: "13px", background: "#dcfce7", padding: "2px 8px", borderRadius: "12px" }}>
+                      🆓 Бесплатно
                     </span>
                   </div>
                   {/* 7-day availability calendar */}

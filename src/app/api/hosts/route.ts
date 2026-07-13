@@ -42,7 +42,8 @@ export async function POST(req: NextRequest) {
   if (!EMAIL_RE.test(body.email)) {
     return NextResponse.json({ error: "Invalid email" }, { status: 400 });
   }
-  if (typeof body.pricePerNight !== "number" || body.pricePerNight < 0 || body.pricePerNight > 10000) {
+  // pricePerNight опционально — проживание бесплатно
+  if (body.pricePerNight !== undefined && (typeof body.pricePerNight !== "number" || body.pricePerNight < 0 || body.pricePerNight > 10000)) {
     return NextResponse.json({ error: "Invalid price" }, { status: 400 });
   }
   if (typeof body.stars !== "number" || body.stars < 1 || body.stars > 5) {
@@ -61,7 +62,9 @@ export async function POST(req: NextRequest) {
     city: String(body.city).slice(0, 100),
     region: String(body.region).slice(0, 100),
     stars: body.stars,
-    pricePerNight: body.pricePerNight,
+    pricePerNight: body.pricePerNight ?? 0,
+    stayFree: true,
+    serviceCategories: Array.isArray(body.serviceCategories) ? body.serviceCategories.slice(0, 10) : [],
     description: sanitize(body.description),
     longDescription: sanitize(body.longDescription),
     i18n: body.i18n || {},

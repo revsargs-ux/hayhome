@@ -16,7 +16,9 @@ export interface Host {
   city: string;
   region: string;
   stars: Stars;
-  pricePerNight: number;
+  pricePerNight?: number;
+  stayFree: boolean;
+  serviceCategories: string[];
   description: string;
   longDescription: string;
   photos: string[];

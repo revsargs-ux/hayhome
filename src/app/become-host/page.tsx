@@ -52,7 +52,7 @@ export default function BecomeHostPage() {
     passportSeries: "", passportNumber: "", passportDate: "", passportIssued: "",
     inn: "", bankAccount: "", bankBic: "", bankName: "",
     city: "", region: "", location: "",
-    pricePerNight: 30, maxGuests: 2, availableRooms: 1,
+    maxGuests: 2, availableRooms: 1,
     description: "", longDescription: "",
     amenities: [] as string[], experiences: [] as string[],
     languages: ["Армянский"] as string[],
@@ -327,18 +327,11 @@ export default function BecomeHostPage() {
             <div className="space-y-5">
               <h2 className="text-xl font-bold text-gray-900 mb-6">{b.step2}</h2>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  {b.priceNight}: <strong>${form.pricePerNight}</strong>
-                </label>
-                <input type="range" min={10} max={150} step={5}
-                  value={form.pricePerNight} onChange={e => set("pricePerNight", Number(e.target.value))} className="w-full accent-red-600" />
-                <div className="flex justify-between text-xs text-gray-400 mt-1"><span>$10</span><span>$150</span></div>
-                <div className="mt-2 bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-blue-800 space-y-1">
-                  <p className="font-semibold">💰 Расчёт вашего дохода за ночь:</p>
-                  <p>Гость платит: <strong>${form.pricePerNight}</strong></p>
-                  <p>Комиссия платформы (15%): −${(form.pricePerNight * 0.15).toFixed(2)}</p>
-                  <p>Комиссия за перевод (1%): −${(form.pricePerNight * 0.84 * 0.01).toFixed(2)}</p>
-                  <p className="font-bold text-green-700">Вы получите: <span className="text-base">${(form.pricePerNight * 0.84 * 0.99).toFixed(2)}</span></p>
+                <div className="bg-green-50 border border-green-100 rounded-xl p-3 text-xs text-green-800 space-y-1">
+                  <p className="font-semibold text-base">🆓 Проживание — БЕСПЛАТНО для гостей</p>
+                  <p>Вы зарабатываете на платных услугах: ужины, экскурсии, мастер-классы</p>
+                  <p>Комиссия платформы: 16% с платных услуг</p>
+                  <p>Вы получаете: <strong>84%</strong> от платных услуг</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">

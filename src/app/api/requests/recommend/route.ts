@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
   // Build hosts query
   let hostQuery = supabase
     .from("hayhome_hosts")
-    .select("id, familyName, pricePerNight, region, city, coverPhoto, rating, reviewCount, maxGuests")
+    .select("id, familyName, region, city, coverPhoto, rating, reviewCount, maxGuests")
     .eq("status", "active");
 
   if (region && region !== "all") {

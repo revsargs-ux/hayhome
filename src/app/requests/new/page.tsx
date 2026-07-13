@@ -40,7 +40,7 @@ const t = (lang: string, tr: any): Record<string, string> => ({
 
 interface Recommendation {
   services: Array<{ id: string; title: string; description: string; price: number; category: string; region: string }>;
-  hosts: Array<{ id: string; familyName: string; pricePerNight: number; region: string; city: string; coverPhoto: string; rating: number; maxGuests: number }>;
+  hosts: Array<{ id: string; familyName: string; region: string; city: string; coverPhoto: string; rating: number; maxGuests: number }>;
 }
 
 export default function NewRequestPage() {
@@ -167,7 +167,7 @@ export default function NewRequestPage() {
                           <span>{regionName(h.region, lang)}</span>
                           {h.rating > 0 && <span>⭐ {h.rating.toFixed(1)}</span>}
                         </div>
-                        <p className="text-sm font-bold text-red-600 mt-0.5">${h.pricePerNight}<span className="text-xs text-gray-400 font-normal">/{l.night}</span></p>
+                        <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full mt-0.5 inline-block">🆓 Бесплатно</span>
                       </div>
                     </div>
                   </Link>
