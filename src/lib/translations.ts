@@ -71,7 +71,6 @@ export interface Translations {
     greeting: string;
     title1: string;
     title2: string;
-    title3: string;
     subtitle: string;
     searchPlaceholder: string;
     searchBtn: string;
@@ -209,9 +208,8 @@ const t: Record<LangCode, Translations> = {
     },
     hero: {
       greeting: "Добро пожаловать!",
-      title1: "Войди — стань",
-      title2: "частью большой",
-      title3: "армянской семьи",
+      title1: "Присоединяйтесь",
+      title2: "к нашей семье",
       subtitle: "Армения открывается через сердце семьи. Настоящий ужин, живые истории, вид на Арарат. Не отель — дом.",
       searchPlaceholder: "Ереван, Дилижан, Севан...",
       searchBtn: "Найти семью",
@@ -314,9 +312,8 @@ const t: Record<LangCode, Translations> = {
     nav: { findFamily: "Find a Family", hostGuests: "Host Guests", about: "About", partner: "Partners", login: "Log In", register: "Sign Up", logout: "Sign Out" },
     hero: {
       greeting: "Welcome!",
-      title1: "Come in — become",
-      title2: "part of one big",
-      title3: "Armenian family",
+      title1: "Join",
+      title2: "our family",
       subtitle: "Armenia opens through the heart of a family. A real dinner, living stories, a view of Ararat. Not a hotel — a home.",
       searchPlaceholder: "Yerevan, Dilijan, Sevan...",
       searchBtn: "Find a Family",
@@ -396,9 +393,8 @@ const t: Record<LangCode, Translations> = {
     nav: { findFamily: "Գտնել ընտանիք", hostGuests: "Ընդունել հյուրեր", about: "Մեր մասին", partner: "Գործընկերներ", login: "Մուտք", register: "Գրանցում" , logout: "Ելք" },
     hero: {
       greeting: "Բարի գալուստ!",
-      title1: "Դարձեք մեր",
-      title2: "ընտանիքի",
-      title3: "մասնիկ",
+      title1: "Միացիր",
+      title2: "մեր ընտանիքին",
       subtitle: "Հայաստանը բացվում է ընտանիքի սրտի միջոցով: Իրական ընթրիք, կենդանի պատմություններ, Արարատի տեսարան:",
       searchPlaceholder: "Երևան, Դիլիջան, Սևան...",
       searchBtn: "Գտնել ընտանիք",
@@ -478,9 +474,8 @@ const t: Record<LangCode, Translations> = {
     nav: { findFamily: "Trouver une famille", hostGuests: "Accueillir des hôtes", about: "À propos", login: "Connexion", register: "S'inscrire", logout: "Se déconnecter", partner: "Partenaires" },
     hero: {
       greeting: "Bienvenue !",
-      title1: "Entrez — devenez",
-      title2: "membre d'une grande",
-      title3: "famille arménienne",
+      title1: "Rejoignez",
+      title2: "notre famille",
       subtitle: "L'Arménie s'ouvre par le cœur d'une famille. Un vrai dîner, des histoires vivantes, une vue sur l'Ararat.",
       searchPlaceholder: "Erevan, Dilijan, Sevan...",
       searchBtn: "Trouver une famille",
@@ -560,9 +555,8 @@ const t: Record<LangCode, Translations> = {
     nav: { findFamily: "Familie finden", hostGuests: "Gäste empfangen", about: "Über uns", login: "Anmelden", register: "Registrieren", logout: "Abmelden", partner: "Partner" },
     hero: {
       greeting: "Willkommen!",
-      title1: "Komm rein — werde",
-      title2: "Teil einer großen",
-      title3: "armenischen Familie",
+      title1: "Werden Sie",
+      title2: "Teil unserer Familie",
       subtitle: "Armenien öffnet sich durch das Herz einer Familie. Ein echtes Abendessen, lebendige Geschichten, ein Blick auf den Ararat.",
       searchPlaceholder: "Jerewan, Dilijan, Sevan...",
       searchBtn: "Familie finden",
@@ -642,9 +636,8 @@ const t: Record<LangCode, Translations> = {
     nav: { findFamily: "Encontrar familia", hostGuests: "Recibir huéspedes", about: "Sobre nosotros", login: "Iniciar sesión", register: "Registrarse", logout: "Cerrar sesión", partner: "Socios" },
     hero: {
       greeting: "¡Bienvenido!",
-      title1: "Entra — conviértete",
-      title2: "en parte de una gran",
-      title3: "familia armenia",
+      title1: "Únete",
+      title2: "a nuestra familia",
       subtitle: "Armenia se abre a través del corazón de una familia. Una cena real, historias vivas, una vista del Ararat.",
       searchPlaceholder: "Ereván, Dilijan, Sevan...",
       searchBtn: "Encontrar familia",
@@ -724,9 +717,8 @@ const t: Record<LangCode, Translations> = {
     nav: { findFamily: "Trova una famiglia", hostGuests: "Ospita viaggiatori", about: "Chi siamo", login: "Accedi", register: "Registrati", logout: "Esci", partner: "Partner" },
     hero: {
       greeting: "Benvenuto!",
-      title1: "Entra — diventa",
-      title2: "parte di una grande",
-      title3: "famiglia armena",
+      title1: "Unisciti",
+      title2: "alla nostra famiglia",
       subtitle: "L'Armenia si apre attraverso il cuore di una famiglia. Una vera cena, storie vive, una vista sull'Ararat.",
       searchPlaceholder: "Yerevan, Dilijan, Sevan...",
       searchBtn: "Trova una famiglia",
@@ -806,9 +798,8 @@ const t: Record<LangCode, Translations> = {
     nav: { findFamily: "ابحث عن عائلة", hostGuests: "استقبال الضيوف", about: "من نحن", login: "تسجيل الدخول", register: "إنشاء حساب", logout: "تسجيل الخروج", partner: "شركاء" },
     hero: {
       greeting: "¡Bienvenido!",
-      title1: "ادخل — كن",
-      title2: "جزءاً من عائلة",
-      title3: "أرمينية كبيرة",
+      title1: "انضم",
+      title2: "إلى عائلتنا",
       subtitle: "أرمينيا تنفتح من خلال قلب الأسرة. عشاء حقيقي، قصص حية، منظر جبل أرارات.",
       searchPlaceholder: "يريفان، ديليجان، سيفان...",
       searchBtn: "ابحث عن عائلة",
@@ -888,9 +879,8 @@ const t: Record<LangCode, Translations> = {
     nav: { findFamily: "寻找家庭", hostGuests: "接待客人", about: "关于我们", login: "登录", register: "注册", logout: "退出", partner: "合作伙伴" },
     hero: {
       greeting: "مرحباً!",
-      title1: "加入我们——成为",
-      title2: "亚美尼亚大家庭",
-      title3: "的一份子",
+      title1: "加入",
+      title2: "我们的家庭",
       subtitle: "亚美尼亚通过家庭的心向您敞开。真实的晚餐，生动的故事，亚拉腊山的美景。不是酒店——是家。",
       searchPlaceholder: "埃里温，迪利然，塞凡...",
       searchBtn: "寻找家庭",
@@ -970,9 +960,8 @@ const t: Record<LangCode, Translations> = {
     nav: { findFamily: "یافتن خانواده", hostGuests: "پذیرش مهمان", about: "درباره ما", login: "ورود", register: "ثبت‌نام", logout: "خروج", partner: "همکاران" },
     hero: {
       greeting: "خوش آمدید!",
-      title1: "بیایید — بخشی از",
-      title2: "یک خانواده بزرگ",
-      title3: "ارمنی شوید",
+      title1: "به خانواده",
+      title2: "ما بپیوندید",
       subtitle: "ارمنستان از طریق قلب خانواده‌ای باز می‌شود. یک شام واقعی، داستان‌های زنده، منظره آرارات.",
       searchPlaceholder: "ایروان، دیلیجان، سوان...",
       searchBtn: "یافتن خانواده",
