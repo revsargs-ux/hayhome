@@ -116,6 +116,7 @@ export interface UI {
   history: string;
   noRecords: string;
   noBookingsAdmin: string;
+  noSvcBookings: string;
   noPayoutRequests: string;
   noUsers: string;
   searchByName: string;
@@ -334,6 +335,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "Всего бронирований",
     earnedLabel: "Заработано",
     noBookings: "Пока нет заявок",
+    noSvcBookings: "У вас пока нет заказанных услуг",
     bookingsTab: "Бронирования",
     profileTab: "Профиль",
     calendarTab: "Календарь",
@@ -617,6 +619,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "Total bookings",
     earnedLabel: "Earned",
     noBookings: "No bookings yet",
+    noSvcBookings: "No services booked yet",
     bookingsTab: "Bookings",
     profileTab: "Profile",
     calendarTab: "Calendar",
@@ -900,6 +903,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "Ընդհանուր ամրագրումներ",
     earnedLabel: "Վաստակված",
     noBookings: "Դեռևս ամրագրումներ չկան",
+    noSvcBookings: "Դեռևս պատասխան չկան պատասխան",
     bookingsTab: "Ամրագրումներ",
     profileTab: "Պրոֆիլ",
     calendarTab: "Օրացույց",
@@ -1183,6 +1187,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "Total réservations",
     earnedLabel: "Revenus",
     noBookings: "Pas encore de réservations",
+    noSvcBookings: "Aucun service réservé pour le moment",
     bookingsTab: "Réservations",
     profileTab: "Profil",
     calendarTab: "Calendrier",
@@ -1466,6 +1471,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "Buchungen gesamt",
     earnedLabel: "Verdient",
     noBookings: "Noch keine Buchungen",
+    noSvcBookings: "Noch keine Dienstleistungen gebucht",
     bookingsTab: "Buchungen",
     profileTab: "Profil",
     calendarTab: "Kalender",
@@ -1749,6 +1755,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "Reservas totales",
     earnedLabel: "Ganado",
     noBookings: "Aún no hay reservas",
+    noSvcBookings: "Aún no hay servicios reservados",
     bookingsTab: "Reservas",
     profileTab: "Perfil",
     calendarTab: "Calendario",
@@ -2032,6 +2039,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "Prenotazioni totali",
     earnedLabel: "Guadagnato",
     noBookings: "Nessuna prenotazione",
+    noSvcBookings: "Nessun servizio prenotato",
     bookingsTab: "Prenotazioni",
     profileTab: "Profilo",
     calendarTab: "Calendario",
@@ -2315,6 +2323,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "إجمالي الحجوزات",
     earnedLabel: "المكتسبة",
     noBookings: "لا حجوزات بعد",
+    noSvcBookings: "لا توجد خدمات محجوزة بعد",
     bookingsTab: "الحجوزات",
     profileTab: "ملفي",
     calendarTab: "التقويم",
@@ -2598,6 +2607,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "总预订",
     earnedLabel: "已赚取",
     noBookings: "暂无预订",
+    noSvcBookings: "暂无预订服务",
     bookingsTab: "预订",
     profileTab: "资料",
     calendarTab: "日历",
@@ -2881,6 +2891,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "کل رزروها",
     earnedLabel: "کسب شده",
     noBookings: "هنوز رزروی وجود ندارد",
+    noSvcBookings: "هنوز خدمتی رزرو نشده است",
     bookingsTab: "رزروها",
     profileTab: "پروفایل",
     calendarTab: "تقویم",
