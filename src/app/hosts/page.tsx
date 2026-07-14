@@ -198,7 +198,7 @@ function HostsContent() {
             <h3 className="text-xl font-bold text-gray-900 mb-2">{h.notFound}</h3>
             <p className="text-gray-500 mb-6">{h.notFoundSub}</p>
             <button
-              onClick={() => { setSearch(""); setRegion(""); setMinStars(0); }}
+              onClick={() => { setSearch(""); setRegion(""); setMinStars(0); setExperience(""); }}
               className="px-6 py-2.5 rounded-full text-white font-medium"
               style={{ background: "#D4001A" }}
             >
