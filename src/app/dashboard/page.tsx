@@ -15,6 +15,7 @@ import ChatWidget from "@/components/ChatWidget";
 import FavoriteButton from "@/components/FavoriteButton";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false });
+import { isUserInArmenia, findNearestAirport, ZVARTNOTS } from "@/components/RouteMap";
 
 // Route translation labels for dashboard
 const DASH_RT = {
@@ -808,14 +809,25 @@ function DashRouteSection({ booking, lang }: { booking: Booking; lang: string })
             lang={lang}
           />
           <div className="mt-2">
-            <NavigatorLinks
-              fromLat={origin.lat}
-              fromLng={origin.lng}
-              toLat={destCoords.lat}
-              toLng={destCoords.lng}
-              toName={booking.hostName}
-              lang={lang}
-            />
+            {isUserInArmenia(origin.lat, origin.lng) ? (
+              <NavigatorLinks
+                fromLat={origin.lat}
+                fromLng={origin.lng}
+                toLat={destCoords.lat}
+                toLng={destCoords.lng}
+                toName={booking.hostName}
+                lang={lang}
+              />
+            ) : (
+              <NavigatorLinks
+                fromLat={ZVARTNOTS.lat}
+                fromLng={ZVARTNOTS.lng}
+                toLat={destCoords.lat}
+                toLng={destCoords.lng}
+                toName={booking.hostName}
+                lang={lang}
+              />
+            )}
           </div>
         </>
       )}
