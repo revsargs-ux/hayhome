@@ -39,11 +39,12 @@ export default function MobileBottomBar() {
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`flex-1 flex flex-col items-center justify-center py-2 gap-0.5 active:bg-gray-50 transition ${
+                aria-label={tab.label}
+                className={`flex-1 flex flex-col items-center justify-center py-3 gap-0.5 min-h-[44px] active:bg-gray-50 transition ${
                   active ? "text-red-600" : "text-gray-600"
                 }`}
               >
-                <span className="text-lg leading-none">{tab.icon}</span>
+                <span className="text-xl leading-none">{tab.icon}</span>
                 <span className="text-[10px] font-medium leading-tight text-center">
                   {tab.label}
                 </span>

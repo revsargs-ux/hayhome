@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Inter } from "next/font/google";
+import { Inter, Noto_Sans_Arabic, Noto_Sans_SC } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"], display: "swap", variable: "--font-inter" });
+const notoArabic = Noto_Sans_Arabic({ subsets: ["arabic"], display: "swap", variable: "--font-arabic", weight: ["400", "700"] });
+const notoSC     = Noto_Sans_SC({ subsets: ["latin"], display: "swap", variable: "--font-sc", weight: ["400", "700"] });
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -50,6 +52,7 @@ export const metadata: Metadata = {
     apple: "/icon-192.png",
   },
   alternates: {
+    canonical: 'https://hay-home.com',
     languages: {
       'ru': '/?lang=ru',
       'en': '/?lang=en',
@@ -100,7 +103,7 @@ export const revalidate = 0;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="hy" className={`h-full ${inter.variable}`}>
+    <html lang="hy" className={`h-full ${inter.variable} ${notoArabic.variable} ${notoSC.variable}`}>
       <head>
         <script
           type="application/ld+json"

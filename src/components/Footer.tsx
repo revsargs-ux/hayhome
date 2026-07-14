@@ -38,7 +38,7 @@ export default function Footer() {
               { label: "Instagram", href: "https://instagram.com/hayhome.am", icon: "📸" },
               { label: "Facebook", href: "https://facebook.com/hayhome.am", icon: "👤" },
               { label: "Telegram", href: "https://t.me/hayhome_bot", icon: "✈️" },
-              { label: "YouTube", href: "#", icon: "▶️" },
+              { label: "YouTube", href: "https://youtube.com/@hayhome", icon: "▶️" },
             ].map((s) => (
               <a key={s.label} href={s.href}
                 className="flex items-center gap-1.5 text-white/40 hover:text-white/80 transition-colors text-sm font-medium">
