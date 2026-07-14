@@ -1,12 +1,24 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin", "cyrillic"], display: "swap", variable: "--font-inter" });
+const inter = Inter({
+  subsets: ["latin", "cyrillic"],
+  display: "swap",
+  variable: "--font-inter",
+});
+const playfair = Playfair_Display({
+  subsets: ["latin", "cyrillic"],
+  display: "swap",
+  variable: "--font-playfair",
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBottomBar from "@/components/MobileBottomBar";
+import SmoothScrollProvider from "@/components/SmoothScrollProvider";
+import PageTransition from "@/components/PageTransition";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import LightboxWrapper from "@/components/LightboxWrapper";
@@ -100,7 +112,7 @@ export const revalidate = 0;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="hy" className={`h-full ${inter.variable}`}>
+    <html lang="hy" className={`h-full ${inter.variable} ${playfair.variable}`}>
       <head>
         <script
           type="application/ld+json"
@@ -139,14 +151,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </noscript>
         <AuthProvider>
           <LanguageProvider>
-            <LightboxWrapper>
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-              <MobileBottomBar />
-              <CookieBanner />
-              <ServiceWorkerRegister />
-            </LightboxWrapper>
+            <SmoothScrollProvider>
+              <LightboxWrapper>
+                <Header />
+                <main className="flex-1">
+                  <PageTransition>{children}</PageTransition>
+                </main>
+                <Footer />
+                <MobileBottomBar />
+                <CookieBanner />
+                <ServiceWorkerRegister />
+              </LightboxWrapper>
+            </SmoothScrollProvider>
           </LanguageProvider>
         </AuthProvider>
       </body>
