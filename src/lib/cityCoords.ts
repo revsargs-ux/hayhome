@@ -943,3 +943,64 @@ export function getCityCoords(cityName: string): { lat: number; lng: number } {
   // Default: Yerevan
   return { lat: 40.1792, lng: 44.4991 };
 }
+
+// Client-side cache for geocoded cities
+const GEO_RESOLVE_CACHE = new Map<string, { lat: number; lng: number; ts: number }>();
+const GEO_CACHE_TTL = 24 * 60 * 60 * 1000;
+
+// Pending requests (dedup concurrent calls for same city)
+const PENDING = new Map<string, Promise<{ lat: number; lng: number } | null>>();
+
+/**
+ * Async version with Nominatim API fallback.
+ * 1. Checks local CITY_COORDS / COUNTRY_COORDS (instant, no API call)
+ * 2. Checks client-side cache
+ * 3. Calls /api/geocode/lookup (Nominatim) and caches result
+ * Returns Yerevan as ultimate fallback.
+ */
+export async function getCityCoordsAsync(cityName: string): Promise<{ lat: number; lng: number }> {
+  if (!cityName) return { lat: 40.1792, lng: 44.4991 };
+
+  // 1. Try local (sync) lookup first
+  const local = getCityCoords(cityName);
+  // If it's NOT the default fallback, the city was found locally
+  const isDefault = local.lat === 40.1792 && local.lng === 44.4991;
+  // But Yerevan IS a valid local match — only treat as miss if input wasn't Yerevan
+  const isYerevanInput = cityName.toLowerCase() === "ерева́н" || cityName.toLowerCase() === "yerevan";
+  if (!isDefault || isYerevanInput) return local;
+
+  // 2. Check client-side cache
+  const key = cityName.trim().toLowerCase();
+  const cached = GEO_RESOLVE_CACHE.get(key);
+  if (cached && Date.now() - cached.ts < GEO_CACHE_TTL) {
+    return { lat: cached.lat, lng: cached.lng };
+  }
+
+  // 3. Dedup: if a request for this city is already in-flight, reuse it
+  const pending = PENDING.get(key);
+  if (pending) return pending.then(r => r || { lat: 40.1792, lng: 44.4991 });
+
+  // 4. Call geocode API
+  const promise = fetch(`/api/geocode/lookup?q=${encodeURIComponent(cityName.trim())}`)
+    .then(res => {
+      if (res.ok) return res.json();
+      return null;
+    })
+    .then(data => {
+      PENDING.delete(key);
+      if (data && typeof data.lat === 'number' && typeof data.lng === 'number') {
+        GEO_RESOLVE_CACHE.set(key, { lat: data.lat, lng: data.lng, ts: Date.now() });
+        // Also cache the result back into local map for future sync calls
+        return { lat: data.lat, lng: data.lng };
+      }
+      return null;
+    })
+    .catch(() => {
+      PENDING.delete(key);
+      return null;
+    });
+
+  PENDING.set(key, promise);
+  const result = await promise;
+  return result || { lat: 40.1792, lng: 44.4991 };
+}

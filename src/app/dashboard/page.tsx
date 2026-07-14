@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import NavigatorLinks from "@/components/NavigatorLinks";
-import { getCityCoords } from "@/lib/cityCoords";
+import { getCityCoords, getCityCoordsAsync } from "@/lib/cityCoords";
 import getUI from "@/lib/ui";
 import ChatWidget from "@/components/ChatWidget";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -748,9 +748,11 @@ function DashRouteSection({ booking, lang }: { booking: Booking; lang: string })
   useEffect(() => {
     fetch(`/api/hosts/${booking.hostId}`)
       .then(r => r.json())
-      .then(h => {
+      .then(async h => {
         if (h && h.city) {
-          setDestCoords(getCityCoords(h.city));
+          // Try async geocoding (Nominatim fallback for unknown cities)
+          const coords = await getCityCoordsAsync(h.city);
+          setDestCoords(coords);
         }
       })
       .catch(() => {});

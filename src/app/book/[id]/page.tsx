@@ -13,7 +13,7 @@ import AddressAutocomplete from "@/components/AddressAutocomplete";
 import type { NominatimResult } from "@/components/AddressAutocomplete";
 import dynamic from "next/dynamic";
 import NavigatorLinks from "@/components/NavigatorLinks";
-import { getCityCoords } from "@/lib/cityCoords";
+import { getCityCoords, getCityCoordsAsync } from "@/lib/cityCoords";
 import Recommendations from "@/components/Recommendations";
 import { reverseGeocode } from "@/lib/geo";
 
