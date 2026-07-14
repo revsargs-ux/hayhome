@@ -102,9 +102,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
     }
 
-    // Verify YooKassa signature (IP whitelist or shared secret header)
+    // Verify YooKassa signature (timing-safe)
     const incomingSecret = req.headers.get("x-yookassa-secret") || "";
-    if (incomingSecret !== yookassaSecret) {
+    let validSecret = false;
+    try {
+      const a = Buffer.from(incomingSecret, "utf-8");
+      const b = Buffer.from(yookassaSecret, "utf-8");
+      validSecret = a.length === b.length && crypto.timingSafeEqual(a, b);
+    } catch {
+      validSecret = false;
+    }
+    if (!validSecret) {
       return NextResponse.json({ error: "Invalid webhook secret" }, { status: 401 });
     }
 

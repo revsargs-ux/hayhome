@@ -26,10 +26,13 @@ const T = {
 // ============================================
 // HOSTS
 // ============================================
+// Публичные поля для GET /api/hosts — исключаем паспорт/реквизиты/координаты
+const HOST_PUBLIC_FIELDS = "id,name,slug,city,region,description,descriptionEn,longDescription,amenities,experiences,languages,rules,pricePerNight,maxGuests,photos,galleryPhotos,coverPhoto,rating,reviewCount,verified,status,createdAt,coordinates,familyName,location,stars,stayFree,serviceCategories,phone,email,badges,availableRooms,hostType,hostSince,videoLink,freeStayDays,i18n,user_id";
+
 export async function getHosts(): Promise<Host[]> {
   const { data, error } = await supabase
     .from(T.hosts)
-    .select("*")
+    .select(HOST_PUBLIC_FIELDS)
     .eq("status", "active")
     .order("rating", { ascending: false });
 
@@ -43,7 +46,7 @@ export async function getHosts(): Promise<Host[]> {
 export async function getHost(id: string): Promise<Host | null> {
   const { data, error } = await supabase
     .from(T.hosts)
-    .select("*")
+    .select(HOST_PUBLIC_FIELDS)
     .eq("id", id)
     .single();
 
@@ -206,7 +209,7 @@ export async function updateBooking(id: string, updates: Partial<Booking>): Prom
 // USERS
 // ============================================
 export async function getUsers(): Promise<User[]> {
-  const { data, error } = await supabase.from(T.users).select("*");
+  const { data, error } = await supabase.from(T.users).select("id,name,email,role,createdAt");
 
   if (error || !data) {
     console.warn("[Supabase] getUsers fallback to JSON:", error?.message);
@@ -218,7 +221,7 @@ export async function getUsers(): Promise<User[]> {
 export async function getUserByEmail(email: string): Promise<User | null> {
   const { data, error } = await supabase
     .from(T.users)
-    .select("*")
+    .select("id,name,email,role,createdAt,password")
     .eq("email", email)
     .single();
 

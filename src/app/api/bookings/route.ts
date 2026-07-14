@@ -175,8 +175,7 @@ export async function POST(req: NextRequest) {
   // Partner commission (async, non-blocking)
   (async () => {
     try {
-      const { createClient } = require("@supabase/supabase-js");
-      const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+      const sb = supabase;
       // Check if guest was referred
       const { data: guestUser } = await sb.from("hayhome_users").select("referred_by_code, referred_by").eq("id", user.id).single();
       if (guestUser?.referred_by_code) {
@@ -187,15 +186,23 @@ export async function POST(req: NextRequest) {
           // Update booking with commission
           await sb.from("hayhome_bookings").update({ commission_partner: commission, partner_id: partner.id }).eq("id", booking.id);
           // Check/create referral record
-          const { data: ref } = await sb.from("hayhome_referrals").select("id, first_booking_at").eq("partner_id", partner.id).eq("referred_user_id", user.id).single();
+          const { data: ref } = await sb.from("hayhome_referrals").select("id,first_booking_at,expires_at").eq("partner_id", partner.id).eq("referred_user_id", user.id).single();
           if (ref) {
             if (!ref.first_booking_at) {
               await sb.from("hayhome_referrals").update({ first_booking_at: new Date().toISOString(), expires_at: new Date(Date.now() + 2 * 365.25 * 24 * 60 * 60 * 1000).toISOString() }).eq("id", ref.id);
             } else if (new Date(ref.expires_at) > new Date()) {
-              // Still within 2-year window — credit partner (read then update)
-              const { data: p } = await sb.from("hayhome_partners").select("balance, total_earned").eq("id", partner.id).single();
-              if (p) {
-                await sb.from("hayhome_partners").update({ balance: (p.balance || 0) + commission, total_earned: (p.total_earned || 0) + commission }).eq("id", partner.id);
+              // Still within 2-year window — credit partner via RPC (atomic)
+              try {
+                await sb.rpc("credit_partner_balance", {
+                  p_partner_id: partner.id,
+                  p_amount: commission,
+                });
+              } catch (rpcErr) {
+                console.warn("[Partner] RPC credit_partner_balance failed, trying manual update:", rpcErr);
+                const { data: p } = await sb.from("hayhome_partners").select("balance, total_earned").eq("id", partner.id).single();
+                if (p) {
+                  await sb.from("hayhome_partners").update({ balance: (p.balance || 0) + commission, total_earned: (p.total_earned || 0) + commission }).eq("id", partner.id);
+                }
               }
             }
           }
