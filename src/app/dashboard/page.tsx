@@ -805,6 +805,7 @@ function DashRouteSection({ booking, lang }: { booking: Booking; lang: string })
             fromLabel={originLabel}
             toLabel={booking.hostName}
             height={200}
+            lang={lang}
           />
           <div className="mt-2">
             <NavigatorLinks

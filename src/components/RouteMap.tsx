@@ -26,6 +26,7 @@ interface RouteMapProps {
   fromLabel?: string;
   toLabel?: string;
   height?: number;
+  lang?: string;
 }
 
 function createIcon(color: string, isDestination: boolean = false): L.DivIcon {
@@ -41,19 +42,73 @@ function createIcon(color: string, isDestination: boolean = false): L.DivIcon {
   });
 }
 
-export default function RouteMap({ fromLat, fromLng, toLat, toLng, fromLabel, toLabel, height = 300 }: RouteMapProps) {
+const ROUTE_TEXTS: Record<string, Record<string, string>> = {
+  routeUnavailable: {
+    ru: "Автомобильный маршрут недоступен (международный рейс)",
+    en: "Driving route unavailable (international trip)",
+    hy: "Ավտոմոբիլային երթուղին հասանելի չէ (միջազգային)",
+    fr: "Itinéraire en voiture indisponible (trajet international)",
+    de: "Fahrtroute nicht verfügbar (internationale Reise)",
+    es: "Ruta en coche no disponible (viaje internacional)",
+    it: "Percorso stradale non disponibile (viaggio internazionale)",
+    ar: "المسار بالسيارة غير متاح (رحلة دولية)",
+    zh: "驾车路线不可用（国际行程）",
+    fa: "مسیر رانندگی در دسترس نیست (سفر بین‌المللی)",
+  },
+  useNavigator: {
+    ru: "Используйте навигатор ниже для построения маршрута",
+    en: "Use the navigator links below for directions",
+    hy: "Օգտագործեք նավարկիչի հղումները կողքում",
+    fr: "Utilisez les liens de navigation ci-dessous",
+    de: "Nutzen Sie die Navigationslinks unten",
+    es: "Use los enlaces de navegación a continuación",
+    it: "Usa i link di navigazione qui sotto",
+    ar: "استخدم روابط التنقل أدناه",
+    zh: "请使用下方的导航链接",
+    fa: "از لینک‌های ناوبری زیر استفاده کنید",
+  },
+  calculating: {
+    ru: "Расчёт маршрута...",
+    en: "Calculating route...",
+    hy: "Երթուղիի հաշվարկ...",
+    fr: "Calcul de l'itinéraire...",
+    de: "Route wird berechnet...",
+    es: "Calculando ruta...",
+    it: "Calcolo percorso...",
+    ar: "حساب المسار...",
+    zh: "正在计算路线...",
+    fa: "در حال محاسبه مسیر...",
+  },
+};
+
+export default function RouteMap({ fromLat, fromLng, toLat, toLng, fromLabel, toLabel, height = 300, lang = "ru" }: RouteMapProps) {
   const [route, setRoute] = useState<RouteInfo | null>(null);
   const [routeError, setRouteError] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isInternational, setIsInternational] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Detect if this is an international trip (distance > 1000km)
+  useEffect(() => {
+    const dist = Math.sqrt(Math.pow(toLat - fromLat, 2) + Math.pow(toLng - fromLng, 2));
+    // If angular distance > 10 degrees (~1100km), likely international
+    setIsInternational(dist > 10);
+  }, [fromLat, fromLng, toLat, toLng]);
+
   useEffect(() => {
     if (!mounted) return;
     setRoute(null);
     setRouteError(false);
+
+    // For international trips, skip OSRM (it doesn't cover all regions)
+    if (isInternational) {
+      setRouteError(true);
+      return;
+    }
+
     // OSRM routing
     fetch(`https://router.project-osrm.org/route/v1/driving/${fromLng},${fromLat};${toLng},${toLat}?overview=full&geometries=geojson`)
       .then(r => r.json())
@@ -69,12 +124,43 @@ export default function RouteMap({ fromLat, fromLng, toLat, toLng, fromLabel, to
         }
       })
       .catch(() => setRouteError(true));
-  }, [fromLat, fromLng, toLat, toLng, mounted]);
+  }, [fromLat, fromLng, toLat, toLng, mounted, isInternational]);
+
+  const t = (key: string) => ROUTE_TEXTS[key]?.[lang] || ROUTE_TEXTS[key]?.en || key;
 
   if (!mounted) {
     return (
       <div className="w-full rounded-2xl bg-gray-100 flex items-center justify-center" style={{ height }}>
         <div className="w-8 h-8 border-3 border-red-200 border-t-red-600 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // For international / unavailable routes, show a clean info card instead of a broken map
+  if (isInternational && routeError) {
+    return (
+      <div className="w-full">
+        <div
+          className="w-full rounded-2xl flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200"
+          style={{ height }}
+        >
+          <div className="text-3xl">✈️</div>
+          <div className="flex items-center gap-3 text-sm text-gray-700">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow" />
+              <span className="font-medium">{fromLabel || "GPS"}</span>
+            </div>
+            <div className="text-gray-300">── ── ── ✈️ ── ── ──</div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-red-500 border-2 border-white shadow" style={{ borderRadius: "50% 50% 50% 0", transform: "rotate(-45deg)" }} />
+              <span className="font-medium">{toLabel || "Destination"}</span>
+            </div>
+          </div>
+        </div>
+        <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+          ⚠️ {t("routeUnavailable")}
+        </p>
+        <p className="text-xs text-gray-400 mt-0.5">{t("useNavigator")}</p>
       </div>
     );
   }
@@ -140,9 +226,12 @@ export default function RouteMap({ fromLat, fromLng, toLat, toLng, fromLabel, to
           <span className="text-gray-600">⏱️ {formatDuration(route.duration)}</span>
         </div>
       ) : routeError ? (
-        <p className="text-xs text-gray-400 mt-1">⚠️ Route unavailable</p>
+        <div className="mt-2">
+          <p className="text-xs text-gray-500 flex items-center gap-1">⚠️ {t("routeUnavailable")}</p>
+          <p className="text-xs text-gray-400 mt-0.5">{t("useNavigator")}</p>
+        </div>
       ) : (
-        <p className="text-xs text-gray-400 mt-1">Calculating route...</p>
+        <p className="text-xs text-gray-400 mt-1">{t("calculating")}</p>
       )}
     </div>
   );
