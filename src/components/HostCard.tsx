@@ -3,12 +3,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { MapPin, Users, Star } from "lucide-react";
+import { motion } from "framer-motion";
 import FavoriteButton from "@/components/FavoriteButton";
 import { Host } from "@/lib/types";
 import { useLang } from "@/contexts/LanguageContext";
 import { useLightbox } from "@/contexts/LightboxContext";
 import { translateLang, translateBadge, getLocalizedField, regionName } from "@/lib/i18n-utils";
 import getUI from "@/lib/ui";
+
+const easing = [0.25, 0.46, 0.45, 0.94] as const;
 
 const COMPARE_KEY = "hayhome_compare";
 const MAX_COMPARE = 3;
@@ -66,8 +69,12 @@ export default function HostCard({ host, valueRank }: Props) {
   const description = getLocalizedField(host.description, host.i18n, "description", lang);
 
   return (
-    <Link href={`/hosts/${host.id}`} className="block">
-      <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 card-hover cursor-pointer h-full flex flex-col">
+    <Link href={`/hosts/${host.id}`} className="block h-full">
+      <motion.div
+        whileHover={{ y: -6, boxShadow: "0 20px 48px rgba(0,0,0,0.12)" }}
+        transition={{ duration: 0.3, ease: easing }}
+        className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 cursor-pointer h-full flex flex-col"
+      >
         <div className="relative h-52 overflow-hidden bg-gray-200 flex-shrink-0">
           <div
             className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity"
@@ -160,7 +167,7 @@ export default function HostCard({ host, valueRank }: Props) {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </Link>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
+import { motion } from "framer-motion";
 import HostCard from "@/components/HostCard";
 import dynamic from "next/dynamic";
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
@@ -249,9 +250,21 @@ function HostsContent() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((host) => <HostCard key={host.id} host={host} valueRank={valueRanks[host.id]} />)}
-          </div>
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            initial="hidden"
+            animate="show"
+            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } } }}
+          >
+            {filtered.map((host) => (
+              <motion.div
+                key={host.id}
+                variants={{ hidden: { opacity: 0, y: 36 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] } } }}
+              >
+                <HostCard host={host} valueRank={valueRanks[host.id]} />
+              </motion.div>
+            ))}
+          </motion.div>
         )}
       </div>
 
