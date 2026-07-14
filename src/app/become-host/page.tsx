@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ChevronRight, ChevronLeft, Sparkles, RotateCcw, Loader2, Languages } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "@/contexts/LanguageContext";
 import { stripInvalidChars, stripNonPhone, scriptErrorMsg, phoneErrorMsg } from "@/lib/inputValidation";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
@@ -209,7 +210,15 @@ export default function BecomeHostPage() {
           </div>
         )}
 
-        <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+        <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 overflow-hidden">
+          <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -24 }}
+            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+          >
 
           {/* Step 0 */}
           {step === 0 && (
@@ -484,6 +493,8 @@ export default function BecomeHostPage() {
           )}
 
           {error && <p className="text-red-600 text-sm mt-4">{error}</p>}
+          </motion.div>
+          </AnimatePresence>
 
           {step < 4 && (
             <>

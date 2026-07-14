@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { MapPin, Users, Globe, Star, Phone, Mail, Check, ChevronLeft, X, Camera, Trash2 } from "lucide-react";
 import { Host, Review, Booking } from "@/lib/types";
 import { useLang } from "@/contexts/LanguageContext";
@@ -300,11 +301,18 @@ export default function HostProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* Left */}
-          <div className="lg:col-span-2 space-y-6">
+          <motion.div
+            className="lg:col-span-2 space-y-6"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+          >
             {/* Gallery */}
             <div className="space-y-2">
-              <div
-                className="relative rounded-2xl overflow-hidden h-72 md:h-96 bg-gray-200 cursor-pointer hover:opacity-95 transition-opacity"
+              <motion.div
+                whileHover={{ scale: 1.005 }}
+                transition={{ duration: 0.3 }}
+                className="relative rounded-2xl overflow-hidden h-72 md:h-96 bg-gray-200 cursor-pointer"
                 onClick={() => {
                   const imgs = [host.coverPhoto, ...host.photos.filter(p => p !== host.coverPhoto)];
                   lightbox.open(imgs, 0);
@@ -319,7 +327,7 @@ export default function HostProfilePage() {
                     <MapPin size={14} /><span>{host.location}</span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
               {host.photos.length > 0 && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {host.photos.slice(0, 4).map((photo, idx) => (
@@ -665,10 +673,15 @@ export default function HostProfilePage() {
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
 
           {/* Right: booking card */}
-          <div className="lg:col-span-1">
+          <motion.div
+            className="lg:col-span-1"
+            initial={{ opacity: 0, x: 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+          >
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 lg:sticky lg:top-24">
               <div className="text-center mb-6">
                 <div className="text-4xl font-extrabold text-gray-900">
@@ -684,11 +697,13 @@ export default function HostProfilePage() {
                 )}
               </div>
 
-              <Link href={`/book/${host.id}`}
-                className="w-full block text-center py-4 rounded-xl text-white font-bold text-lg mb-3 hover:opacity-90 transition active:scale-95"
-                style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                {h.book}
-              </Link>
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                <Link href={`/book/${host.id}`}
+                  className="w-full block text-center py-4 rounded-xl text-white font-bold text-lg mb-3 hover:opacity-90 transition shadow-lg shadow-red-300/30"
+                  style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
+                  {h.book}
+                </Link>
+              </motion.div>
 
               <div className="flex gap-2 mb-4">
                 {user && host.user_id && (
@@ -779,7 +794,7 @@ export default function HostProfilePage() {
                 ))}
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
