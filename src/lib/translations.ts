@@ -118,6 +118,14 @@ export interface Translations {
     noCalendar: string;
     listView: string;
     mapView: string;
+    // Badges & labels
+    freeBadge: string;
+    freeStay: string;
+    calFree: string;
+    calBusy: string;
+    calSelected: string;
+    calOccupied: string;
+    deletePhoto: string;
   };
   home: {
     whyTitle: string;
@@ -255,6 +263,13 @@ const t: Record<LangCode, Translations> = {
       available: "Свободно", booked: "Забронировано", blocked: "Заблокировано",
       noCalendar: "У вас нет календаря. Станьте хозяином, чтобы управлять датами.",
       listView: "Список", mapView: "Карта",
+      freeBadge: "🆓 Бесплатно",
+      freeStay: "🆓 Бесплатное проживание",
+      calFree: "🟢 Свободно",
+      calBusy: "🔴 Занято",
+      calSelected: "🔵 Выбрано",
+      calOccupied: "Занятость на 7 дней",
+      deletePhoto: "Удалить это фото?",
     },
     home: {
       whyTitle: "Почему HayHome?",
@@ -340,6 +355,13 @@ const t: Record<LangCode, Translations> = {
       available: "Available", booked: "Booked", blocked: "Blocked",
       noCalendar: "You don't have a calendar. Become a host to manage dates.",
       listView: "List", mapView: "Map",
+      freeBadge: "🆓 Free",
+      freeStay: "🆓 Free stay",
+      calFree: "🟢 Available",
+      calBusy: "🔴 Booked",
+      calSelected: "🔵 Selected",
+      calOccupied: "7-day occupancy",
+      deletePhoto: "Delete this photo?",
     },
     home: {
       whyTitle: "Why HayHome?",
@@ -421,6 +443,13 @@ const t: Record<LangCode, Translations> = {
       available: "Հասանելի", booked: "Ամրագրված", blocked: "Արգելափակված",
       noCalendar: "Դուք չունեք օրացույց: Դառմավ տանտեր՝ ամսաթիվները կառավարելու համար:",
       listView: "Ցանկ", mapView: "Քարտեզ",
+      freeBadge: "🆓 Անվճար",
+      freeStay: "🆓 Անվճար ապրելակեցություն",
+      calFree: "🟢 Ազատ",
+      calBusy: "🔴 զանգված",
+      calSelected: "🔵 ընտրված",
+      calOccupied: "7 օրվա զբաղվածություն",
+      deletePhoto: "Ջնջե՞լ այս նկարը",
     },
     home: {
       whyTitle: "Ինչու՞ HayHome?",
@@ -502,6 +531,13 @@ const t: Record<LangCode, Translations> = {
       available: "Disponible", booked: "Réservé", blocked: "Bloqué",
       noCalendar: "Vous n'avez pas de calendrier. Devenez hôte pour gérer les dates.",
       listView: "Liste", mapView: "Carte",
+      freeBadge: "🆓 Gratuit",
+      freeStay: "🆓 Séjour gratuit",
+      calFree: "🟢 Disponible",
+      calBusy: "🔴 Réservé",
+      calSelected: "🔵 Sélectionné",
+      calOccupied: "Occupation sur 7 jours",
+      deletePhoto: "Supprimer cette photo ?",
     },
     home: {
       whyTitle: "Pourquoi HayHome?",
@@ -583,6 +619,13 @@ const t: Record<LangCode, Translations> = {
       available: "Verfügbar", booked: "Gebucht", blocked: "Gesperrt",
       noCalendar: "Sie haben keinen Kalender. Werden Sie Gastgeber, um Daten zu verwalten.",
       listView: "Liste", mapView: "Karte",
+      freeBadge: "🆓 Kostenlos",
+      freeStay: "🆓 Kostenloser Aufenthalt",
+      calFree: "🟢 Verfügbar",
+      calBusy: "🔴 Gebucht",
+      calSelected: "🔵 Ausgewählt",
+      calOccupied: "7-Tage-Auslastung",
+      deletePhoto: "Dieses Foto löschen?",
     },
     home: {
       whyTitle: "Warum HayHome?",
@@ -664,6 +707,13 @@ const t: Record<LangCode, Translations> = {
       available: "Disponible", booked: "Reservado", blocked: "Bloqueado",
       noCalendar: "No tienes calendario. Conviértete en anfitrión para gestionar fechas.",
       listView: "Lista", mapView: "Mapa",
+      freeBadge: "🆓 Gratis",
+      freeStay: "🆓 Estancia gratuita",
+      calFree: "🟢 Disponible",
+      calBusy: "🔴 Reservado",
+      calSelected: "🔵 Seleccionado",
+      calOccupied: "Ocupación de 7 días",
+      deletePhoto: "¿Eliminar esta foto?",
     },
     home: {
       whyTitle: "¿Por qué HayHome?",
@@ -745,6 +795,13 @@ const t: Record<LangCode, Translations> = {
       available: "Disponibile", booked: "Prenotato", blocked: "Bloccato",
       noCalendar: "Non hai un calendario. Diventa host per gestire le date.",
       listView: "Lista", mapView: "Mappa",
+      freeBadge: "🆓 Gratuito",
+      freeStay: "🆓 Soggiorno gratuito",
+      calFree: "🟢 Disponibile",
+      calBusy: "🔴 Prenotato",
+      calSelected: "🔵 Selezionato",
+      calOccupied: "Occupazione di 7 giorni",
+      deletePhoto: "Eliminare questa foto?",
     },
     home: {
       whyTitle: "Perché HayHome?",
@@ -826,6 +883,13 @@ const t: Record<LangCode, Translations> = {
       available: "متاح", booked: "محجوز", blocked: "محظور",
       noCalendar: "ليس لديك تقويم. كن مضيفاً لإدارة التواريخ.",
       listView: "قائمة", mapView: "خريطة",
+      freeBadge: "🆓 مجاني",
+      freeStay: "🆓 إقامة مجانية",
+      calFree: "🟢 متاح",
+      calBusy: "🔴 محجوز",
+      calSelected: "🔵 مختار",
+      calOccupied: "الإشغال لمدة 7 أيام",
+      deletePhoto: "حذف هذه الصورة؟",
     },
     home: {
       whyTitle: "لماذا HayHome؟",
@@ -907,6 +971,13 @@ const t: Record<LangCode, Translations> = {
       available: "可预订", booked: "已预订", blocked: "已屏蔽",
       noCalendar: "您没有日历。成为房东以管理日期。",
       listView: "列表", mapView: "地图",
+      freeBadge: "🆓 免费",
+      freeStay: "🆓 免费住宿",
+      calFree: "🟢 可预订",
+      calBusy: "🔴 已预订",
+      calSelected: "🔵 已选择",
+      calOccupied: "7天入住率",
+      deletePhoto: "删除这张照片？",
     },
     home: {
       whyTitle: "为什么选择HayHome？",
@@ -988,6 +1059,13 @@ const t: Record<LangCode, Translations> = {
       available: "در دسترس", booked: "رزرو شده", blocked: "مسدود شده",
       noCalendar: "شما تقویم ندارید. برای مدیریت تاریخ‌ها میزبان شوید.",
       listView: "فهرست", mapView: "نقشه",
+      freeBadge: "🆓 رایگان",
+      freeStay: "🆓 اقامت رایگان",
+      calFree: "🟢 در دسترس",
+      calBusy: "🔴 رزرو شده",
+      calSelected: "🔵 انتخاب شده",
+      calOccupied: "اشغال ۷ روزه",
+      deletePhoto: "این عکس حذف شود؟",
     },
     home: {
       whyTitle: "چرا HayHome؟",

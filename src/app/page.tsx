@@ -184,7 +184,7 @@ export default function HomePage() {
                     <div className="p-5">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-lg font-bold text-gray-900">{(host.i18n?.[lang]?.familyName) || host.familyName}</h3>
-                        <span className="text-sm font-bold text-green-600 bg-green-50 px-2.5 py-0.5 rounded-full">🆓 Бесплатно</span>
+                        <span className="text-sm font-bold text-green-600 bg-green-50 px-2.5 py-0.5 rounded-full">{tr.hosts.freeBadge}</span>
                       </div>
                       <p className="text-gray-500 text-sm mb-3">
                         📍 {host.city}, {host.region} · ⭐ {Number(host.rating || 0).toFixed(1)} ({host.reviewCount || 0})
@@ -282,7 +282,7 @@ export default function HomePage() {
                           {host.rating > 0 ? Number(host.rating).toFixed(1) : "New"}
                         </span>
                       </div>
-                      <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">🆓 Бесплатно</span>
+                      <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{tr.hosts.freeBadge}</span>
                     </div>
                   </div>
                 </Link>

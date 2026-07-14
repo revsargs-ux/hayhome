@@ -48,7 +48,7 @@ const TOD_DISPLAY: Record<string, Record<string, string>> = {
 export default function ProviderDashboardPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const { lang } = useLang();
+  const { lang, tr } = useLang();
   const u = getUI(lang);
 
   const [tab, setTab] = useState<"services" | "orders" | "profile" | "messages">("services");
@@ -103,7 +103,7 @@ export default function ProviderDashboardPage() {
   const handleSvcPhotoDelete = async (svcId: string, photoUrl: string) => {
     const svc = services.find((s) => s.id === svcId);
     if (!svc) return;
-    if (!confirm("Удалить это фото?")) return;
+    if (!confirm(tr.hosts.deletePhoto)) return;
 
     const newPhotos = svc.photos.filter((p) => p !== photoUrl);
 

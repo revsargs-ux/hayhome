@@ -39,7 +39,7 @@ interface Recommendation {
 
 export default function RequestDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { lang } = useLang();
+  const { lang, tr } = useLang();
   const u = getUI(lang);
   const isRu = lang === "ru";
   const L = (ru: string, en: string, hy: string, fr: string, de: string, es: string, it: string, ar: string, zh: string, fa: string) =>
@@ -204,7 +204,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                     </div>
                     <div className="min-w-0">
                       <h4 className="font-semibold text-gray-900 text-sm truncate">{h.familyName}</h4>
-                      <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">🆓 Бесплатно</span>
+                      <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{tr.hosts.freeBadge}</span>
                     </div>
                   </div>
                 </Link>

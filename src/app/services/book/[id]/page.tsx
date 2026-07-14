@@ -16,7 +16,7 @@ const PRICE_UNIT_LABELS: Record<string, Record<string, string>> = {
 
 function ServiceBookContent() {
   const params = useParams();
-  const { lang } = useLang();
+  const { lang, tr } = useLang();
   const u = getUI(lang);
   const { user } = useAuth();
   const id = params.id as string;
@@ -280,7 +280,7 @@ function ServiceBookContent() {
                     {(() => {
                       const today = new Date();
                       today.setHours(0, 0, 0, 0);
-                      const dayNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+                      const dayNames = [tr.hosts.mon, tr.hosts.tue, tr.hosts.wed, tr.hosts.thu, tr.hosts.fri, tr.hosts.sat, tr.hosts.sun];
                       const cells = [];
                       // Header
                       dayNames.forEach((n) => {
@@ -325,9 +325,9 @@ function ServiceBookContent() {
                     })()}
                   </div>
                   <div style={{ marginTop: "8px", display: "flex", gap: "12px", fontSize: "11px" }}>
-                    <span style={{ color: "#16a34a" }}>🟢 Свободно</span>
-                    <span style={{ color: "#ef4444" }}>🔴 Занято</span>
-                    <span style={{ color: "#1d4ed8" }}>🔵 Выбрано</span>
+                    <span style={{ color: "#16a34a" }}>{tr.hosts.calFree}</span>
+                    <span style={{ color: "#ef4444" }}>{tr.hosts.calBusy}</span>
+                    <span style={{ color: "#1d4ed8" }}>{tr.hosts.calSelected}</span>
                   </div>
                 </div>
 

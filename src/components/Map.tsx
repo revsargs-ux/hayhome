@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { Host } from "@/lib/types";
+import { useLang } from "@/contexts/LanguageContext";
 
 // Armenian city → coordinates lookup
 export const CITY_COORDS: Record<string, [number, number]> = {
@@ -154,6 +155,7 @@ interface MapProps {
 }
 
 export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
+  const { tr } = useLang();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -249,7 +251,7 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
                       {host.rating > 0 ? `⭐ ${host.rating}` : ""}
                     </span>
                     <span style={{ fontWeight: 700, color: "#16a34a", fontSize: "13px", background: "#dcfce7", padding: "2px 8px", borderRadius: "12px" }}>
-                      🆓 Бесплатно
+                      {tr.hosts.freeBadge}
                     </span>
                   </div>
                   {/* 7-day availability calendar */}

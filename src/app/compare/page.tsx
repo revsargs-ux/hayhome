@@ -152,7 +152,7 @@ function CompareContent() {
           <Row label={u.priceLabel}>
             {hosts.map((h) => (
               <Cell key={h.id}>
-                <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full text-sm">🆓 Бесплатно</span>
+                <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full text-sm">{tr.hosts.freeBadge}</span>
               </Cell>
             ))}
           </Row>
@@ -294,7 +294,7 @@ function CompareContent() {
 
             <div className="space-y-2 text-xs">
               <div className="flex justify-between border-b border-gray-100 py-1.5">
-                <span className="text-gray-400">🆓 Стоимость</span>
+                <span className="text-gray-400">{tr.hosts.freeBadge}</span>
                 <span className="font-bold text-green-600">Бесплатно</span>
               </div>
               <div className="flex justify-between border-b border-gray-100 py-1.5">

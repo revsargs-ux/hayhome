@@ -14,6 +14,7 @@ import AdminGuestRequests from "./AdminGuestRequests";
 import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";
 import type { LangCode } from "@/lib/translations";
+import translations from "@/lib/translations";
 
 type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar" | "users" | "services" | "promocodes" | "contracts" | "finance" | "logs" | "reviews" | "settings" | "notifications" | "guest-requests";
 
@@ -105,7 +106,7 @@ export default function AdminPage() {
   const [guestRequests, setGuestRequests] = useState<any[]>([]);
   const [platformSettings, setPlatformSettings] = useState({ commissionPercent: 16, iban: "", bankName: "", legalName: "HayHome LLC", legalAddress: "", supportPhone: "", supportEmail: "info@hay-home.com" });
 
-  const { lang } = useLang();
+  const { lang, tr } = useLang();
   const u = getUI(lang);
 
   const a = () => ""; // deprecated — do not use, kept for type compat only
@@ -699,7 +700,7 @@ function HostRow({ host, updating, onUpdate, onLogAction, lang }: {
           </div>
           <p className="text-sm text-gray-600">{host.description}</p>
           <p className="text-xs text-gray-400 mt-1">
-            {host.phone} · {host.email} · {"★".repeat(host.stars)} · 🆓 Бесплатное проживание
+            {host.phone} · {host.email} · {"★".repeat(host.stars)} · {translations[lang]?.hosts?.freeStay ?? "🆓 Free"}
           </p>
           {host.admin_notes && (
             <p className="text-xs text-amber-600 mt-1 bg-amber-50 rounded px-2 py-1">📝 {host.admin_notes}</p>

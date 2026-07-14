@@ -17,11 +17,11 @@ type Host = {
 };
 
 const T: Record<string, Record<string, string>> = {
-  title: { ru:"Договоры партнёров", en:"Partner Contracts", hy:"Գործընկերների պայտագրություններ", fr:"Contrats des partenaires", de:"Partnerverträge", es:"Contratos de socios", it:"Contratti dei partner", ar:"عقود الشركاء", zh:"合作伙伴合同", fa:"قراردادهای شرکا" },
+  title: { ru:"Договоры партнёров", en:"Partner Contracts", hy:"Գործընկերների պայմանագրեր", fr:"Contrats des partenaires", de:"Partnerverträge", es:"Contratos de socios", it:"Contratti dei partner", ar:"عقود الشركاء", zh:"合作伙伴合同", fa:"قراردادهای شرکا" },
   name: { ru:"Партнёр", en:"Partner", hy:"Գործընկեր", fr:"Partenaire", de:"Partner", es:"Socio", it:"Partner", ar:"الشريك", zh:"合作伙伴", fa:"شریک" },
   city: { ru:"Город", en:"City", hy:"Քաղաք", fr:"Ville", de:"Stadt", es:"Ciudad", it:"Città", ar:"المدينة", zh:"城市", fa:"شهر" },
   price: { ru:"Цена/ночь", en:"Price/night", hy:"Գին/գիշեր", fr:"Prix/nuit", de:"Preis/Nacht", es:"Precio/noche", it:"Prezzo/notte", ar:"السعر/ليلة", zh:"价格/晚", fa:"قیمت/شب" },
-  status: { ru:"Статус", en:"Status", hy:"Կարգավորություն", fr:"Statut", de:"Status", es:"Estado", it:"Stato", ar:"الحالة", zh:"状态", fa:"وضعیت" },
+  status: { ru:"Статус", en:"Status", hy:"Կարգավիճակ", fr:"Statut", de:"Status", es:"Estado", it:"Stato", ar:"الحالة", zh:"状态", fa:"وضعیت" },
   print: { ru:"Печать", en:"Print", hy:"Տպել", fr:"Imprimer", de:"Drucken", es:"Imprimir", it:"Stampa", ar:"طباعة", zh:"打印", fa:"چاپ" },
   verified: { ru:"Проверен", en:"Verified", hy:"Հաստատված", fr:"Vérifié", de:"Verifiziert", es:"Verificado", it:"Verificato", ar:"مُتحقق", zh:"已验证", fa:"تایید شده" },
   pending: { ru:"Ожидает", en:"Pending", hy:"Սպասում", fr:"En attente", de:"Ausstehend", es:"Pendiente", it:"In attesa", ar:"قيد الانتظار", zh:"待审核", fa:"در انتظار" },
@@ -31,7 +31,8 @@ const T: Record<string, Record<string, string>> = {
   search: { ru:"Поиск по имени, городу...", en:"Search by name, city...", hy:"Որոնել անունով, քաղաքով...", fr:"Rechercher par nom, ville...", de:"Nach Name, Stadt suchen...", es:"Buscar por nombre, ciudad...", it:"Cerca per nome, città...", ar:"البحث بالاسم، المدينة...", zh:"按姓名、城市搜索...", fa:"جستجو بر اساس نام، شهر..." },
   allStatus: { ru:"Все статусы", en:"All statuses", hy:"Բոլորը", fr:"Tous les statuts", de:"Alle Status", es:"Todos los estados", it:"Tutti gli stati", ar:"جميع الحالات", zh:"所有状态", fa:"همه وضعیت‌ها" },
   allCities: { ru:"Все города", en:"All cities", hy:"Բոլոր քաղաքները", fr:"Toutes les villes", de:"Alle Städte", es:"Todas las ciudades", it:"Tutte le città", ar:"جميع المدن", zh:"所有城市", fa:"همه شهرها" },
-  noResults: { ru:"Ничего не найдено", en:"No results found", hy:"Անդրազատցված չկան", fr:"Aucun résultat", de:"Keine Ergebnisse", es:"Sin resultados", it:"Nessun risultato", ar:"لا توجد نتائج", zh:"未找到结果", fa:"نتیجه‌ای یافت نشد" },
+  noResults: { ru:"Ничего не найдено", en:"No results found", hy:"Ոչինչ չի գտնվել", fr:"Aucun résultat", de:"Keine Ergebnisse", es:"Sin resultados", it:"Nessun risultato", ar:"لا توجد نتائج", zh:"未找到结果", fa:"نتیجه‌ای یافت نشد" },
+  freeBadge: { ru:"🆓 Бесплатно", en:"🆓 Free", hy:"🆓 Անվճար", fr:"🆓 Gratuit", de:"🆓 Kostenlos", es:"🆓 Gratis", it:"🆓 Gratuito", ar:"🆓 مجاني", zh:"🆓 免费", fa:"🆓 رایگان" },
 };
 
 function ct(key: string, lang: string) { return T[key]?.[lang] || T[key]?.en || key; }
@@ -159,7 +160,7 @@ export default function AdminContractsPage() {
                     <div className="text-xs text-gray-500">{host.name}{host.patronymic ? ` ${host.patronymic}` : ""}</div>
                   </td>
                   <td className="px-4 py-3 text-gray-600">{host.city}, {host.region}</td>
-                  <td className="px-4 py-3"><span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">🆓 Бесплатно</span></td>
+                  <td className="px-4 py-3"><span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{ct("freeBadge", lang)}</span></td>
                   <td className="px-4 py-3">
                     {host.verified ? (
                       <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">

@@ -113,7 +113,7 @@ export default function HostCard({ host, valueRank }: Props) {
           </button>
           <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/65 to-transparent p-3 pointer-events-none">
             <span className="inline-flex items-center gap-1 bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
-              🆓 Бесплатно
+              {tr.hosts.freeBadge}
             </span>
           </div>
         </div>

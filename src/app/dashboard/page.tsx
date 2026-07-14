@@ -151,7 +151,7 @@ export default function DashboardPage() {
 
   const handleDashboardPhotoDelete = async (photoUrl: string) => {
     if (!myProfile) return;
-    if (!confirm("Удалить это фото?")) return;
+    if (!confirm(tr.hosts.deletePhoto)) return;
 
     const newPhotos = myProfile.photos.filter((p) => p !== photoUrl);
     const newCover = myProfile.coverPhoto === photoUrl ? (newPhotos[0] || "") : myProfile.coverPhoto;
@@ -582,7 +582,7 @@ export default function DashboardPage() {
 
         {/* Favorites tab */}
         {tab === "favorites" && (
-          <DashboardFavorites lang={lang} />
+          <DashboardFavorites lang={lang} tr={tr} />
         )}
 
         {/* Calendar tab */}
@@ -1014,7 +1014,7 @@ function GuestServiceHistory({ lang, tr }: { lang: string; tr: any }) {
 }
 
 // ── Dashboard Favorites Tab ──
-function DashboardFavorites({ lang }: { lang: string }) {
+function DashboardFavorites({ lang, tr }: { lang: string; tr: any }) {
   const u = getUI(lang as any);
   const [favorites, setFavorites] = useState<any[]>([]);
   const [hosts, setHosts] = useState<Host[]>([]);
@@ -1076,7 +1076,7 @@ function DashboardFavorites({ lang }: { lang: string }) {
                 <h3 className="font-bold text-gray-900 text-sm mb-1">{host.familyName}</h3>
                 <p className="text-xs text-gray-500 mb-2">{host.city}, {host.region}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">🆓 Бесплатно</span>
+                  <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{tr.hosts.freeBadge}</span>
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <Star size={12} fill="#F2A900" color="#F2A900" />
                     {host.rating > 0 ? host.rating.toFixed(1) : "New"}

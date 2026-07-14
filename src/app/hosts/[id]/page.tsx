@@ -163,7 +163,7 @@ export default function HostProfilePage() {
 
   const handleDeletePhoto = async (photoUrl: string) => {
     if (!host || !isHostOwner) return;
-    if (!confirm("Удалить это фото?")) return;
+    if (!confirm(tr.hosts.deletePhoto)) return;
 
     const newPhotos = host.photos.filter((p) => p !== photoUrl);
     const newCover = host.coverPhoto === photoUrl ? (newPhotos[0] || "") : host.coverPhoto;
@@ -673,7 +673,7 @@ export default function HostProfilePage() {
               <div className="text-center mb-6">
                 <div className="flex justify-center mb-1">
                   <span className="inline-flex items-center gap-2 bg-green-500 text-white text-xl font-bold px-5 py-2 rounded-2xl shadow">
-                    🆓 Бесплатное проживание
+                    {tr.hosts.freeStay}
                   </span>
                 </div>
                 {host.rating > 0 && (
@@ -750,11 +750,11 @@ export default function HostProfilePage() {
                   d.setDate(d.getDate() + i);
                   return d;
                 });
-                const dayNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+                const dayNames = [tr.hosts.sun, tr.hosts.mon, tr.hosts.tue, tr.hosts.wed, tr.hosts.thu, tr.hosts.fri, tr.hosts.sat];
                 const monthNames = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
                 return (
                   <div className="mt-4 pt-4 border-t border-gray-100">
-                    <p className="text-xs font-semibold text-gray-600 mb-2">📅 {lang === "ru" ? "Занятость на 7 дней" : "Availability — next 7 days"}</p>
+                    <p className="text-xs font-semibold text-gray-600 mb-2">📅 {tr.hosts.calOccupied}</p>
                     <div className="grid grid-cols-7 gap-1">
                       {days.map((d) => {
                         const dateStr = d.toISOString().split("T")[0];
