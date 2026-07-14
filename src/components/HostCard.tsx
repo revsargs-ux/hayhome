@@ -106,6 +106,7 @@ export default function HostCard({ host, valueRank }: Props) {
           )}
           <button
             onClick={toggleCompare}
+            aria-label={inCompare ? u.removeFromCompare : u.addToCompare}
             className={`absolute bottom-3 right-3 w-9 h-9 rounded-full flex items-center justify-center shadow-md transition z-10 ${inCompare ? "bg-red-600 text-white" : "bg-white/95 text-gray-700 hover:bg-white"}`}
             title={inCompare ? u.removeFromCompare : u.addToCompare}
           >

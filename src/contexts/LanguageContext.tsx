@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
 import t, { LangCode, Translations, LANGUAGES } from "@/lib/translations";
 
 interface LanguageContextType {
@@ -16,20 +17,29 @@ const LanguageContext = createContext<LanguageContextType>({
   isRtl: false,
 });
 
+function applyLang(l: LangCode) {
+  const isRtl = LANGUAGES.find((x) => x.code === l)?.rtl ?? false;
+  document.documentElement.setAttribute("dir", isRtl ? "rtl" : "ltr");
+  document.documentElement.setAttribute("lang", l);
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<LangCode>("hy");
+  const searchParams = useSearchParams();
 
+  // Init: URL param → localStorage → default
   useEffect(() => {
+    const urlLang = searchParams.get("lang") as LangCode | null;
     const saved = localStorage.getItem("hayhome_lang") as LangCode | null;
-    if (saved && t[saved]) setLangState(saved);
+    const init = urlLang && t[urlLang] ? urlLang : saved && t[saved] ? saved : "hy";
+    setLangState(init);
+    applyLang(init);
   }, []);
 
   const setLang = (l: LangCode) => {
     setLangState(l);
     localStorage.setItem("hayhome_lang", l);
-    // RTL support
-    const isRtl = LANGUAGES.find((x) => x.code === l)?.rtl ?? false;
-    document.documentElement.setAttribute("dir", isRtl ? "rtl" : "ltr");
+    applyLang(l);
   };
 
   const isRtl = LANGUAGES.find((x) => x.code === lang)?.rtl ?? false;

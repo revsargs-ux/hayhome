@@ -39,7 +39,7 @@ export default function MobileBottomBar() {
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`flex-1 flex flex-col items-center justify-center py-2 gap-0.5 active:bg-gray-50 transition ${
+                className={`flex-1 flex flex-col items-center justify-center min-h-[44px] py-2.5 gap-0.5 active:bg-gray-50 transition ${
                   active ? "text-red-600" : "text-gray-600"
                 }`}
               >
