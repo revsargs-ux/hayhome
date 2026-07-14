@@ -87,6 +87,7 @@ function createMarkerIcon(): L.DivIcon {
 // Geolocation button component
 function GeolocationButton() {
   const map = useMap();
+  const { tr, lang } = useLang();
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
 
   const handleLocate = () => {
@@ -109,7 +110,7 @@ function GeolocationButton() {
       <button
         onClick={handleLocate}
         className="absolute right-3 top-3 z-[1000] bg-white rounded-lg shadow-md p-2 hover:bg-gray-50 transition"
-        title="My location"
+        title={lang === "ru" ? "Моё местоположение" : lang === "fr" ? "Ma position" : lang === "de" ? "Mein Standort" : lang === "es" ? "Mi ubicación" : lang === "it" ? "La mia posizione" : lang === "ar" ? "موقعي" : lang === "zh" ? "我的位置" : lang === "fa" ? "موقعیت من" : "My location"}
         style={{ border: "2px solid rgba(0,0,0,0.1)" }}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4001A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -130,7 +131,7 @@ function GeolocationButton() {
             iconAnchor: [8, 8],
           })}
         >
-          <Popup>You are here</Popup>
+          <Popup>{lang === "ru" ? "Вы здесь" : lang === "fr" ? "Vous êtes ici" : lang === "de" ? "Sie sind hier" : lang === "es" ? "Estás aquí" : lang === "it" ? "Sei qui" : lang === "ar" ? "أنت هنا" : lang === "zh" ? "你在这里" : lang === "fa" ? "شما اینجا هستید" : "You are here"}</Popup>
         </Marker>
       )}
     </>
@@ -288,7 +289,7 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
                       textDecoration: "none",
                     }}
                   >
-                    Забронировать
+                    {tr.hosts?.book || "Book"}
                   </a>
                 </div>
               </Popup>

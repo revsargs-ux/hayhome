@@ -316,6 +316,15 @@ export interface UI {
   closeMenu: string;
   openMenu: string;
   requisites: string;
+  // Additional i18n keys
+  uploading: string;
+  cover: string;
+  noPhotos: string;
+  profile: string;
+  leaveReview: string;
+  myLocation: string;
+  youAreHere: string;
+  book: string;
 }
 
 type Rec = Record<string, string>;
@@ -603,6 +612,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Закрыть меню",
     openMenu: "Открыть меню",
     requisites: "Реквизиты",
+    uploading: "Загрузка...",
+    cover: "Обложка",
+    noPhotos: "Фото пока не загружены",
+    profile: "Профиль",
+    leaveReview: "Оставить отзыв",
+    myLocation: "Мое местоположение",
+    youAreHere: "Вы здесь",
+    book: "Забронировать",
   },
 
   en: {
@@ -887,6 +904,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Close menu",
     openMenu: "Open menu",
     requisites: "Legal Details",
+    uploading: "Uploading...",
+    cover: "Cover",
+    noPhotos: "No photos yet",
+    profile: "Profile",
+    leaveReview: "Leave a review",
+    myLocation: "My location",
+    youAreHere: "You are here",
+    book: "Book",
   },
 
   hy: {
@@ -1171,6 +1196,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Փակել մենյուը",
     openMenu: "Բացել մենյուը",
     requisites: "Տվյալներ",
+    uploading: "Բեռնում...",
+    cover: "Քապ",
+    noPhotos: "Սպասի փոչում չկա",
+    profile: "Պրոֆիլ",
+    leaveReview: "Տալի կարից",
+    myLocation: "Մու պատճառը",
+    youAreHere: "Դուք այստես եք",
+    book: "Ամրագրիր",
   },
 
   fr: {
@@ -1455,6 +1488,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Fermer le menu",
     openMenu: "Ouvrir le menu",
     requisites: "Coordonnées",
+    uploading: "Téléchargement...",
+    cover: "Couverture",
+    noPhotos: "Pas encore de photos",
+    profile: "Profil",
+    leaveReview: "Laisser un avis",
+    myLocation: "Ma position",
+    youAreHere: "Vous êtes ici",
+    book: "Réserver",
   },
 
   de: {
@@ -1739,6 +1780,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Menü schließen",
     openMenu: "Menü öffnen",
     requisites: "Bankdaten",
+    uploading: "Hochladen...",
+    cover: "Cover",
+    noPhotos: "Noch keine Fotos",
+    profile: "Profil",
+    leaveReview: "Bewertung abgeben",
+    myLocation: "Mein Standort",
+    youAreHere: "Sie sind hier",
+    book: "Buchen",
   },
 
   es: {
@@ -2023,6 +2072,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Cerrar menú",
     openMenu: "Abrir menú",
     requisites: "Datos legales",
+    uploading: "Subiendo...",
+    cover: "Portada",
+    noPhotos: "Aún no hay fotos",
+    profile: "Perfil",
+    leaveReview: "Dejar una reseña",
+    myLocation: "Mi ubicación",
+    youAreHere: "Estás aquí",
+    book: "Reservar",
   },
 
   it: {
@@ -2307,6 +2364,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Chiudi menu",
     openMenu: "Apri menu",
     requisites: "Dati legali",
+    uploading: "Caricamento...",
+    cover: "Copertina",
+    noPhotos: "Nessuna foto ancora",
+    profile: "Profilo",
+    leaveReview: "Lascia una recensione",
+    myLocation: "La mia posizione",
+    youAreHere: "Sei qui",
+    book: "Prenota",
   },
 
   ar: {
@@ -2591,6 +2656,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "إغلاق القائمة",
     openMenu: "فتح القائمة",
     requisites: "البيانات القانونية",
+    uploading: "جارٍ الرفع...",
+    cover: "غلاف",
+    noPhotos: "لا توجد صور بعد",
+    profile: "الملف الشخصي",
+    leaveReview: "أضف تقييماً",
+    myLocation: "موقعي",
+    youAreHere: "أنت هنا",
+    book: "احجز",
   },
 
   zh: {
@@ -2875,6 +2948,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "关闭菜单",
     openMenu: "打开菜单",
     requisites: "法律信息",
+    uploading: "上传中...",
+    cover: "封面",
+    noPhotos: "还没有照片",
+    profile: "个人资料",
+    leaveReview: "留下评价",
+    myLocation: "我的位置",
+    youAreHere: "你在这里",
+    book: "预订",
   },
 
   fa: {
@@ -3139,6 +3220,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "بستن منو",
     openMenu: "باز کردن منو",
     requisites: "اطلاعات قانونی",
+    uploading: "بارگذاری...",
+    cover: "جلد",
+    noPhotos: "هنوز عکسی نیست",
+    profile: "پروفایل",
+    leaveReview: "برجسبان بگذارید",
+    myLocation: "موقعیت من",
+    youAreHere: "شما اینجا هستید",
+    book: "رزرو",
     free: "در دسترس",
     booked: "اشغال",
     selected: "انتخاب شده",

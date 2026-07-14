@@ -678,7 +678,7 @@ const t: Record<LangCode, Translations> = {
   es: {
     nav: { findFamily: "Encontrar familia", hostGuests: "Recibir huéspedes", about: "Sobre nosotros", login: "Iniciar sesión", register: "Registrarse", logout: "Cerrar sesión", partner: "Socios" },
     hero: {
-      greeting: "¡Bienvenido!",
+      greeting: "مرحباً",
       title1: "Únete",
       title2: "a nuestra familia",
       subtitle: "Armenia se abre a través del corazón de una familia. Una cena real, historias vivas, una vista del Ararat.",
@@ -854,7 +854,7 @@ const t: Record<LangCode, Translations> = {
   ar: {
     nav: { findFamily: "ابحث عن عائلة", hostGuests: "استقبال الضيوف", about: "من نحن", login: "تسجيل الدخول", register: "إنشاء حساب", logout: "تسجيل الخروج", partner: "شركاء" },
     hero: {
-      greeting: "¡Bienvenido!",
+      greeting: "مرحباً",
       title1: "انضم",
       title2: "إلى عائلتنا",
       subtitle: "أرمينيا تنفتح من خلال قلب الأسرة. عشاء حقيقي، قصص حية، منظر جبل أرارات.",

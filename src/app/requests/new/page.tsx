@@ -191,7 +191,7 @@ export default function NewRequestPage() {
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
           {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">{error}</div>}
           {isTranslating && <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-2 text-sm text-blue-700 flex items-center gap-2">
-            <span className="animate-spin">⏳</span> {lang === "ru" ? "Перевод..." : "Translating..."}
+            <span className="animate-spin">⏳</span> {lang === "ru" ? "Перевод..." : lang === "hy" ? "Չարգմանում..." : lang === "fr" ? "Traduction..." : lang === "de" ? "Übersetzung..." : lang === "es" ? "Traduciendo..." : lang === "it" ? "Traduzione..." : lang === "ar" ? "ترجمة..." : lang === "zh" ? "翻译中..." : lang === "fa" ? "ترجمه..." : "Translating..."}
           </div>}
 
           <div>

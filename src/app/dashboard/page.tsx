@@ -457,7 +457,7 @@ export default function DashboardPage() {
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
                 style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
               >
-                <Camera size={16} /> {photoUploading ? "Загрузка..." : "Добавить фото"}
+                <Camera size={16} /> {photoUploading ? (u.uploading || "Загрузка...") : "Добавить фото"}
               </button>
               {photoError && <p className="text-red-500 text-xs mt-2">{photoError}</p>}
             </div>
@@ -474,13 +474,13 @@ export default function DashboardPage() {
                       <Trash2 size={13} />
                     </button>
                     {photo === myProfile.coverPhoto && (
-                      <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium">Обложка</span>
+                      <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium">{u.cover || "Обложка"}</span>
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-400 text-sm text-center py-6">Фото пока не загружены</p>
+              <p className="text-gray-400 text-sm text-center py-6">{u.noPhotos || "Фото пока не загружены"}</p>
             )}
           </div>
           </div>
@@ -545,19 +545,19 @@ export default function DashboardPage() {
                             "bg-gray-100 text-gray-500"
                           }`}>{statusLabels[b.status]}</span>
                         </div>
-                        <p className="text-sm text-gray-500">{b.checkIn} → {b.checkOut} · {b.guests} гостей</p>
+                        <p className="text-sm text-gray-500">{b.checkIn} → {b.checkOut} · {b.guests} {lang === "ru" ? "гостей" : lang === "hy" ? "հյուրեր" : "guests"}</p>
                 
                       </div>
                       <div className="flex gap-2 flex-shrink-0">
                         <Link href={`/hosts/${b.hostId}`}
                           className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 transition">
-                          Профиль
+                          {u.profile || "Профиль"}
                         </Link>
                         {b.status === "completed" && (
                           <Link href={`/hosts/${b.hostId}#reviews`}
                             className="px-3 py-1.5 rounded-lg text-xs font-medium text-white transition"
                             style={{ background: "#D4001A" }}>
-                            Оставить отзыв
+                            {u.leaveReview || "Оставить отзыв"}
                           </Link>
                         )}
                       </div>

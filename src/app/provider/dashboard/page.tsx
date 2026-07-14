@@ -362,7 +362,7 @@ export default function ProviderDashboardPage() {
                       className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-orange-400 resize-none" />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Price unit</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">{lang === "ru" ? "Ед. цены" : lang === "fr" ? "Unité de prix" : lang === "de" ? "Preiseinheit" : lang === "es" ? "Unidad de precio" : lang === "it" ? "Unità di prezzo" : lang === "ar" ? "وحدة السعر" : lang === "zh" ? "价格单位" : lang === "fa" ? "واحد قیمت" : "Price unit"}</label>
                     <select value={form.price_unit} onChange={(e) => setForm((f) => ({ ...f, price_unit: e.target.value }))}
                       className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-orange-400 bg-white">
                       {PRICE_UNITS.map((u) => <option key={u.key} value={u.key}>{u.label}</option>)}
@@ -446,13 +446,13 @@ export default function ProviderDashboardPage() {
                         disabled={svcPhotoUploading === svc.id}
                         className="w-full py-1.5 rounded-lg bg-amber-50 text-amber-700 text-xs font-medium hover:bg-amber-100 transition flex items-center justify-center gap-1 disabled:opacity-50 mb-2"
                       >
-                        <Camera size={12} /> {svcPhotoUploading === svc.id ? "..." : "Фото"}
+                        <Camera size={12} /> {svcPhotoUploading === svc.id ? "..." : (lang === "ru" ? "Фото" : lang === "fr" ? "Photo" : lang === "de" ? "Foto" : lang === "es" ? "Foto" : lang === "it" ? "Foto" : lang === "ar" ? "صور" : lang === "zh" ? "照片" : lang === "fa" ? "عکس" : "Photo")}
                       </button>
 
                       <div className="flex gap-2">
                         <button onClick={() => startEdit(svc)}
                           className="flex-1 py-2 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 flex items-center justify-center gap-1">
-                          <Edit2 size={12} /> Edit
+                          <Edit2 size={12} /> {lang === "ru" ? "Ред." : lang === "fr" ? "Modif." : lang === "de" ? "Ändern" : lang === "es" ? "Editar" : lang === "it" ? "Modifica" : lang === "ar" ? "تعديل" : lang === "zh" ? "编辑" : lang === "fa" ? "ویرایش" : "Edit"}
                         </button>
                         <button onClick={() => deleteService(svc.id)}
                           className="py-2 px-3 rounded-lg bg-red-50 text-red-600 text-xs font-medium hover:bg-red-100">

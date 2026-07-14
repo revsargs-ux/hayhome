@@ -295,7 +295,7 @@ function CompareContent() {
             <div className="space-y-2 text-xs">
               <div className="flex justify-between border-b border-gray-100 py-1.5">
                 <span className="text-gray-400">{tr.hosts.freeBadge}</span>
-                <span className="font-bold text-green-600">Бесплатно</span>
+                <span className="font-bold text-green-600">{tr.hosts.freeBadge}</span>
               </div>
               <div className="flex justify-between border-b border-gray-100 py-1.5">
                 <span className="text-gray-400">⭐ {tr.common.rating}</span>

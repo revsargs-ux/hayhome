@@ -721,7 +721,7 @@ export default function HostProfilePage() {
                   onClick={(e) => e.stopPropagation()}>
                   <Phone size={16} className="text-gray-400 flex-shrink-0 group-hover:text-red-600 transition" />
                   <span className="font-medium group-hover:text-red-600 transition">{host.phone}</span>
-                  <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-green-50 border border-green-200 text-green-700 font-semibold">📞 {lang === "ru" ? "Позвонить" : "Call"}</span>
+                  <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-green-50 border border-green-200 text-green-700 font-semibold">📞 {lang === "ru" ? "Позвонить" : lang === "fr" ? "Appeler" : lang === "de" ? "Anrufen" : lang === "es" ? "Llamar" : lang === "it" ? "Chiamare" : lang === "ar" ? "اتصال" : lang === "zh" ? "打电话" : lang === "fa" ? "تماس" : "Call"}</span>
                 </a>
                 <a href={`mailto:${host.email}`}
                   className="flex items-center gap-2 group"
@@ -751,7 +751,7 @@ export default function HostProfilePage() {
                   return d;
                 });
                 const dayNames = [tr.hosts.sun, tr.hosts.mon, tr.hosts.tue, tr.hosts.wed, tr.hosts.thu, tr.hosts.fri, tr.hosts.sat];
-                const monthNames = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+                const monthNames = lang === "ru" ? ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"] : lang === "hy" ? ["Հուն","Փետ","Մար","Ապր","Մայ","Հուն","Հուլ","Օգ","Սեպ","Հոկ","Նոյ","Դեկ"] : lang === "fr" ? ["jan","fév","mar","avr","mai","juin","juil","aoû","sep","oct","nov","déc"] : lang === "de" ? ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"] : lang === "es" ? ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"] : lang === "it" ? ["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"] : lang === "ar" ? ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"] : lang === "zh" ? ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"] : lang === "fa" ? ["ژانویه","فوریه","مارس","آوریل","مه","ژئن","ژئیه","اوت","سپتامبر","اکتبر","نوامبر","دسامبر"] : ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
                 return (
                   <div className="mt-4 pt-4 border-t border-gray-100">
                     <p className="text-xs font-semibold text-gray-600 mb-2">📅 {tr.hosts.calOccupied}</p>

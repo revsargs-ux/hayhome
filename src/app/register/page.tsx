@@ -32,7 +32,7 @@ function RegisterContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!consent) { setError("⚠️ " + a.consentPD); return; }
-    if (!captchaToken) { setError("⚠️ " + (lang === "ru" ? "Подтвердите, что вы не робот" : "Verify you are not a robot")); return; }
+    if (!captchaToken) { setError("⚠️ " + (lang === "ru" ? "Подтвердите, что вы не робот" : lang === "fr" ? "Vérifiez que vous n'êtes pas un robot" : lang === "de" ? "Bestätigen Sie, dass Sie kein Roboter sind" : lang === "es" ? "Confirma que no eres un robot" : lang === "it" ? "Conferma di non essere un robot" : lang === "ar" ? "تأكد أنك لست روبوتًا" : lang === "zh" ? "请确认您不是机器人" : lang === "fa" ? "تأیید کنید که ربات نیستید" : "Verify you are not a robot")); return; }
     if (form.password !== form.confirm) { setError(a.passMismatch); return; }
     if (form.password.length < 6) { setError(a.minPass); return; }
     setLoading(true);
@@ -124,7 +124,7 @@ function RegisterContent() {
 
           {/* CAPTCHA */}
           <div className="py-1">
-            <label className="text-xs text-gray-500 mb-1.5 block">{lang === "ru" ? "Подтвердите, что вы человек:" : "Verify you are human:"}</label>
+            <label className="text-xs text-gray-500 mb-1.5 block">{lang === "ru" ? "Подтвердите, что вы человек:" : lang === "fr" ? "Vérifiez que vous êtes un humain :" : lang === "de" ? "Bestätigen Sie, dass Sie ein Mensch sind:" : lang === "es" ? "Confirma que eres humano:" : lang === "it" ? "Conferma di essere umano:" : lang === "ar" ? "تأكد أنك إنسان:" : lang === "zh" ? "请确认您是人类：" : lang === "fa" ? "تأیید کنید که انسان هستید:" : "Verify you are human:"}</label>
             <Captcha onVerify={setCaptchaToken} />
           </div>
 
