@@ -140,6 +140,10 @@ export interface Translations {
     becomeSub: string;
     becomeCta: string;
     browseBtn: string;
+    statFamilies: string;
+    statRegions: string;
+    statSatisfaction: string;
+    statLanguages: string;
   };
   become: {
     title: string;
@@ -273,6 +277,7 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Зарегистрируйтесь бесплатно. Первые 12 месяцев — без комиссии.",
       becomeCta: "Принять гостей",
       browseBtn: "Посмотреть семьи",
+      statFamilies: "Семей-хостов", statRegions: "Регионов", statSatisfaction: "Довольных гостей", statLanguages: "Языков",
     },
     become: {
       title: "Принять гостей в HayHome",
@@ -350,6 +355,7 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Register for free. First 12 months — no commission.",
       becomeCta: "Host Guests",
       browseBtn: "Browse Families",
+      statFamilies: "Host families", statRegions: "Regions", statSatisfaction: "Satisfied guests", statLanguages: "Languages",
     },
     become: {
       title: "Host Guests in HayHome",
@@ -427,6 +433,7 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Գրանցվեք անվճար:",
       becomeCta: "Ընդունել հյուրեր",
       browseBtn: "Դիտել ընտանիքները",
+      statFamilies: "Ընտանիք-հյուրընկալողներ", statRegions: "Շրջաններ", statSatisfaction: "Բավարարված հյուրեր", statLanguages: "Լեզուներ",
     },
     become: {
       title: "Առաջարկել հյուրընկալություն HayHome-ում",
@@ -504,6 +511,7 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Inscrivez-vous gratuitement. 12 premiers mois sans commission.",
       becomeCta: "Accueillir des hôtes",
       browseBtn: "Voir les familles",
+      statFamilies: "Familles hôtes", statRegions: "Régions", statSatisfaction: "Hôtes satisfaits", statLanguages: "Langues",
     },
     become: {
       title: "Accueillir des hôtes sur HayHome",
@@ -581,6 +589,7 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Kostenlos registrieren. Erste 12 Monate ohne Provision.",
       becomeCta: "Gäste empfangen",
       browseBtn: "Familien ansehen",
+      statFamilies: "Gastgeber-Familien", statRegions: "Regionen", statSatisfaction: "Zufriedene Gäste", statLanguages: "Sprachen",
     },
     become: {
       title: "Gäste in HayHome empfangen",
@@ -658,6 +667,7 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Regístrate gratis. Primeros 12 meses sin comisión.",
       becomeCta: "Recibir huéspedes",
       browseBtn: "Ver familias",
+      statFamilies: "Familias anfitrionas", statRegions: "Regiones", statSatisfaction: "Huéspedes satisfechos", statLanguages: "Idiomas",
     },
     become: {
       title: "Recibir huéspedes en HayHome",
@@ -735,6 +745,7 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "Registrati gratis. Primi 12 mesi senza commissioni.",
       becomeCta: "Ospita viaggiatori",
       browseBtn: "Vedi le famiglie",
+      statFamilies: "Famiglie ospitanti", statRegions: "Regioni", statSatisfaction: "Ospiti soddisfatti", statLanguages: "Lingue",
     },
     become: {
       title: "Ospita su HayHome",
@@ -812,6 +823,7 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "سجل مجاناً. أول 12 شهراً بدون عمولة.",
       becomeCta: "استقبال الضيوف مجاناً",
       browseBtn: "عرض العائلات",
+      statFamilies: "عائلات مضيفة", statRegions: "مناطق", statSatisfaction: "ضيوف راضون", statLanguages: "لغات",
     },
     become: {
       title: "استقبال الضيوف في HayHome",
@@ -889,6 +901,7 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "免费注册。前12个月无佣金。",
       becomeCta: "免费接待客人",
       browseBtn: "浏览家庭",
+      statFamilies: "接待家庭", statRegions: "地区", statSatisfaction: "满意的客人", statLanguages: "语言",
     },
     become: {
       title: "在HayHome接待客人",
@@ -966,6 +979,7 @@ const t: Record<LangCode, Translations> = {
       becomeSub: "رایگان ثبت‌نام کنید. ۱۲ ماه اول بدون کمیسیون.",
       becomeCta: "پذیرش مهمان رایگان",
       browseBtn: "مشاهده خانواده‌ها",
+      statFamilies: "خانواده‌های میزبان", statRegions: "مناطق", statSatisfaction: "مهمانان راضی", statLanguages: "زبان‌ها",
     },
     become: {
       title: "پذیرش مهمان در HayHome",
