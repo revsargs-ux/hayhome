@@ -15,6 +15,86 @@ import dynamic from "next/dynamic";
 import NavigatorLinks from "@/components/NavigatorLinks";
 import { getCityCoords, getCityCoordsAsync } from "@/lib/cityCoords";
 import Recommendations from "@/components/Recommendations";
+
+// Category emoji mapping
+const CATEGORY_ICONS: Record<string, string> = {
+  food: "🍴", tour: "🗺️", music: "🎵", events: "🎉",
+  culture: "🎭", craft: "🧵", transport: "🚗", other: "✨",
+};
+const PRICE_UNIT: Record<string, Record<string, string>> = {
+  per_hour: { ru: "/час", en: "/hour", hy: "/ժամ" },
+  per_event: { ru: "/меропр.", en: "/event", hy: "/միջոցառ" },
+  per_person: { ru: "/чел", en: "/person", hy: "/հյուր" },
+};
+
+function PostBookingServices({ hostId, region, checkIn, checkOut, guests }: {
+  hostId: string; region: string; checkIn: string; checkOut: string; guests: number;
+}) {
+  const { lang } = useLang();
+  const [services, setServices] = useState<Record<string, unknown>[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/recommendations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "similar-services", hostId, limit: 6 }),
+    })
+      .then(r => r.json())
+      .then(d => { setServices((d?.services || []) as Record<string, unknown>[]); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [hostId]);
+
+  if (loading || services.length === 0) return null;
+
+  const unitLabel = (u: string) => (PRICE_UNIT[u] || PRICE_UNIT.per_event)[lang] || (PRICE_UNIT.per_event).en;
+  const titles: Record<string, string> = {
+    ru: "✨ Добавьте впечатления к вашему визиту", en: "✨ Add experiences to your visit",
+    hy: "✨ Ավելացրեք տպավորություններ", fr: "✨ Ajoutez des expériences",
+    de: "✨ Erlebnisse hinzufügen", es: "✨ Agregue experiencias",
+    it: "✨ Aggiungi esperienze", ar: "✨ أضف تجارب", zh: "✨ 添加体验", fa: "✨ تجربه اضافه کنید",
+  };
+  const btnLabels: Record<string, string> = {
+    ru: "Забронировать", en: "Book now", hy: "Ամրագրել",
+    fr: "Réserver", de: "Buchen", es: "Reservar",
+    it: "Prenota", ar: "احجز", zh: "立即预订", fa: "رزرو",
+  };
+  const dateHint: Record<string, string> = {
+    ru: "Даты вашего бронирования", en: "Your booking dates", hy: "Ձեր ամրագրման ամսաթվերը",
+    fr: "Dates de votre réservation", de: "Ihre Buchungsdaten",
+    es: "Fechas de su reserva", it: "Date della prenotazione",
+    ar: "تواريخ الحجز", zh: "您的预订日期", fa: "تاریخ رزرو شما",
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto px-4 mt-6 w-full">
+      <h3 className="text-lg font-bold text-gray-900 mb-1 text-center">{titles[lang] || titles.en}</h3>
+      <p className="text-sm text-gray-500 mb-4 text-center">📅 {checkIn} → {checkOut} · {dateHint[lang] || dateHint.en}</p>
+      <div className="space-y-3">
+        {services.map((s) => {
+          const cat = String(s.category || "other");
+          const priceUnit = String(s.price_unit || "per_event");
+          const bookingUrl = `/services/book/${s.id}?date=${checkIn}&guests=${guests}`;
+          return (
+            <Link key={String(s.id)} href={bookingUrl}
+              className="flex items-center gap-4 bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+              <div className="text-3xl flex-shrink-0">{CATEGORY_ICONS[cat] || "✨"}</div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-semibold text-gray-900 text-sm truncate">{String(s.title)}</h4>
+                <p className="text-xs text-gray-500 truncate">{String(s.region)}</p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <p className="font-bold text-gray-900">${Number(s.price)}<span className="text-xs text-gray-400 font-normal">{unitLabel(priceUnit)}</span></p>
+                <span className="text-xs text-orange-600 font-medium">{btnLabels[lang] || btnLabels.en} →</span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 import { reverseGeocode } from "@/lib/geo";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false });
@@ -323,16 +403,8 @@ export default function BookPage() {
         </div>
       </div>
 
-      {/* Recommendations after booking */}
-      <div className="max-w-4xl mx-auto px-4 mt-8 w-full">
-        <Recommendations
-          type="similar-services"
-          hostId={id}
-          title="✨ Добавьте впечатления"
-          titleEn="✨ Add experiences"
-          limit={4}
-        />
-      </div>
+      {/* Post-booking: suggest services for these dates */}
+      <PostBookingServices hostId={id} region={host.region} checkIn={form.checkIn} checkOut={form.checkOut} guests={form.guests} />
     </div>
   );
 
