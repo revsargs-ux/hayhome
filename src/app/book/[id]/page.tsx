@@ -33,15 +33,34 @@ function PostBookingServices({ hostId, region, checkIn, checkOut, guests }: {
   const { lang } = useLang();
   const [services, setServices] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isFallback, setIsFallback] = useState(false);
 
   useEffect(() => {
+    // First try services from same region
     fetch("/api/recommendations", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "similar-services", hostId, limit: 6 }),
     })
       .then(r => r.json())
-      .then(d => { setServices((d?.services || []) as Record<string, unknown>[]); setLoading(false); })
+      .then(d => {
+        const regional = (d?.services || []) as Record<string, unknown>[];
+        if (regional.length > 0) {
+          setServices(regional);
+          setLoading(false);
+        } else {
+          // No services in this region — show all available services
+          setIsFallback(true);
+          fetch("/api/recommendations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "services", limit: 6 }),
+          })
+          .then(r => r.json())
+          .then(d2 => { setServices((d2?.services || []) as Record<string, unknown>[]); setLoading(false); })
+          .catch(() => setLoading(false));
+        }
+      })
       .catch(() => setLoading(false));
   }, [hostId]);
 
@@ -49,10 +68,16 @@ function PostBookingServices({ hostId, region, checkIn, checkOut, guests }: {
 
   const unitLabel = (u: string) => (PRICE_UNIT[u] || PRICE_UNIT.per_event)[lang] || (PRICE_UNIT.per_event).en;
   const titles: Record<string, string> = {
-    ru: "✨ Добавьте впечатления к вашему визиту", en: "✨ Add experiences to your visit",
-    hy: "✨ Ավելացրեք տպավորություններ", fr: "✨ Ajoutez des expériences",
-    de: "✨ Erlebnisse hinzufügen", es: "✨ Agregue experiencias",
-    it: "✨ Aggiungi esperienze", ar: "✨ أضف تجارب", zh: "✨ 添加体验", fa: "✨ تجربه اضافه کنید",
+    ru: isFallback ? "✨ Доступные впечатления в Армении" : "✨ Добавьте впечатления к вашему визиту",
+    en: isFallback ? "✨ Available experiences in Armenia" : "✨ Add experiences to your visit",
+    hy: isFallback ? "✨ Հայաստանում հասանելի տպավորություններ" : "✨ Ավելացրեք տպավորություններ",
+    fr: isFallback ? "✨ Expériences disponibles en Arménie" : "✨ Ajoutez des expériences",
+    de: isFallback ? "✨ Verfügbare Erlebnisse in Armenien" : "✨ Erlebnisse hinzufügen",
+    es: isFallback ? "✨ Experiencias disponibles en Armenia" : "✨ Agregue experiencias",
+    it: isFallback ? "✨ Esperienze disponibili in Armenia" : "✨ Aggiungi esperienze",
+    ar: isFallback ? "✨ تجارب متاحة في أرمينيا" : "✨ أضف تجارب",
+    zh: isFallback ? "✨ 亚美尼亚可用体验" : "✨ 添加体验",
+    fa: isFallback ? "✨ تجربه‌های موجود در ارمنستان" : "✨ تجربه اضافه کنید",
   };
   const btnLabels: Record<string, string> = {
     ru: "Забронировать", en: "Book now", hy: "Ամրագրել",
