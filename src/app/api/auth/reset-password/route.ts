@@ -18,7 +18,11 @@ export async function POST(req: NextRequest) {
   }
 
   // Верифицируем токен
-  let payload: any;
+  let payload: JWTPayload & { purpose?: string; id?: string };
+
+  interface JWTPayload {
+    [key: string]: unknown;
+  }
   try {
     const result = await jwtVerify(token, SECRET);
     payload = result.payload;

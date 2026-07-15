@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     if (!supabase) return NextResponse.json({ hosts: [], services: [] });
 
     const maxItems = limit || 4;
-    const result: { hosts: any[]; services: any[] } = { hosts: [], services: [] };
+    const result: { hosts: Record<string, unknown>[]; services: Record<string, unknown>[] } = { hosts: [], services: [] };
 
     if (type === "hosts" || type === "all") {
       let q = supabase.from("hayhome_hosts").select("*");

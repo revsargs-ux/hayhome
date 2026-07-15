@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
   // Filter: admin sees all, others see only their own
   const filtered = user.role === "admin"
     ? bookings
-    : bookings.filter((b: any) => b.guestEmail === user.email);
+    : bookings.filter((b: { guestEmail?: string }) => b.guestEmail === user.email);
 
   return NextResponse.json(filtered);
 }
@@ -78,11 +78,11 @@ export async function POST(req: NextRequest) {
 
     if (calendarEntries && calendarEntries.length > 0) {
       const unavailable = calendarEntries.filter(
-        (e: any) => e.status === "booked" || e.status === "blocked"
+        (e: { status?: string; date?: string }) => e.status === "booked" || e.status === "blocked"
       );
       if (unavailable.length > 0) {
         return NextResponse.json(
-          { error: "Some dates are not available", unavailableDates: unavailable.map((e: any) => e.date) },
+          { error: "Some dates are not available", unavailableDates: unavailable.map((e: { date?: string }) => e.date) },
           { status: 409 }
         );
       }

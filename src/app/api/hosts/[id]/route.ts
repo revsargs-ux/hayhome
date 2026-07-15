@@ -29,7 +29,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   // Ownership check: only admin or host owner can PATCH
   const isAdmin = user.role === "admin";
-  const hostUserId = (host as any).user_id || (host as any).userId;
+  const hostRecord = host as unknown as Record<string, unknown>;
+  const hostUserId = (hostRecord.user_id ?? hostRecord.userId) as string | undefined;
   if (!isAdmin && hostUserId !== user.id) {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }

@@ -121,7 +121,9 @@ export async function POST(req: NextRequest) {
       .in("date", dates);
 
     const bookedDates = new Set(
-      (existing || []).filter((e: any) => e.status === "booked").map((e: any) => e.date)
+      (existing || [])
+        .filter((e: { status?: string; date?: string }) => e.status === "booked")
+        .map((e: { status?: string; date?: string }) => e.date)
     );
 
     const upsertRows = dates.map((d) => ({
