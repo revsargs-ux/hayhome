@@ -99,7 +99,7 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX';
 const YM_ID = process.env.NEXT_PUBLIC_YM_ID || '12345678';
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+// Required: LanguageContext uses useSearchParams() which needs dynamic rendering
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

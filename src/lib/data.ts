@@ -29,7 +29,19 @@ const T = {
 // Публичные поля для GET /api/hosts — исключаем паспорт/реквизиты/координаты
 const HOST_PUBLIC_FIELDS = "id,name,familyName,location,city,region,stars,pricePerNight,description,longDescription,i18n,coverPhoto,photos,badges,languages,amenities,experiences,maxGuests,availableRooms,rating,reviewCount,verified,phone,email,createdAt,status";
 
-export async function getHosts(): Promise<Host[]> {
+export async function getHosts(includeAll = false): Promise<Host[]> {
+  if (includeAll) {
+    const { data, error } = await supabase
+      .from(T.hosts)
+      .select(HOST_PUBLIC_FIELDS)
+      .order("rating", { ascending: false });
+    if (error || !data) {
+      console.warn("[Supabase] getHosts(all) error:", error?.message);
+      return readJSON<Host>("hosts.json");
+    }
+    return data as Host[];
+  }
+
   const { data, error } = await supabase
     .from(T.hosts)
     .select(HOST_PUBLIC_FIELDS)

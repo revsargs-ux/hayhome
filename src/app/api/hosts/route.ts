@@ -11,15 +11,16 @@ const stripHtml = (s: string) => s.replace(/<[^>]*>/g, "").trim();
 
 export async function GET(req: NextRequest) {
   const all = req.nextUrl.searchParams.get("all");
-  const hosts = await getHosts();
   if (all) {
     const user = await getAuthUser(req);
     if (!user || user.role !== "admin") {
       return NextResponse.json({ error: "Admin access required" }, { status: 403 });
     }
+    const hosts = await getHosts(true); // includeAll = true — all statuses
     return NextResponse.json(hosts);
   }
-  return NextResponse.json(hosts.filter((h) => h.status === "active"));
+  const hosts = await getHosts();
+  return NextResponse.json(hosts);
 }
 
 export async function POST(req: NextRequest) {
