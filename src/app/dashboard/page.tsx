@@ -45,6 +45,7 @@ export default function DashboardPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [myProfile, setMyProfile] = useState<Host | null>(null);
   const [loading, setLoading] = useState(true);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [tab, setTab] = useState<"bookings" | "profile" | "calendar" | "messages" | "favorites">("bookings");
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -62,6 +63,29 @@ export default function DashboardPage() {
   const [photoError, setPhotoError] = useState("");
 
   const statusLabels = STATUS_LABELS[lang] ?? STATUS_LABELS.en;
+  const cancelLabels: Record<string, string> = { ru: "Отменить", en: "Cancel", hy: "Չեղարկել", fr: "Annuler", de: "Stornieren", es: "Cancelar", it: "Annulla", ar: "إلغاء", zh: "取消", fa: "لغو" };
+
+  const cancelBooking = async (bookingId: string) => {
+    setCancellingId(bookingId);
+    try {
+      const res = await fetch(`/api/bookings/${bookingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelled" }),
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(err.error || "Cancel failed");
+        return;
+      }
+      setBookings((prev) => prev.map((b) => b.id === bookingId ? { ...b, status: "cancelled" as const } : b));
+    } catch {
+      alert("Network error");
+    } finally {
+      setCancellingId(null);
+    }
+  };
 
   useEffect(() => {
     if (!authLoading && !user) { router.push("/login"); return; }
@@ -333,10 +357,8 @@ export default function DashboardPage() {
                       {b.message && <p className="text-xs text-gray-500 italic mt-1">"{b.message}"</p>}
                       {/* Service bookings for this booking */}
                       <ServiceBookingsList bookingId={b.id} lang={lang} />
-                      {/* Route for confirmed/completed bookings */}
-                      {(b.status === "confirmed" || b.status === "completed") && (
-                        <DashRouteSection booking={b} lang={lang} />
-                      )}
+                      {/* Route for all bookings */}
+                      <DashRouteSection booking={b} lang={lang} />
                     </div>
                     <div className="flex gap-2 flex-shrink-0">
                       <Link href={`/hosts/${b.hostId}`}
@@ -349,6 +371,15 @@ export default function DashboardPage() {
                           style={{ background: "#D4001A" }}>
                           {u.reviewBtn}
                         </Link>
+                      )}
+                      {(b.status === "pending" || b.status === "confirmed") && (
+                        <button
+                          onClick={() => cancelBooking(b.id)}
+                          disabled={cancellingId === b.id}
+                          className="px-3 py-1.5 rounded-lg border border-red-200 text-xs font-medium text-red-600 hover:bg-red-50 transition disabled:opacity-50"
+                        >
+                          {cancellingId === b.id ? "..." : cancelLabels[lang] || cancelLabels.en}
+                        </button>
                       )}
                     </div>
                   </div>
