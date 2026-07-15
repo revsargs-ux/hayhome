@@ -263,7 +263,7 @@ function ServiceBookContent() {
                       required
                       type="tel"
                       value={guestPhone}
-                      onChange={(e) => setGuestPhone(e.target.value)}
+                      onChange={(e) => setGuestPhone(e.target.value.replace(/[^+\d\s()\-]/g, ''))}
                       placeholder="+374 ..."
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-orange-400 text-gray-900"
                     />
