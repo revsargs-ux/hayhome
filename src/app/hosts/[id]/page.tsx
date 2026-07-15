@@ -26,6 +26,7 @@ export default function HostProfilePage() {
   const [host, setHost] = useState<Host | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [calendarDates, setCalendarDates] = useState<Map<string, string>>(new Map());
   const [canReview, setCanReview] = useState(false);
   const [hasCompletedBooking, setHasCompletedBooking] = useState(false);
   const [hostBookings, setHostBookings] = useState<Booking[]>([]);
@@ -54,10 +55,26 @@ export default function HostProfilePage() {
   const isHostOwner = user && host && (user.id === host.user_id || user.role === "admin");
 
   useEffect(() => {
+    // Calendar data for availability (auth-less, always up-to-date)
+    const now = new Date();
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+    const nextMonth = new Date(now.getFullYear(), now.getMonth()+1, 1);
+    const nextMonthStr = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth()+1).padStart(2,"0")}`;
+
+    // Fetch this month + next month
+    Promise.all([
+      fetch(`/api/calendar?hostId=${id}&month=${thisMonth}`).then(r => r.ok ? r.json() : []),
+      fetch(`/api/calendar?hostId=${id}&month=${nextMonthStr}`).then(r => r.ok ? r.json() : []),
+    ]).then(([m1, m2]) => {
+      const m = new Map<string, string>();
+      [...(m1||[]), ...(m2||[])].forEach((e: {date: string; status: string}) => m.set(e.date, e.status));
+      setCalendarDates(m);
+    }).catch(() => {});
+
     Promise.all([
       fetch(`/api/hosts/${id}`).then((r) => r.json()),
       fetch(`/api/reviews?hostId=${id}`).then((r) => r.json()),
-      fetch(`/api/bookings?hostId=${id}`).then((r) => r.ok ? r.json() : []),
+      fetch("/api/bookings").then((r) => r.ok ? r.json() : []).catch(() => []),
     ]).then(([hostData, reviewData, bookingData]) => {
       setHost(hostData);
       setReviews(Array.isArray(reviewData) ? reviewData : []);
@@ -732,19 +749,8 @@ export default function HostProfilePage() {
               </div>
 
               {/* 7-day availability calendar */}
-              {hostBookings.length > 0 && (() => {
+              {calendarDates.size > 0 ? function HostCal(): React.ReactElement {
                 const today = new Date();
-                const bookedDates = new Set<string>();
-                hostBookings.forEach((b: Booking) => {
-                  if (b.status === "confirmed" || b.status === "completed" || b.status === "pending") {
-                    let d = new Date(b.checkIn);
-                    const end = new Date(b.checkOut);
-                    while (d < end) {
-                      bookedDates.add(d.toISOString().split("T")[0]);
-                      d.setDate(d.getDate() + 1);
-                    }
-                  }
-                });
                 const days = Array.from({ length: 7 }, (_, i) => {
                   const d = new Date(today);
                   d.setDate(d.getDate() + i);
@@ -758,7 +764,8 @@ export default function HostProfilePage() {
                     <div className="grid grid-cols-7 gap-1">
                       {days.map((d) => {
                         const dateStr = d.toISOString().split("T")[0];
-                        const isBooked = bookedDates.has(dateStr);
+                        const status = calendarDates.get(dateStr);
+                        const isBooked = status === "booked" || status === "blocked";
                         return (
                           <div key={dateStr} className={`text-center rounded-lg py-1.5 ${isBooked ? "bg-red-50 border border-red-200" : "bg-green-50 border border-green-200"}`}>
                             <div className="text-[10px] text-gray-400">{dayNames[d.getDay()]}</div>
@@ -770,7 +777,7 @@ export default function HostProfilePage() {
                     </div>
                   </div>
                 );
-              })()}
+              }() : null}
 
               <div className="mt-6 pt-5 border-t border-gray-100 space-y-2">
                 {[h.freeCancel, h.directContact, h.noHidden].map((f) => (
