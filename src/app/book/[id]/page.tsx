@@ -302,11 +302,14 @@ export default function BookPage() {
   const total = 0;
   const finalTotal = 0;
 
+  // Day visit: checkIn == checkOut разрешено если хост позволяет
+  const isDayVisit = host?.allowsDayVisit && form.checkIn && form.checkOut && form.checkIn === form.checkOut;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!host) return;
     if (!user) { setAuthRequired(true); return; }
-    if (nights < 1) { setError(u.bookingDatesError); return; }
+    if (nights < 1 && !isDayVisit) { setError(u.bookingDatesError); return; }
     setLoading(true);
     setError("");
     try {
@@ -413,7 +416,7 @@ export default function BookPage() {
         </p>
         <div className="bg-orange-50 rounded-xl p-4 mb-6 text-left text-sm">
           <p className="font-semibold text-gray-800 mb-2">{t("details")}:</p>
-          <p>📅 {form.checkIn}{form.checkInTime ? " " + form.checkInTime : ""} → {form.checkOut}{form.checkOutTime ? " " + form.checkOutTime : ""} ({nights} {t("nights")})</p>
+          <p>📅 {form.checkIn}{form.checkInTime ? " " + form.checkInTime : ""} → {form.checkOut}{form.checkOutTime ? " " + form.checkOutTime : ""} {isDayVisit ? `(${lang === "ru" ? "дневной визит" : "day visit"})` : `(${nights} ${t("nights")})`}</p>
           <p>👥 {form.guests} {tr.hosts.guests}</p>
           <p>💵 {t("total")}: ${finalTotal}</p>
         </div>
@@ -489,7 +492,7 @@ export default function BookPage() {
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("checkOut")} *</label>
                     <input required type="date" value={form.checkOut}
-                      min={form.checkIn || new Date().toISOString().split("T")[0]}
+                      min={host?.allowsDayVisit ? form.checkIn || new Date().toISOString().split("T")[0] : (form.checkIn || new Date().toISOString().split("T")[0])}
                       onChange={e => setForm(f => ({ ...f, checkOut: e.target.value }))}
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
                     <input type="time" value={form.checkOutTime}
@@ -579,12 +582,19 @@ export default function BookPage() {
                   </div>
                 </div>
               </div>
-              {nights > 0 ? (
+              {(nights > 0 || isDayVisit) ? (
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between text-gray-700">
-                    <span>{lang === "ru" ? "Проживание" : lang === "hy" ? "Կացելություն" : "Accommodation"}</span>
-                    <span className="text-green-600 font-semibold">{t("free")}</span>
-                  </div>
+                  {isDayVisit ? (
+                    <div className="flex justify-between text-amber-700">
+                      <span>{lang === "ru" ? "🥘 Дневной визит" : lang === "hy" ? "🥘 Օրեկան այցելություն" : "🥘 Day Visit"}</span>
+                      <span className="text-green-600 font-semibold">{t("free")}</span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between text-gray-700">
+                      <span>{lang === "ru" ? "Проживание" : lang === "hy" ? "Կացելություն" : "Accommodation"}</span>
+                      <span className="text-green-600 font-semibold">{t("free")}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-gray-500 text-xs">
                     <span>{t("service")}</span>
                     <span className="text-green-600 font-medium">{t("free")}</span>

@@ -86,6 +86,7 @@ export default function BecomeHostPage() {
   const binTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [stayFree, setStayFree] = useState(true);
+  const [allowsDayVisit, setAllowsDayVisit] = useState(false);
   const [form, setForm] = useState({
     familyName: "", name: "", patronymic: "", phone: "", email: "",
     passportSeries: "", passportNumber: "", passportDate: "", passportIssued: "",
@@ -215,7 +216,7 @@ export default function BecomeHostPage() {
     try {
       const res = await fetch("/api/hosts", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, stars: 1, photos: [], coverPhoto: "", lang, stayFree }),
+        body: JSON.stringify({ ...form, stars: 1, photos: [], coverPhoto: "", lang, stayFree, allowsDayVisit }),
       });
       if (!res.ok) throw new Error();
       goToStep(4);
@@ -388,12 +389,24 @@ export default function BecomeHostPage() {
           {step === 2 && (
             <div className="space-y-5">
               <h2 className="text-xl font-bold text-gray-900 mb-6">{b.step2}</h2>
-              <div>
+              <div className="space-y-3">
                 <div className="bg-green-50 border border-green-100 rounded-xl p-3 text-xs text-green-800 space-y-1">
                   <p className="font-semibold text-base">🆓 Проживание — БЕСПЛАТНО для гостей</p>
                   <p>Вы зарабатываете на платных услугах: ужины, экскурсии, мастер-классы</p>
                   <p>Комиссия платформы: 16% с платных услуг</p>
                   <p>Вы получаете: <strong>84%</strong> от платных услуг</p>
+                </div>
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" checked={allowsDayVisit}
+                      onChange={e => setAllowsDayVisit(e.target.checked)}
+                      className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                  </label>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-800">🥘 Дневной визит без проживания</p>
+                    <p className="text-xs text-gray-600">Гости могут приехать с утра и уехать вечером того же дня — обеды, экскурсии, мастер-классы. Вы сами решаете, подходит ли вам такой формат.</p>
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">

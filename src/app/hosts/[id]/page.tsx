@@ -688,10 +688,15 @@ export default function HostProfilePage() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 lg:sticky lg:top-24">
               <div className="text-center mb-6">
-                <div className="flex justify-center mb-1">
+                <div className="flex justify-center gap-2 mb-1">
                   <span className="inline-flex items-center gap-2 bg-green-500 text-white text-xl font-bold px-5 py-2 rounded-2xl shadow">
                     {tr.hosts.freeStay}
                   </span>
+                  {host.allowsDayVisit && (
+                    <span className="inline-flex items-center gap-1 bg-amber-500 text-white text-xs font-bold px-3 py-2 rounded-2xl shadow">
+                      🥘 {lang === "ru" ? "Дневной визит" : lang === "hy" ? "Օրեկան այց" : "Day Visit"}
+                    </span>
+                  )}
                 </div>
                 {host.rating > 0 && (
                   <div className="flex items-center justify-center gap-1 mt-1 text-sm text-gray-500">

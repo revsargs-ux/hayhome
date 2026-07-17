@@ -18,6 +18,7 @@ export interface Host {
   stars: Stars;
   pricePerNight?: number;
   stayFree: boolean;
+  allowsDayVisit: boolean;
   serviceCategories: string[];
   description: string;
   longDescription: string;

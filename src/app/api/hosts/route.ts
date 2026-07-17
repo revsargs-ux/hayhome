@@ -65,6 +65,7 @@ export async function POST(req: NextRequest) {
     stars: body.stars,
     pricePerNight: body.pricePerNight ?? 0,
     stayFree: true,
+    allowsDayVisit: body.allowsDayVisit === true,
     serviceCategories: Array.isArray(body.serviceCategories) ? body.serviceCategories.slice(0, 10) : [],
     description: sanitize(body.description),
     longDescription: sanitize(body.longDescription),
