@@ -159,7 +159,7 @@ export interface Translations {
     step0: string; step1: string; step2: string; step3: string;
     familyName: string; yourName: string; patronymic: string; phone: string; email: string;
     passportTitle: string; passportSeries: string; passportNumber: string; passportDate: string; passportIssued: string;
-    inn: string; bankTitle: string; bankAccount: string; bankName: string;
+    stayFree: string; paidHost: string; inn: string; bankTitle: string; bankAccount: string; bankName: string;
     city: string; region: string; address: string; pickRegion: string;
     priceNight: string; maxGuests: string; rooms: string;
     shortDesc: string; longDesc: string;
@@ -302,7 +302,7 @@ const t: Record<LangCode, Translations> = {
       subtitle: "Поделитесь армянским гостеприимством с миром",
       step0: "Контакты", step1: "Локация", step2: "Условия", step3: "Опыт",
       familyName: "Название семьи", yourName: "Ваше имя", phone: "Телефон", email: "Email",
-        patronymic: "Отчество",         passportTitle: "📝 Паспортные данные",         passportSeries: "Серия паспорта",         passportNumber: "Номер паспорта",         passportDate: "Дата выдачи",         passportIssued: "Кем выдан",         inn: "РНН / ИНН (опционально)",         bankTitle: "🏦 Банковские реквизиты для выплат",         bankAccount: "Номер счёта / карты",         bankName: "Банк",
+        patronymic: "Отчество",         passportTitle: "📝 Паспортные данные",         passportSeries: "Серия паспорта",         passportNumber: "Номер паспорта",         passportDate: "Дата выдачи",         passportIssued: "Кем выдан",         inn: "РНН / ИНН (опционально)",         stayFree: "🆓 Принимаю гостей бесплатно",         paidHost: "💰 Принимаю за плату (нужны реквизиты)",         bankTitle: "🏦 Банковские реквизиты для выплат",         bankAccount: "Номер счёта / карты",         bankName: "Банк",
       city: "Город", region: "Регион", address: "Адрес", pickRegion: "Выберите регион",
       priceNight: "Цена за ночь", maxGuests: "Максимум гостей", rooms: "Комнат для гостей",
       shortDesc: "Краткое описание", longDesc: "Расскажите о себе подробнее",
@@ -390,7 +390,7 @@ const t: Record<LangCode, Translations> = {
       subtitle: "Share the warmth of Armenian families with the world",
       step0: "Contacts", step1: "Location", step2: "Terms", step3: "Experience",
       familyName: "Family Name", yourName: "Your Name", phone: "Phone", email: "Email",
-        patronymic: "Patronymic",         passportTitle: "📝 Passport",         passportSeries: "Passport series",         passportNumber: "Passport number",         passportDate: "Date of issue",         passportIssued: "Issued by",         inn: "Tax ID (optional)",         bankTitle: "🏦 Bank details for payouts",         bankAccount: "Account / Card number",         bankName: "Bank",
+        patronymic: "Patronymic",         passportTitle: "📝 Passport",         passportSeries: "Passport series",         passportNumber: "Passport number",         passportDate: "Date of issue",         passportIssued: "Issued by",         inn: "Tax ID (optional)",         stayFree: "🆓 Hosting guests for free",         paidHost: "💰 Hosting for payment (bank details needed)",         bankTitle: "🏦 Bank details for payouts",         bankAccount: "Account / Card number",         bankName: "Bank",
       city: "City", region: "Region", address: "Address", pickRegion: "Select region",
       priceNight: "Price per night", maxGuests: "Max guests", rooms: "Guest rooms",
       shortDesc: "Short description", longDesc: "Tell us more about yourself",
@@ -478,7 +478,7 @@ const t: Record<LangCode, Translations> = {
       subtitle: "Կիսվեք հայկական հյուրընկալությամբ",
       step0: "Կոնտակտներ", step1: "Տեղ", step2: "Պայմաններ", step3: "Փորձակիրություն",
       familyName: "Ազգանուն", yourName: "Անուն", phone: "Հեռախոս", email: "Էլ. փոստ",
-        patronymic: "Հայրանուն",         passportTitle: "📝 Անձամահության տվյալներ",         passportSeries: "Անձամահության սերիա",         passportNumber: "Անձամահության համար",         passportDate: "Տրման ամսաթիվ",         passportIssued: "Տրում է",         inn: "ՀՀՀ (ընտրանքային)",         bankTitle: "🏦 Բանկային ռեկվիզիտներ",         bankAccount: "Հաշվամահության / Քարտի համար",         bankName: "Բանկ",
+        patronymic: "Հայրանուն",         passportTitle: "📝 Անձամահության տվյալներ",         passportSeries: "Անձամահության սերիա",         passportNumber: "Անձամահության համար",         passportDate: "Տրման ամսաթիվ",         passportIssued: "Տրում է",         inn: "ՀՀՀ (ընտրանքային)",         stayFree: "🆓 Հյուրերին ընդունում եմ անվճար",         paidHost: "💰 Վճարովի ընդունելություն (անհրաժեշտ են ռեկվիզիտներ)",         bankTitle: "🏦 Բանկային ռեկվիզիտներ",         bankAccount: "Հաշվամահության / Քարտի համար",         bankName: "Բանկ",
       city: "Քաղաք", region: "Մարզ", address: "Հասցե", pickRegion: "Ընտրեք մարզ",
       priceNight: "Գինը մեկ գիշերվա", maxGuests: "Առավոլ հյուրեր", rooms: "Հյուրերի սենյակներ",
       shortDesc: "Կարճ նկարագրություն", longDesc: "Մանրամասն նկարագրություն",
@@ -566,7 +566,7 @@ const t: Record<LangCode, Translations> = {
       subtitle: "Partagez la chaleur des familles arméniennes",
       step0: "Contacts", step1: "Lieu", step2: "Conditions", step3: "Expérience",
       familyName: "Nom de famille", yourName: "Votre nom", phone: "Téléphone", email: "Email",
-        patronymic: "Patronyme",         passportTitle: "📝 Passeport",         passportSeries: "Série du passeport",         passportNumber: "Numéro du passeport",         passportDate: "Date de délivrance",         passportIssued: "Délivré par",         inn: "Numéro fiscal (facultatif)",         bankTitle: "🏦 Coordonnées bancaires",         bankAccount: "Numéro de compte / carte",         bankName: "Banque",
+        patronymic: "Patronyme",         passportTitle: "📝 Passeport",         passportSeries: "Série du passeport",         passportNumber: "Numéro du passeport",         passportDate: "Date de délivrance",         passportIssued: "Délivré par",         inn: "Numéro fiscal (facultatif)",         stayFree: "🆓 J'accueille gratuitement",         paidHost: "💰 Accueil payant (coordonnées bancaires requises)",         bankTitle: "🏦 Coordonnées bancaires",         bankAccount: "Numéro de compte / carte",         bankName: "Banque",
       city: "Ville", region: "Région", address: "Adresse", pickRegion: "Sélectionnez une région",
       priceNight: "Prix par nuit", maxGuests: "Max hôtes", rooms: "Chambres",
       shortDesc: "Description courte", longDesc: "Parlez-nous de vous",
@@ -654,7 +654,7 @@ const t: Record<LangCode, Translations> = {
       subtitle: "Teilen Sie armenische Gastfreundschaft",
       step0: "Kontakte", step1: "Standort", step2: "Konditionen", step3: "Erfahrung",
       familyName: "Familienname", yourName: "Ihr Name", phone: "Telefon", email: "E-Mail",
-        patronymic: "Patronym",         passportTitle: "📝 Reisepass",         passportSeries: "Pass-Serie",         passportNumber: "Pass-Nummer",         passportDate: "Ausstellungsdatum",         passportIssued: "Ausgestellt von",         inn: "Steuer-ID (optional)",         bankTitle: "🏦 Bankverbindung",         bankAccount: "Konto-/Kartennummer",         bankName: "Bank",
+        patronymic: "Patronym",         passportTitle: "📝 Reisepass",         passportSeries: "Pass-Serie",         passportNumber: "Pass-Nummer",         passportDate: "Ausstellungsdatum",         passportIssued: "Ausgestellt von",         inn: "Steuer-ID (optional)",         stayFree: "🆓 Kostenlose Unterkunft",         paidHost: "💰 Kostenpflichtig (Bankdaten erforderlich)",         bankTitle: "🏦 Bankverbindung",         bankAccount: "Konto-/Kartennummer",         bankName: "Bank",
       city: "Stadt", region: "Region", address: "Adresse", pickRegion: "Region auswählen",
       priceNight: "Preis pro Nacht", maxGuests: "Max. Gäste", rooms: "Gästezimmer",
       shortDesc: "Kurzbeschreibung", longDesc: "Erzählen Sie mehr über sich",
@@ -742,7 +742,7 @@ const t: Record<LangCode, Translations> = {
       subtitle: "Comparte la hospitalidad armenia",
       step0: "Contactos", step1: "Ubicación", step2: "Condiciones", step3: "Experiencia",
       familyName: "Nombre de familia", yourName: "Tu nombre", phone: "Teléfono", email: "Correo",
-        patronymic: "Patronímico",         passportTitle: "📝 Pasaporte",         passportSeries: "Serie del pasaporte",         passportNumber: "Número de pasaporte",         passportDate: "Fecha de emisión",         passportIssued: "Emitido por",         inn: "NIF (opcional)",         bankTitle: "🏦 Datos bancarios",         bankAccount: "Número de cuenta / tarjeta",         bankName: "Banco",
+        patronymic: "Patronímico",         passportTitle: "📝 Pasaporte",         passportSeries: "Serie del pasaporte",         passportNumber: "Número de pasaporte",         passportDate: "Fecha de emisión",         passportIssued: "Emitido por",         inn: "NIF (opcional)",         stayFree: "🆓 Recibo huéspedes gratis",         paidHost: "💰 Recibo por pago (datos bancarios requeridos)",         bankTitle: "🏦 Datos bancarios",         bankAccount: "Número de cuenta / tarjeta",         bankName: "Banco",
       city: "Ciudad", region: "Región", address: "Dirección", pickRegion: "Selecciona región",
       priceNight: "Precio por noche", maxGuests: "Máx. huéspedes", rooms: "Habitaciones",
       shortDesc: "Descripción corta", longDesc: "Cuéntanos más sobre ti",
@@ -830,7 +830,7 @@ const t: Record<LangCode, Translations> = {
       subtitle: "Condividi l'ospitalità armena",
       step0: "Contatti", step1: "Posizione", step2: "Condizioni", step3: "Esperienza",
       familyName: "Nome famiglia", yourName: "Il tuo nome", phone: "Telefono", email: "Email",
-        patronymic: "Patronimico",         passportTitle: "📝 Passaporto",         passportSeries: "Serie passaporto",         passportNumber: "Numero passaporto",         passportDate: "Data di rilascio",         passportIssued: "Rilasciato da",         inn: "Codice fiscale (opzionale)",         bankTitle: "🏦 Dati bancari",         bankAccount: "Numero conto / carta",         bankName: "Banca",
+        patronymic: "Patronimico",         passportTitle: "📝 Passaporto",         passportSeries: "Serie passaporto",         passportNumber: "Numero passaporto",         passportDate: "Data di rilascio",         passportIssued: "Rilasciato da",         inn: "Codice fiscale (opzionale)",         stayFree: "🆓 Ospito gratuitamente",         paidHost: "💰 Ospito a pagamento (servono dati bancari)",         bankTitle: "🏦 Dati bancari",         bankAccount: "Numero conto / carta",         bankName: "Banca",
       city: "Città", region: "Regione", address: "Indirizzo", pickRegion: "Seleziona regione",
       priceNight: "Prezzo a notte", maxGuests: "Max ospiti", rooms: "Camere",
       shortDesc: "Descrizione breve", longDesc: "Raccontaci di più",
@@ -918,7 +918,7 @@ const t: Record<LangCode, Translations> = {
       subtitle: "شارك الضيافة الأرمينية",
       step0: "جهات الاتصال", step1: "الموقع", step2: "الشروط", step3: "التجربة",
       familyName: "اسم العائلة", yourName: "اسمك", phone: "الهاتف", email: "البريد الإلكتروني",
-        patronymic: "اسم الأب",         passportTitle: "📝 جواز السفر",         passportSeries: "سلسلة جواز السفر",         passportNumber: "رقم جواز السفر",         passportDate: "تاريخ الإصدار",         passportIssued: "صادر من",         inn: "الرقم الضريبي (اختياري)",         bankTitle: "🏦 بيانات مصرف",         bankAccount: "رقم الحساب / البطاقة",         bankName: "المصرف",
+        patronymic: "اسم الأب",         passportTitle: "📝 جواز السفر",         passportSeries: "سلسلة جواز السفر",         passportNumber: "رقم جواز السفر",         passportDate: "تاريخ الإصدار",         passportIssued: "صادر من",         inn: "الرقم الضريبي (اختياري)",         stayFree: "🆓 أستقبل الضيوف مجاناً",         paidHost: "💰 أستقبل بمقابل (البيانات المصرفية مطلوبة)",         bankTitle: "🏦 بيانات مصرف",         bankAccount: "رقم الحساب / البطاقة",         bankName: "المصرف",
       city: "المدينة", region: "المنطقة", address: "العنوان", pickRegion: "اختر منطقة",
       priceNight: "السعر لكل ليلة", maxGuests: "أقصى عدد ضيوف", rooms: "غرف الضيوف",
       shortDesc: "وصف مختصر", longDesc: "أخبرنا المزيد عنك",
@@ -1006,7 +1006,7 @@ const t: Record<LangCode, Translations> = {
       subtitle: "分享亚美尼亚的热情好客",
       step0: "联系方式", step1: "位置", step2: "条件", step3: "体验",
       familyName: "家庭名称", yourName: "您的姓名", phone: "电话", email: "电子邮件",
-        patronymic: "父名",         passportTitle: "📝 护照信息",         passportSeries: "护照号码段",         passportNumber: "护照号码",         passportDate: "签发日期",         passportIssued: "签发机关",         inn: "税号（可选）",         bankTitle: "🏦 银行信息",         bankAccount: "账户/卡号",         bankName: "银行",
+        patronymic: "父名",         passportTitle: "📝 护照信息",         passportSeries: "护照号码段",         passportNumber: "护照号码",         passportDate: "签发日期",         passportIssued: "签发机关",         inn: "税号（可选）",         stayFree: "🆓 免费接待客人",         paidHost: "💰 付费接待（需要银行信息）",         bankTitle: "🏦 银行信息",         bankAccount: "账户/卡号",         bankName: "银行",
       city: "城市", region: "地区", address: "地址", pickRegion: "选择地区",
       priceNight: "每晚价格", maxGuests: "最多客人数", rooms: "客房数",
       shortDesc: "简短描述", longDesc: "详细介绍自己",
@@ -1094,7 +1094,7 @@ const t: Record<LangCode, Translations> = {
       subtitle: "مهمان‌نوازی ارمنی را به اشتراک بگذارید",
       step0: "مخاطبین", step1: "موقعیت", step2: "شرایط", step3: "تجربه",
       familyName: "نام خانواده", yourName: "نام شما", phone: "تلفن", email: "ایمیل",
-        patronymic: "نام پدر",         passportTitle: "📝 پاسپورت",         passportSeries: "سری پاسپورت",         passportNumber: "شماره پاسپورت",         passportDate: "تاریخ صدور",         passportIssued: "صادرکننده",         inn: "کد مالیاتی (اختیاری)",         bankTitle: "🏦 اطلاعات بانکی",         bankAccount: "شماره حساب / کارت",         bankName: "بانک",
+        patronymic: "نام پدر",         passportTitle: "📝 پاسپورت",         passportSeries: "سری پاسپورت",         passportNumber: "شماره پاسپورت",         passportDate: "تاریخ صدور",         passportIssued: "صادرکننده",         inn: "کد مالیاتی (اختیاری)",         stayFree: "🆓 پذیرش رایگان مهمان",         paidHost: "💰 پذیرش پولی (اطلاعات بانکی لازم است)",         bankTitle: "🏦 اطلاعات بانکی",         bankAccount: "شماره حساب / کارت",         bankName: "بانک",
       city: "شهر", region: "منطقه", address: "آدرس", pickRegion: "منطقه را انتخاب کنید",
       priceNight: "قیمت هر شب", maxGuests: "حداکثر مهمان", rooms: "اتاق مهمان",
       shortDesc: "توضیح کوتاه", longDesc: "بیشتر درباره خود بگویید",

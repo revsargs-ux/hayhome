@@ -85,6 +85,7 @@ export default function BecomeHostPage() {
   const [binLoading, setBinLoading] = useState(false);
   const binTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [stayFree, setStayFree] = useState(true);
   const [form, setForm] = useState({
     familyName: "", name: "", patronymic: "", phone: "", email: "",
     passportSeries: "", passportNumber: "", passportDate: "", passportIssued: "",
@@ -214,7 +215,7 @@ export default function BecomeHostPage() {
     try {
       const res = await fetch("/api/hosts", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, stars: 1, photos: [], coverPhoto: "", lang }),
+        body: JSON.stringify({ ...form, stars: 1, photos: [], coverPhoto: "", lang, stayFree }),
       });
       if (!res.ok) throw new Error();
       goToStep(4);
@@ -285,6 +286,28 @@ export default function BecomeHostPage() {
                   {fieldErrors[f.field] && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors[f.field]}</p>}
                 </div>
               ))}
+              {/* Бесплатно vs платно */}
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+                <p className="text-xs font-semibold text-amber-800 uppercase tracking-wider">{b.stayFree}</p>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setStayFree(true)}
+                    className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${stayFree ? "bg-white text-gray-900 shadow-sm ring-2 ring-green-500" : "bg-amber-50 text-gray-500"}`}
+                  >
+                    🆓 {b.stayFree}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStayFree(false)}
+                    className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${!stayFree ? "bg-white text-gray-900 shadow-sm ring-2 ring-red-500" : "bg-amber-50 text-gray-500"}`}
+                  >
+                    💰 {b.paidHost}
+                  </button>
+                </div>
+              </div>
+
+              {!stayFree && <>
               <hr className="my-4 border-gray-200" />
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-3">{b.bankTitle}</p>
               {/* Card / account number — BIN auto-detection */}
@@ -322,6 +345,7 @@ export default function BecomeHostPage() {
                   className={`${inputCls} ${fieldErrors.bankName ? "border-amber-400 bg-amber-50" : ""}`} />
                 {fieldErrors.bankName && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors.bankName}</p>}
               </div>
+              </>} {/* end !stayFree */}
             </div>
           )}
 
