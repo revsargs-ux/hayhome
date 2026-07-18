@@ -204,7 +204,9 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                     </div>
                     <div className="min-w-0">
                       <h4 className="font-semibold text-gray-900 text-sm truncate">{h.familyName}</h4>
+                      {(h as any).stayFree && (
                       <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{tr.hosts.freeBadge}</span>
+                    )}
                     </div>
                   </div>
                 </Link>

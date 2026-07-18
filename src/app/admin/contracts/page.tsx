@@ -14,7 +14,9 @@ type Host = {
   email: string;
   status: string;
   verified: boolean;
+  stayFree?: boolean;
 };
+
 
 const T: Record<string, Record<string, string>> = {
   title: { ru:"Договоры партнёров", en:"Partner Contracts", hy:"Գործընկերների պայմանագրեր", fr:"Contrats des partenaires", de:"Partnerverträge", es:"Contratos de socios", it:"Contratti dei partner", ar:"عقود الشركاء", zh:"合作伙伴合同", fa:"قراردادهای شرکا" },
@@ -160,7 +162,9 @@ export default function AdminContractsPage() {
                     <div className="text-xs text-gray-500">{host.name}{host.patronymic ? ` ${host.patronymic}` : ""}</div>
                   </td>
                   <td className="px-4 py-3 text-gray-600">{host.city}, {host.region}</td>
-                  <td className="px-4 py-3"><span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{ct("freeBadge", lang)}</span></td>
+                  <td className="px-4 py-3">{host.stayFree && (
+                  <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{ct("freeBadge", lang)}</span>
+                )}</td>
                   <td className="px-4 py-3">
                     {host.verified ? (
                       <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">

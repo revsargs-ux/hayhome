@@ -300,7 +300,7 @@ export default function BookPage() {
 
   // Проживание бесплатно
   const total = 0;
-  const finalTotal = 0;
+  const finalTotal = host?.stayFree ? 0 : (host?.pricePerNight || 0) * (nights || 0);
 
   // Day visit: checkIn == checkOut разрешено если хост позволяет
   const isDayVisit = host?.allowsDayVisit && form.checkIn && form.checkOut && form.checkIn === form.checkOut;

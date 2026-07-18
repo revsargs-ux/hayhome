@@ -30,6 +30,7 @@ function HostsContent() {
   const [minStars, setMinStars] = useState(0);
 
   const [experience, setExperience] = useState("");
+  const [stayFreeOnly, setStayFreeOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<"rating" | "value">("rating");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
@@ -69,6 +70,7 @@ function HostsContent() {
     if (region) result = result.filter((h) => h.region === region || h.city === region);
     if (minStars > 0) result = result.filter((h) => h.stars >= minStars);
     if (experience) result = result.filter((h) => h.experiences?.some(e => e.toLowerCase().includes(experience.toLowerCase())));
+    if (stayFreeOnly) result = result.filter((h) => h.stayFree);
     if (sortBy === "rating") result.sort((a, b) => b.rating - a.rating);
     else if (sortBy === "value") result.sort((a, b) => (valueRanks[a.id] || 999) - (valueRanks[b.id] || 999));
     setFiltered(result);
@@ -109,6 +111,10 @@ function HostsContent() {
           {showFilters && (
             <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                    <input type="checkbox" checked={stayFreeOnly} onChange={(e) => setStayFreeOnly(e.target.checked)} className="accent-red-600 w-4 h-4" />
+                    🆓 {tr.hosts.freeBadge}
+                  </label>
                 <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">{h.region}</label>
                 <select value={region} onChange={(e) => setRegion(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none bg-white">
@@ -198,7 +204,7 @@ function HostsContent() {
             <h3 className="text-xl font-bold text-gray-900 mb-2">{h.notFound}</h3>
             <p className="text-gray-500 mb-6">{h.notFoundSub}</p>
             <button
-              onClick={() => { setSearch(""); setRegion(""); setMinStars(0); setExperience(""); }}
+              onClick={() => { setSearch(""); setRegion(""); setMinStars(0); setExperience(""); setStayFreeOnly(false); }}
               className="px-6 py-2.5 rounded-full text-white font-medium"
               style={{ background: "#D4001A" }}
             >

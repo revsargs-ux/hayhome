@@ -27,7 +27,7 @@ const T = {
 // HOSTS
 // ============================================
 // Публичные поля для GET /api/hosts — исключаем паспорт/реквизиты/координаты
-const HOST_PUBLIC_FIELDS = "id,name,familyName,location,city,region,stars,pricePerNight,description,longDescription,i18n,coverPhoto,photos,badges,languages,amenities,experiences,maxGuests,availableRooms,rating,reviewCount,verified,phone,email,createdAt,status";
+const HOST_PUBLIC_FIELDS = "id,name,familyName,location,city,region,stars,pricePerNight,description,longDescription,i18n,coverPhoto,photos,badges,languages,amenities,experiences,maxGuests,availableRooms,rating,reviewCount,verified,phone,email,createdAt,status,stayFree,allowsDayVisit,serviceCategories";
 
 export async function getHosts(includeAll = false): Promise<Host[]> {
   if (includeAll) {

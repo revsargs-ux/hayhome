@@ -146,6 +146,7 @@ export interface MapHost {
   coverPhoto: string;
   rating: number;
   stars: number;
+  stayFree?: boolean;
 }
 
 interface MapProps {
@@ -251,9 +252,11 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
                     <span style={{ fontSize: "12px" }}>
                       {host.rating > 0 ? `⭐ ${host.rating}` : ""}
                     </span>
+                    {host.stayFree && (
                     <span style={{ fontWeight: 700, color: "#16a34a", fontSize: "13px", background: "#dcfce7", padding: "2px 8px", borderRadius: "12px" }}>
                       {tr.hosts.freeBadge}
                     </span>
+                    )}
                   </div>
                   {/* 7-day availability calendar */}
                   <div style={{ marginBottom: "8px" }}>

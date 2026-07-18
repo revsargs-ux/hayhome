@@ -167,7 +167,9 @@ export default function NewRequestPage() {
                           <span>{regionName(h.region, lang)}</span>
                           {h.rating > 0 && <span>⭐ {h.rating.toFixed(1)}</span>}
                         </div>
+                        {(h as any).stayFree && (
                         <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full mt-0.5 inline-block">{tr.hosts.freeBadge}</span>
+                      )}
                       </div>
                     </div>
                   </Link>

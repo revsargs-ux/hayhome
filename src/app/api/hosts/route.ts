@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     region: String(body.region).slice(0, 100),
     stars: body.stars,
     pricePerNight: body.pricePerNight ?? 0,
-    stayFree: true,
+    stayFree: body.stayFree === true,
     allowsDayVisit: body.allowsDayVisit === true,
     serviceCategories: Array.isArray(body.serviceCategories) ? body.serviceCategories.slice(0, 10) : [],
     description: sanitize(body.description),

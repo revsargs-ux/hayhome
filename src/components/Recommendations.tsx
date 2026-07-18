@@ -12,6 +12,7 @@ interface Host {
   coverPhoto: string;
   rating: number;
   maxGuests: number;
+  stayFree?: boolean;
 }
 
 interface Service {
@@ -82,7 +83,7 @@ export default function Recommendations({ type, region, category, hostId, exclud
               <h4 className="font-semibold text-gray-900 text-sm truncate">{h.familyName}</h4>
               <p className="text-xs text-gray-500">{regionName(h.region, lang)} · {h.city}</p>
               <div className="flex items-center justify-between mt-1">
-                <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{tr.hosts.freeBadge}</span>
+                {h.stayFree && <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{tr.hosts.freeBadge}</span>}
                 {h.rating > 0 && <span className="text-xs text-gray-400">⭐ {h.rating.toFixed(1)}</span>}
               </div>
             </div>

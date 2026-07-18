@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
     checkIn: body.checkIn,
     checkOut: body.checkOut,
     guests: body.guests,
-    totalPrice: 0,
+    totalPrice: host?.stayFree ? 0 : (host?.pricePerNight || 0) * nights,
     message: String(body.message || "").slice(0, 2000),
   });
 

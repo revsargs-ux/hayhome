@@ -1107,7 +1107,9 @@ function DashboardFavorites({ lang, tr }: { lang: string; tr: any }) {
                 <h3 className="font-bold text-gray-900 text-sm mb-1">{host.familyName}</h3>
                 <p className="text-xs text-gray-500 mb-2">{host.city}, {host.region}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{tr.hosts.freeBadge}</span>
+                  {host.stayFree && (
+                          <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{tr.hosts.freeBadge}</span>
+                        )}
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <Star size={12} fill="#F2A900" color="#F2A900" />
                     {host.rating > 0 ? host.rating.toFixed(1) : "New"}
