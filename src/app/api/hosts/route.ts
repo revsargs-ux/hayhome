@@ -17,10 +17,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Admin access required" }, { status: 403 });
     }
     const hosts = await getHosts(true); // includeAll = true — all statuses
-    return NextResponse.json(hosts);
+    return NextResponse.json(hosts, { headers: { "Cache-Control": "public, max-age=60, s-maxage=300" } });
   }
   const hosts = await getHosts();
-  return NextResponse.json(hosts);
+  return NextResponse.json(hosts, { headers: { "Cache-Control": "public, max-age=60, s-maxage=300" } });
 }
 
 export async function POST(req: NextRequest) {

@@ -61,5 +61,5 @@ export async function GET(req: NextRequest) {
   scored.sort((a, b) => b.value_score - a.value_score);
   scored.forEach((h, idx) => { h.rank = idx + 1; });
 
-  return NextResponse.json(scored);
+  return NextResponse.json(scored, { headers: { "Cache-Control": "public, max-age=120, s-maxage=600" } });
 }
