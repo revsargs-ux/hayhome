@@ -92,14 +92,17 @@ export async function POST(req: NextRequest) {
   // ── Verify host exists ──
   const { data: host } = await supabase
     .from("hayhome_hosts")
-    .select("id")
+    .select("id, stayFree, pricePerNight")
     .eq("id", body.hostId)
     .single();
   if (!host) {
     return NextResponse.json({ error: "Host not found" }, { status: 400 });
   }
 
-  // ── Проживание БЕСПЛАТНО — totalPrice всегда 0 ──
+  // ── Calculate price ──
+  const nights = Math.max(1, Math.round((new Date(body.checkOut).getTime() - new Date(body.checkIn).getTime()) / 86400000));
+  const totalPrice = (host as any)?.stayFree ? 0 : ((host as any)?.pricePerNight || 0) * nights;
+
   const booking = await createBooking({
     hostId: body.hostId,
     hostName: String(body.hostName || "").slice(0, 200),
@@ -110,7 +113,7 @@ export async function POST(req: NextRequest) {
     checkIn: body.checkIn,
     checkOut: body.checkOut,
     guests: body.guests,
-    totalPrice: host?.stayFree ? 0 : (host?.pricePerNight || 0) * nights,
+    totalPrice,
     message: String(body.message || "").slice(0, 2000),
   });
 
