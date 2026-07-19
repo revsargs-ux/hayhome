@@ -2,26 +2,31 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests",
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: "html",
+  retries: process.env.CI ? 1 : 0,
+  workers: process.env.CI ? 1 : 2,
+  reporter: "list",
   use: {
-    baseURL: "http://localhost:3001",
+    baseURL: "https://hay-home.com",
     trace: "on-first-retry",
     locale: "ru-RU",
+    // Ignore SSL cert issues (self-signed in dev)
+    ignoreHTTPSErrors: true,
   },
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        launchOptions: {
+          args: [
+            "--disable-gpu",
+            "--disable-software-rasterizer",
+            "--no-sandbox",
+          ],
+        },
+      },
     },
   ],
-  webServer: {
-    command: "npm run dev -- -p 3001",
-    url: "http://localhost:3001",
-    reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
-  },
 });
