@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
-import { FileText, Printer, Globe, Search } from "lucide-react";
+import { FileText, Search } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 
 type Host = {

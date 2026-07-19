@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Star, Trash2, Edit2, Plus, Check, X, RefreshCw, Camera } from "lucide-react";
+import { Trash2, Edit2, Plus, Check, X, RefreshCw, Camera } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";

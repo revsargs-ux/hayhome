@@ -101,7 +101,6 @@ export default function ProviderRegisterPage() {
 
     try {
       // If not logged in, register first
-      let authToken = "";
       if (!user) {
         if (!form.name || !form.email || !form.password) {
           setError(t("name") + ", Email, " + t("password"));

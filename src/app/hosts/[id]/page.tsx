@@ -37,7 +37,6 @@ export default function HostProfilePage() {
   const [submitting, setSubmitting] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const [showChat, setShowChat] = useState(false);
-  const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const ui = getUI(lang);
 
   // Review media state
@@ -103,7 +102,7 @@ export default function HostProfilePage() {
         const hasConfirmed = bookings && bookings.some(
           (b) => b.hostId === id && (b.status === "confirmed" || b.status === "completed")
         );
-        setBookingConfirmed(!!hasConfirmed);
+        // booking confirmed check (state not needed)
       })
       .catch(() => setCanReview(false));
   }, [user, id]);

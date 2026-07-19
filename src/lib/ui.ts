@@ -327,7 +327,6 @@ export interface UI {
   book: string;
 }
 
-type Rec = Record<string, string>;
 
 const translations: Record<LangCode, UI> = {
   ru: {

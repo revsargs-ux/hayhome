@@ -17,11 +17,6 @@ import FavoriteButton from "@/components/FavoriteButton";
 const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false });
 import { isUserInArmenia, findNearestAirport, ZVARTNOTS } from "@/components/RouteMap";
 
-// Route translation labels for dashboard
-const DASH_RT = {
-  route: { ru: "Маршрут", en: "Route", hy: "Երթուղի", fr: "Itinéraire", de: "Route", es: "Ruta", it: "Percorso", ar: "الطريق", zh: "路线", fa: "مسیر" },
-  useGeo: { ru: "Определить местоположение", en: "Use my location", hy: "Իմ գտնվելու վայրը", fr: "Ma position", de: "Mein Standort", es: "Mi ubicación", it: "Mia posizione", ar: "موقعي", zh: "我的位置", fa: "موقعیت من" },
-};
 
 const STATUS_LABELS: Record<string, Record<string, string>> = {
   ru: { pending: "Ожидает", confirmed: "Подтверждено", completed: "Завершено", cancelled: "Отменено" },
@@ -53,8 +48,6 @@ export default function DashboardPage() {
   const [partnerCode, setPartnerCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
-  const [favHosts, setFavHosts] = useState<Host[]>([]);
-  const [favLoading, setFavLoading] = useState(false);
   const [showChatWidget, setShowChatWidget] = useState(false);
   const [chatWithUser, setChatWithUser] = useState<string | null>(null);
 

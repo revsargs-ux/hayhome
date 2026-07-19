@@ -13,8 +13,6 @@ const PROVIDER_META: Record<ProviderKey, { label: string; bg: string; textColor:
   yandex:    { label: "Yandex",   bg: "#fc3f1d", textColor: "#ffffff", icon: "Я" },
 };
 
-const PROVIDER_ORDER: ProviderKey[] = ["google", "telegram", "apple", "vk", "facebook", "yandex"];
-
 export function SocialLogin() {
   const { tr } = useLang();
   const a = tr.auth;

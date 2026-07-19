@@ -19,16 +19,6 @@ interface GuestRequest {
   created_at: string;
 }
 
-const CATEGORIES_MAP: Record<string, string> = {
-  all: "all",
-  events: "events",
-  food: "food",
-  tour: "tour",
-  culture: "culture",
-  music: "music",
-  custom: "custom",
-};
-
 const REGIONS = [
   { value: "all", label: "Yerevan" },
   { value: "Kotayk", label: "Kotayk" },

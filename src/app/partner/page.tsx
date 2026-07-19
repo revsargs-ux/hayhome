@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import getUI from "@/lib/ui";
-import { Users, Target, MapPin, DollarSign, ChevronRight, Star, Gift, Shield } from "lucide-react";
+import { Users, Target, MapPin, DollarSign, ChevronRight } from "lucide-react";
 
 function PartnerContent() {
   const { tr, lang } = useLang();

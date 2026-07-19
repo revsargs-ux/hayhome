@@ -3,7 +3,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, MapPin, Globe, X, Check } from "lucide-react";
+import { Star, MapPin, X, Check } from "lucide-react";
 import { Host } from "@/lib/types";
 import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";
