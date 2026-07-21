@@ -15,7 +15,7 @@ test.describe("@critical Provider — услуги", () => {
     const context = await authAs(browser, "guest");
     const page = await context.newPage();
     await page.goto("/provider");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const url = page.url();
     const body = await page.textContent("body");
@@ -29,7 +29,7 @@ test.describe("@critical Provider — услуги", () => {
     const context = await authAs(browser, "provider");
     const page = await context.newPage();
     await page.goto("/provider");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     expect(page.url()).not.toMatch(/\/login/);
     const body = await page.textContent("body");
@@ -41,7 +41,7 @@ test.describe("@critical Provider — услуги", () => {
     const context = await authAs(browser, "provider");
     const page = await context.newPage();
     await page.goto("/provider/services");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     expect(page.url()).not.toMatch(/\/login/);
     const body = await page.textContent("body");

@@ -9,7 +9,7 @@ test.describe("@i18n Переключение языков", () => {
   test("@i18n все 6 языков загружаются на главной", async ({ page }) => {
     for (const lang of LANGUAGES) {
       await page.goto(`/?lang=${lang}`);
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("load");
       const body = await page.textContent("body");
       expect(body).not.toMatch(/500|internal server error/i);
     }
@@ -17,11 +17,11 @@ test.describe("@i18n Переключение языков", () => {
 
   test("@i18n переключение языка сохраняется в URL или cookie", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     // Попытаться переключить через URL
     await page.goto("/?lang=en");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     const body = await page.textContent("body");
     expect(body).not.toMatch(/500/);
   });
@@ -29,7 +29,7 @@ test.describe("@i18n Переключение языков", () => {
   for (const lang of LANGUAGES) {
     test(`@i18n страница /hosts работает на языке ${lang}`, async ({ page }) => {
       await page.goto(`/hosts?lang=${lang}`);
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("load");
       const body = await page.textContent("body");
       expect(body).not.toMatch(/500|error/i);
     });
@@ -37,7 +37,7 @@ test.describe("@i18n Переключение языков", () => {
 
   test("@i18n html[lang] атрибут установлен", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const htmlLang = await page.getAttribute("html", "lang");
     // Должен быть установлен валидный lang
@@ -47,7 +47,7 @@ test.describe("@i18n Переключение языков", () => {
 
   test("@i18n переключение через UI меняет язык", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     // Найти переключатель языков
     const langSelector = page.locator(

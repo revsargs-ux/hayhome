@@ -9,7 +9,7 @@ test.describe("Admin — управление хостами", () => {
     const context = await authAs(browser, "admin");
     const page = await context.newPage();
     await page.goto("/admin/hosts");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     expect(page.url()).not.toMatch(/\/login/);
     const body = await page.textContent("body");
@@ -39,7 +39,7 @@ test.describe("Admin — управление хостами", () => {
     const context = await authAs(browser, "admin");
     const page = await context.newPage();
     await page.goto("/admin/hosts");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const toggleBtn = page.locator(
       'button:has-text("Активировать"), button:has-text("Деактивировать"), button:has-text("Activate"), button:has-text("Deactivate")'

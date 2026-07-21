@@ -3,7 +3,7 @@ import { TIMEOUTS } from "../config";
 
 // Ждать пока пропадёт лоадер/спиннер
 export async function waitForLoad(page: Page) {
-  await page.waitForLoadState("networkidle", { timeout: TIMEOUTS.navigation });
+  await page.waitForLoadState("load", { timeout: TIMEOUTS.navigation });
 }
 
 // Проверить что страница не показывает 404/500

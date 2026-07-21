@@ -8,7 +8,7 @@ export async function switchLang(page: Page, lang: LangCode) {
   const url = new URL(page.url());
   url.searchParams.set("lang", lang);
   await page.goto(url.toString());
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("load");
 }
 
 // Переключить язык через UI (если есть селектор)
@@ -44,7 +44,7 @@ export async function checkAllLanguages(
 ) {
   for (const lang of LANGUAGES) {
     await page.goto(`${path}?lang=${lang}`);
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await check(page, lang);
   }
 }

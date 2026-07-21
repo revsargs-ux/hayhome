@@ -15,7 +15,7 @@ test.describe("@host Дашборд хоста /dashboard", () => {
     const context = await authAs(browser, "host");
     const page = await context.newPage();
     await page.goto("/dashboard");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     // Не должен быть редиректа на логин
     expect(page.url()).not.toMatch(/\/login/);
@@ -28,7 +28,7 @@ test.describe("@host Дашборд хоста /dashboard", () => {
     const context = await authAs(browser, "host");
     const page = await context.newPage();
     await page.goto("/dashboard");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const body = await page.textContent("body");
     // Дашборд должен содержать что-то про бронирования или доход
@@ -40,7 +40,7 @@ test.describe("@host Дашборд хоста /dashboard", () => {
     const context = await authAs(browser, "guest");
     const page = await context.newPage();
     await page.goto("/dashboard/host");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     // Либо редирект, либо 403
     const body = await page.textContent("body");

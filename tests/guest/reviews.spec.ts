@@ -64,7 +64,7 @@ test.describe("UI отзывов", () => {
   test("секция отзывов видна на странице хоста", async ({ page }) => {
     if (!hostId) { test.skip(); return; }
     await page.goto(`/hosts/${hostId}`);
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const reviews = page.locator('[class*="review"], [class*="отзыв"], section:has-text("Отзывы")').first();
     const reviewsExist = await reviews.isVisible({ timeout: 5000 }).catch(() => false);
@@ -79,7 +79,7 @@ test.describe("UI отзывов", () => {
     const context = await authAs(browser, "guest");
     const page = await context.newPage();
     await page.goto(`/hosts/${hostId}`);
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const form = page.locator('form, [class*="review-form"]').first();
     const body = await page.textContent("body");

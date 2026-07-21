@@ -7,7 +7,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Список хостов /hosts", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/hosts");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
   });
 
   test("@critical страница загружается", async ({ page }) => {
@@ -82,7 +82,7 @@ test.describe("Страница хоста /hosts/[id]", () => {
   test("@critical страница хоста загружается", async ({ page }) => {
     if (!hostId) { test.skip(); return; }
     await page.goto(`/hosts/${hostId}`);
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await expect(page).not.toHaveURL(/\/404/);
     const body = await page.textContent("body");
     expect(body).not.toMatch(/404|not found/i);
@@ -91,7 +91,7 @@ test.describe("Страница хоста /hosts/[id]", () => {
   test("кнопка бронирования видна", async ({ page }) => {
     if (!hostId) { test.skip(); return; }
     await page.goto(`/hosts/${hostId}`);
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     const btn = page.locator(
       'button:has-text("Забронировать"), button:has-text("Book")'
     ).first();
@@ -100,7 +100,7 @@ test.describe("Страница хоста /hosts/[id]", () => {
 
   test("несуществующий хост показывает 404", async ({ page }) => {
     await page.goto("/hosts/00000000-0000-0000-0000-000000000000");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     const body = await page.textContent("body");
     expect(body).toMatch(/404|не найден|not found/i);
   });

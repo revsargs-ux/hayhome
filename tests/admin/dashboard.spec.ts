@@ -15,7 +15,7 @@ test.describe("Дашборд администратора /admin", () => {
     const context = await authAs(browser, "guest");
     const page = await context.newPage();
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const url = page.url();
     const body = await page.textContent("body");
@@ -29,7 +29,7 @@ test.describe("Дашборд администратора /admin", () => {
     const context = await authAs(browser, "host");
     const page = await context.newPage();
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const url = page.url();
     const body = await page.textContent("body");
@@ -43,7 +43,7 @@ test.describe("Дашборд администратора /admin", () => {
     const context = await authAs(browser, "admin");
     const page = await context.newPage();
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     expect(page.url()).not.toMatch(/\/login/);
     const body = await page.textContent("body");
@@ -55,7 +55,7 @@ test.describe("Дашборд администратора /admin", () => {
     const context = await authAs(browser, "admin");
     const page = await context.newPage();
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const body = await page.textContent("body");
     const hasStats = /хост|booking|пользовател|user|всего|total|статистика/i.test(body || "");

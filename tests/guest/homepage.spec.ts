@@ -8,7 +8,7 @@ import { checkTapTargets } from "../helpers/ui";
 test.describe("Главная страница", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
   });
 
   test("@critical загружается без ошибок", async ({ page }) => {
@@ -38,7 +38,7 @@ test.describe("Главная страница", () => {
     const link = page.locator('a[href="/hosts"], a:has-text("Семьи"), a:has-text("Families")').first();
     if (await link.isVisible()) {
       await Promise.all([
-        page.waitForLoadState("networkidle"),
+        page.waitForLoadState("load"),
         link.click(),
       ]);
       await expect(page).toHaveURL(/\/hosts/);
@@ -52,7 +52,7 @@ test.describe("Главная страница", () => {
   test("tap-таргеты >= 44px на мобильном (mobile)", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     const violations = await checkTapTargets(page);
     // Не должно быть критичных нарушений на главной
     const critical = violations.filter((v) => v.height < 30 || v.width < 30);

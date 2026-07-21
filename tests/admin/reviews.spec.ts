@@ -9,7 +9,7 @@ test.describe("Admin — модерация отзывов", () => {
     const context = await authAs(browser, "admin");
     const page = await context.newPage();
     await page.goto("/admin/reviews");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     expect(page.url()).not.toMatch(/\/login/);
     const body = await page.textContent("body");
@@ -21,7 +21,7 @@ test.describe("Admin — модерация отзывов", () => {
     const context = await authAs(browser, "guest");
     const page = await context.newPage();
     await page.goto("/admin/reviews");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const url = page.url();
     const body = await page.textContent("body");
@@ -35,7 +35,7 @@ test.describe("Admin — модерация отзывов", () => {
     const context = await authAs(browser, "admin");
     const page = await context.newPage();
     await page.goto("/admin/reviews");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const approveBtn = page.locator(
       'button:has-text("Одобрить"), button:has-text("Approve"), button:has-text("Публиковать")'
@@ -54,7 +54,7 @@ test.describe("Admin — модерация отзывов", () => {
     const context = await authAs(browser, "admin");
     const page = await context.newPage();
     await page.goto("/admin/reviews");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const deleteBtn = page.locator(
       'button:has-text("Удалить"), button:has-text("Delete"), button[aria-label*="удалить" i]'

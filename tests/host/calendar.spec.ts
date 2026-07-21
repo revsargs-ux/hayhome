@@ -10,7 +10,7 @@ test.describe("@host Календарь /dashboard/calendar", () => {
     const context = await authAs(browser, "host");
     const page = await context.newPage();
     await page.goto("/dashboard/calendar");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     expect(page.url()).not.toMatch(/\/login/);
     const body = await page.textContent("body");
@@ -22,7 +22,7 @@ test.describe("@host Календарь /dashboard/calendar", () => {
     const context = await authAs(browser, "host");
     const page = await context.newPage();
     await page.goto("/dashboard/calendar");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const prevBtn = page.locator('button[aria-label*="prev" i], button[aria-label*="назад" i], button:has-text("<"), button:has-text("‹")').first();
     const nextBtn = page.locator('button[aria-label*="next" i], button[aria-label*="вперёд" i], button:has-text(">"), button:has-text("›")').first();
@@ -40,7 +40,7 @@ test.describe("@host Календарь /dashboard/calendar", () => {
     const context = await authAs(browser, "host");
     const page = await context.newPage();
     await page.goto("/dashboard/calendar");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const day = page.locator('[data-date], [class*="day"]:not([class*="disabled"])').first();
     if (await day.isVisible({ timeout: 5000 }).catch(() => false)) {

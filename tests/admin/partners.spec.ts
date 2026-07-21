@@ -9,7 +9,7 @@ test.describe("Admin — партнёры /admin/partners", () => {
     const context = await authAs(browser, "admin");
     const page = await context.newPage();
     await page.goto("/admin/partners");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     expect(page.url()).not.toMatch(/\/login/);
     const body = await page.textContent("body");
@@ -21,7 +21,7 @@ test.describe("Admin — партнёры /admin/partners", () => {
     const context = await authAs(browser, "partner");
     const page = await context.newPage();
     await page.goto("/admin/partners");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const url = page.url();
     const body = await page.textContent("body");
@@ -35,7 +35,7 @@ test.describe("Admin — партнёры /admin/partners", () => {
     const context = await authAs(browser, "admin");
     const page = await context.newPage();
     await page.goto("/admin/partners");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const body = await page.textContent("body");
     // Страница должна содержать что-то про партнёров

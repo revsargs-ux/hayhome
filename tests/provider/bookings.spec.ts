@@ -9,7 +9,7 @@ test.describe("Provider — заявки/бронирования", () => {
     const context = await authAs(browser, "provider");
     const page = await context.newPage();
     await page.goto("/provider/bookings");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     expect(page.url()).not.toMatch(/\/login/);
     const body = await page.textContent("body");
@@ -21,7 +21,7 @@ test.describe("Provider — заявки/бронирования", () => {
     const context = await authAs(browser, "provider");
     const page = await context.newPage();
     await page.goto("/provider/bookings");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const acceptBtn = page.locator(
       'button:has-text("Принять"), button:has-text("Accept")'

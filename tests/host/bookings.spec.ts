@@ -10,7 +10,7 @@ test.describe("@host Бронирования хоста", () => {
     const context = await authAs(browser, "host");
     const page = await context.newPage();
     await page.goto("/dashboard/bookings");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const body = await page.textContent("body");
     expect(body).not.toMatch(/500|403/);
@@ -34,7 +34,7 @@ test.describe("@host Бронирования хоста", () => {
     const context = await authAs(browser, "host");
     const page = await context.newPage();
     await page.goto("/dashboard/bookings");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const acceptBtn = page.locator(
       'button:has-text("Принять"), button:has-text("Accept"), button:has-text("Подтвердить")'
@@ -53,7 +53,7 @@ test.describe("@host Бронирования хоста", () => {
     const context = await authAs(browser, "host");
     const page = await context.newPage();
     await page.goto("/dashboard/bookings");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const rejectBtn = page.locator(
       'button:has-text("Отклонить"), button:has-text("Reject"), button:has-text("Отменить")'

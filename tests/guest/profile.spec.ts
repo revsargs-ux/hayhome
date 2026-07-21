@@ -14,7 +14,7 @@ test.describe("Профиль /profile", () => {
     const context = await authAs(browser, "guest");
     const page = await context.newPage();
     await page.goto("/profile");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const body = await page.textContent("body");
     expect(body).not.toMatch(/500|401|403/);
@@ -27,7 +27,7 @@ test.describe("Профиль /profile", () => {
     const context = await authAs(browser, "guest");
     const page = await context.newPage();
     await page.goto("/profile");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const hasForm = await page.locator("form, input, [class*=\"profile\"]").first()
       .isVisible({ timeout: 5000 }).catch(() => false);

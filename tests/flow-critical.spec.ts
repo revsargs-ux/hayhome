@@ -127,7 +127,7 @@ test.describe("👥 Список хостов (/hosts)", () => {
 
   test("поиск работает", async ({ page }) => {
     await page.goto("/hosts");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const searchInput = page.locator("input[placeholder]").first();
     await searchInput.fill("Гюмри");

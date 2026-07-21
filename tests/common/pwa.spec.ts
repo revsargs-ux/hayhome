@@ -28,28 +28,28 @@ test.describe("@pwa PWA проверки", () => {
 
   test("@pwa <head> содержит link[rel=manifest]", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     const manifestLink = await page.getAttribute('link[rel="manifest"]', "href");
     expect(manifestLink).toBeTruthy();
   });
 
   test("@pwa theme-color мета-тег присутствует", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     const themeColor = await page.getAttribute('meta[name="theme-color"]', "content");
     expect(themeColor).toBeTruthy();
   });
 
   test("@pwa apple-touch-icon присутствует", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     const appleIcon = await page.getAttribute('link[rel="apple-touch-icon"]', "href");
     expect(appleIcon).toBeTruthy();
   });
 
   test("@pwa Service Worker регистрируется", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     const swRegistered = await page.evaluate(async () => {
       if (!("serviceWorker" in navigator)) return false;

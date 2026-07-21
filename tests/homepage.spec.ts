@@ -17,7 +17,7 @@ test.describe("🏠 Homepage & Navigation", () => {
     const hostsLink = page.locator('header a[href="/hosts"]').first();
     await expect(hostsLink).toBeVisible({ timeout: 10000 });
     await hostsLink.click();
-    // Wait for navigation, not networkidle
+    // Wait for navigation, not load
     await page.waitForTimeout(2000);
     expect(page.url()).toContain("/hosts");
   });
