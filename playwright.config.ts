@@ -45,10 +45,13 @@ export default defineConfig({
     },
   ],
 
-  webServer: {
-    command: "npm run dev",
-    url: BASE_URL,
-    reuseExistingServer: !IS_CI,
-    timeout: 90_000,
-  },
+  // webServer только для локальной разработки — на продакшн-URL запускать npm run dev не нужно
+  ...(BASE_URL.includes("localhost") ? {
+    webServer: {
+      command: "npm run dev",
+      url: BASE_URL,
+      reuseExistingServer: !IS_CI,
+      timeout: 90_000,
+    },
+  } : {}),
 });

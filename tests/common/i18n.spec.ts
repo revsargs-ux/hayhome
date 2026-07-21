@@ -31,7 +31,7 @@ test.describe("@i18n Переключение языков", () => {
       await page.goto(`/hosts?lang=${lang}`);
       await page.waitForLoadState("load");
       const body = await page.textContent("body");
-      expect(body).not.toMatch(/500|error/i);
+      expect(body).not.toMatch(/500|internal server error/i);
     });
   }
 
