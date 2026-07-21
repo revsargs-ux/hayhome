@@ -22,13 +22,6 @@ export interface ProviderConfig {
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || "";
 
-function getRedirectUri(provider: OAuthProvider): string {
-  const base = BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
-  if (base) return `${base}/api/auth/${provider}/callback`;
-  // Fallback for local dev — will be replaced at runtime
-  return `/api/auth/${provider}/callback`;
-}
-
 /** Get the configured base URL for redirects */
 export function getBaseUrl(): string {
   return BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") || "https://hay-home.com";
@@ -422,7 +415,7 @@ async function telegramProfile(authResult: string): Promise<OAuthUserProfile> {
 
   // Verify the hash
   const botToken = process.env.TELEGRAM_BOT_TOKEN!;
-  const { createHmac, createHash } = await import("crypto");
+  const { createHmac } = await import("crypto");
 
   const { hash, ...userData } = decoded;
   const dataCheckString = Object.keys(userData)

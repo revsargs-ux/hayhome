@@ -3,7 +3,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, MapPin, Globe, X, Check } from "lucide-react";
+import { Star, MapPin, X, Check } from "lucide-react";
 import { Host } from "@/lib/types";
 import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";
@@ -88,7 +88,7 @@ function CompareContent() {
 
   // Helper to find the best value among hosts
   const bestRating = Math.max(...hosts.map((h) => h.rating));
-  const bestPrice = Math.min(...hosts.map((h) => h.pricePerNight));
+
   const bestReviewCount = Math.max(...hosts.map((h) => h.reviewCount));
 
   const Row = ({ label, children }: { label: string; children: React.ReactNode }) => (
@@ -151,10 +151,10 @@ function CompareContent() {
 
           <Row label={u.priceLabel}>
             {hosts.map((h) => (
-              <Cell key={h.id} highlight={h.pricePerNight === bestPrice}>
-                <span className="text-lg font-bold">${h.pricePerNight}</span>
-                <span className="text-gray-400 text-xs">/ {tr.hosts.perNight}</span>
-                {h.pricePerNight === bestPrice && <div className="text-xs text-green-600">↓ {u.better}</div>}
+              <Cell key={h.id}>
+                {h.stayFree && (
+                <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full text-sm">{tr.hosts.freeBadge}</span>
+              )}
               </Cell>
             ))}
           </Row>
@@ -296,8 +296,10 @@ function CompareContent() {
 
             <div className="space-y-2 text-xs">
               <div className="flex justify-between border-b border-gray-100 py-1.5">
-                <span className="text-gray-400">💰 {tr.hosts.perNight}</span>
-                <span className={`font-bold ${h.pricePerNight === bestPrice ? "text-green-600" : "text-gray-700"}`}>${h.pricePerNight}</span>
+                <span className="text-gray-400">{tr.hosts.freeBadge}</span>
+                {h.stayFree && (
+                  <span className="font-bold text-green-600">{tr.hosts.freeBadge}</span>
+                )}
               </div>
               <div className="flex justify-between border-b border-gray-100 py-1.5">
                 <span className="text-gray-400">⭐ {tr.common.rating}</span>

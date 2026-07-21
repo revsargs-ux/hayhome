@@ -3,9 +3,6 @@ import { getAuthUser } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { rateLimit } from "@/lib/rateLimit";
 
-const COMMISSION_RATE = 0.05; // 5%
-const MIN_PAYOUT = 30;
-
 function generateCode(name: string): string {
   const base = (name || "PARTNER").toUpperCase().replace(/[^A-ZА-ЯЄ]/g, "").slice(0, 6);
   const rand = Math.random().toString(36).slice(2, 5).toUpperCase();
@@ -48,7 +45,7 @@ export async function POST(req: NextRequest) {
     role,
     region: region || null,
     code,
-    status: "active",
+    status: "pending",
     balance: 0,
     total_earned: 0,
     total_withdrawn: 0,

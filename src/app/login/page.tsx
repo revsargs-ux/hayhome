@@ -29,7 +29,7 @@ function LoginContent() {
     e.preventDefault();
     // CAPTCHA после 2 неудачных попыток
     if (attempts >= 2 && !captchaToken) {
-      setError("⚠️ " + (lang === "ru" ? "Подтвердите, что вы не робот" : "Verify you are not a robot"));
+      setError("⚠️ " + (lang === "ru" ? "Подтвердите, что вы не робот" : lang === "fr" ? "Vérifiez que vous n'êtes pas un robot" : lang === "de" ? "Bestätigen Sie, dass Sie kein Roboter sind" : lang === "es" ? "Confirma que no eres un robot" : lang === "it" ? "Conferma di non essere un robot" : lang === "ar" ? "تأكد أنك لست روبوتًا" : lang === "zh" ? "请确认您不是机器人" : lang === "fa" ? "تأیید کنید که ربات نیستید" : "Verify you are not a robot"));
       return;
     }
     setLoading(true);
@@ -76,7 +76,7 @@ function LoginContent() {
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-sm font-semibold text-gray-700">{a.password}</label>
               <Link href="/forgot-password" className="text-xs hover:underline" style={{ color: "#D4001A" }}>
-                {lang === "ru" ? "Забыли пароль?" : lang === "fr" ? "Mot de passe oublié?" : lang === "de" ? "Passwort vergessen?" : lang === "es" ? "¿Olvidaste tu contraseña?" : lang === "ar" ? "نسيت كلمة المرор?" : lang === "zh" ? "忘记密码?" : lang === "hy" ? "Մոռացել գաղտնաբառը?" : "Forgot password?"}
+                {lang === "ru" ? "Забыли пароль?" : lang === "fr" ? "Mot de passe oublié?" : lang === "de" ? "Passwort vergessen?" : lang === "es" ? "¿Olvidaste tu contraseña?" : lang === "ar" ? "نسيت كلمة المرор?" : lang === "zh" ? "忘记密码?" : lang === "hy" ? "Մոռացել գաղտնաբառը?" : lang === "fa" ? "رمز عبور را فراموش کرده‌اید?" : lang === "it" ? "Hai dimenticato la password?" : "Forgot password?"}
               </Link>
             </div>
             <div className="relative">
@@ -95,7 +95,7 @@ function LoginContent() {
           {/* CAPTCHA после 2 неудач */}
           {attempts >= 2 && (
             <div className="py-1">
-              <label className="text-xs text-gray-500 mb-1.5 block">{lang === "ru" ? "Подтвердите, что вы человек:" : "Verify you are human:"}</label>
+              <label className="text-xs text-gray-500 mb-1.5 block">{lang === "ru" ? "Подтвердите, что вы человек:" : lang === "fr" ? "Vérifiez que vous êtes un humain :" : lang === "de" ? "Bestätigen Sie, dass Sie ein Mensch sind:" : lang === "es" ? "Confirma que eres humano:" : lang === "it" ? "Conferma di essere umano:" : lang === "ar" ? "تأكد أنك إنسان:" : lang === "zh" ? "请确认您是人类：" : lang === "fa" ? "تأیید کنید که انسان هستید:" : "Verify you are human:"}</label>
               <Captcha onVerify={setCaptchaToken} reset={attempts} />
             </div>
           )}

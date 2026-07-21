@@ -178,7 +178,7 @@ export default function EventsPage() {
     city: isHy ? e.locationHy : isRu ? e.locationRu : e.location,
     region: "all",
     coverPhoto: "",
-    pricePerNight: e.price,
+    pricePerNight: 0,
     rating: 0,
     stars: 0,
     _coords: e.coords,

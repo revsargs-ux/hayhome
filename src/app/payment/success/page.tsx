@@ -45,16 +45,14 @@ function SuccessContent() {
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-3">{u.paymentSuccess}</h1>
         <p className="text-gray-500 mb-2">
-          {lang === "ru" ? "Комиссия (15%) оплачена. Бронирование подтверждено." : "Commission (15%) paid. Booking confirmed."}
+          {lang === "ru" ? "Бронирование подтверждено." : lang === "hy" ? "Պայմանա嘿ումը հաստատված և." : "Booking confirmed."}
         </p>
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 my-4 text-left">
           <p className="text-sm text-green-800 font-medium">
             {lang === "ru" ? "✅ Контакты семьи теперь доступны на странице семьи и в личном кабинете." : "✅ Host contacts are now unlocked on the host page and in your dashboard."}
           </p>
         </div>
-        <p className="text-gray-500 text-sm mb-4">
-          {lang === "ru" ? "💵 Остаток суммы оплачивается на месте при заселении." : "💵 The remaining balance is paid on-site at check-in."}
-        </p>
+
         {paymentId && (
           <p className="text-gray-400 text-sm mb-6">
             {lang === "ru" ? "ID платежа" : lang === "hy" ? "Վճարման ID" : "Payment ID"}: {paymentId}

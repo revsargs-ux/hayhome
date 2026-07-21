@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
   // Filter: admin sees all, others see only their own
   const filtered = user.role === "admin"
     ? bookings
-    : bookings.filter((b: any) => b.guestEmail === user.email);
+    : bookings.filter((b: { guestEmail?: string }) => b.guestEmail === user.email);
 
   return NextResponse.json(filtered);
 }
@@ -78,28 +78,30 @@ export async function POST(req: NextRequest) {
 
     if (calendarEntries && calendarEntries.length > 0) {
       const unavailable = calendarEntries.filter(
-        (e: any) => e.status === "booked" || e.status === "blocked"
+        (e: { status?: string; date?: string }) => e.status === "booked" || e.status === "blocked"
       );
       if (unavailable.length > 0) {
         return NextResponse.json(
-          { error: "Some dates are not available", unavailableDates: unavailable.map((e: any) => e.date) },
+          { error: "Some dates are not available", unavailableDates: unavailable.map((e: { date?: string }) => e.date) },
           { status: 409 }
         );
       }
     }
   }
 
-  // ── Server-side price calculation ──
+  // ── Verify host exists ──
   const { data: host } = await supabase
     .from("hayhome_hosts")
-    .select("pricePerNight")
+    .select("id, stayFree, pricePerNight")
     .eq("id", body.hostId)
     .single();
-  if (!host || !host.pricePerNight) {
-    return NextResponse.json({ error: "Host not found or price not set" }, { status: 400 });
+  if (!host) {
+    return NextResponse.json({ error: "Host not found" }, { status: 400 });
   }
-  const nights = dateRange.length;
-  const serverTotalPrice = Math.round(host.pricePerNight * nights * 100) / 100;
+
+  // ── Calculate price ──
+  const nights = Math.max(1, Math.round((new Date(body.checkOut).getTime() - new Date(body.checkIn).getTime()) / 86400000));
+  const totalPrice = (host as any)?.stayFree ? 0 : ((host as any)?.pricePerNight || 0) * nights;
 
   const booking = await createBooking({
     hostId: body.hostId,
@@ -111,7 +113,7 @@ export async function POST(req: NextRequest) {
     checkIn: body.checkIn,
     checkOut: body.checkOut,
     guests: body.guests,
-    totalPrice: serverTotalPrice,
+    totalPrice,
     message: String(body.message || "").slice(0, 2000),
   });
 
@@ -176,26 +178,34 @@ export async function POST(req: NextRequest) {
   // Partner commission (async, non-blocking)
   (async () => {
     try {
-      const { createClient } = require("@supabase/supabase-js");
-      const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+      const sb = supabase;
       // Check if guest was referred
       const { data: guestUser } = await sb.from("hayhome_users").select("referred_by_code, referred_by").eq("id", user.id).single();
       if (guestUser?.referred_by_code) {
         const { data: partner } = await sb.from("hayhome_partners").select("id, status").eq("code", guestUser.referred_by_code).eq("status", "active").single();
         if (partner) {
+          // totalPrice=0 для бесплатного проживания → комиссия=0
           const commission = Math.round(booking.totalPrice * 0.05 * 100) / 100;
           // Update booking with commission
           await sb.from("hayhome_bookings").update({ commission_partner: commission, partner_id: partner.id }).eq("id", booking.id);
           // Check/create referral record
-          const { data: ref } = await sb.from("hayhome_referrals").select("id, first_booking_at").eq("partner_id", partner.id).eq("referred_user_id", user.id).single();
+          const { data: ref } = await sb.from("hayhome_referrals").select("id,first_booking_at,expires_at").eq("partner_id", partner.id).eq("referred_user_id", user.id).single();
           if (ref) {
             if (!ref.first_booking_at) {
               await sb.from("hayhome_referrals").update({ first_booking_at: new Date().toISOString(), expires_at: new Date(Date.now() + 2 * 365.25 * 24 * 60 * 60 * 1000).toISOString() }).eq("id", ref.id);
             } else if (new Date(ref.expires_at) > new Date()) {
-              // Still within 2-year window — credit partner (read then update)
-              const { data: p } = await sb.from("hayhome_partners").select("balance, total_earned").eq("id", partner.id).single();
-              if (p) {
-                await sb.from("hayhome_partners").update({ balance: (p.balance || 0) + commission, total_earned: (p.total_earned || 0) + commission }).eq("id", partner.id);
+              // Still within 2-year window — credit partner via RPC (atomic)
+              try {
+                await sb.rpc("credit_partner_balance", {
+                  p_partner_id: partner.id,
+                  p_amount: commission,
+                });
+              } catch (rpcErr) {
+                console.warn("[Partner] RPC credit_partner_balance failed, trying manual update:", rpcErr);
+                const { data: p } = await sb.from("hayhome_partners").select("balance, total_earned").eq("id", partner.id).single();
+                if (p) {
+                  await sb.from("hayhome_partners").update({ balance: (p.balance || 0) + commission, total_earned: (p.total_earned || 0) + commission }).eq("id", partner.id);
+                }
               }
             }
           }

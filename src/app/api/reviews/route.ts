@@ -10,7 +10,7 @@ const MAX_NAME = 100;
 export async function GET(req: NextRequest) {
   const hostId = req.nextUrl.searchParams.get("hostId") ?? undefined;
   const reviews = await getReviews(hostId);
-  return NextResponse.json(reviews);
+  return NextResponse.json(reviews, { headers: { "Cache-Control": "public, max-age=60, s-maxage=300" } });
 }
 
 export async function POST(req: NextRequest) {

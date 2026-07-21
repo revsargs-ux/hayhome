@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// ⚠️ LIMITATION: In-memory rate limiter. Counters reset on container restart.
+// For production scaling with multiple containers, migrate to @upstash/ratelimit + Redis.
+// Current setup is sufficient for single-container Docker deployment.
+//
+// Rate limiting coverage gaps (TODO):
+//   - PATCH /api/hosts/[id] — no rate limit
+//   - DELETE /api/upload — has its own in-memory limiter
+//   - GET /api/hosts/[id] — no rate limit (but returns only public fields)
+
 // Simple in-memory rate limiter
 const requests = new Map<string, { count: number; resetAt: number }>();
 

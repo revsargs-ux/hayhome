@@ -16,7 +16,7 @@ export default function Footer() {
         <div className="max-w-4xl mx-auto px-4 py-16 text-center">
           <div className="text-4xl mb-4">🇦🇲</div>
           <h3 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
-            Բարի եկաք!
+            Բարի գալուստ!
           </h3>
           <p className="text-white/50 text-lg mb-8 max-w-xl mx-auto">
             {u.footerTagline}
@@ -38,7 +38,6 @@ export default function Footer() {
               { label: "Instagram", href: "https://instagram.com/hayhome.am", icon: "📸" },
               { label: "Facebook", href: "https://facebook.com/hayhome.am", icon: "👤" },
               { label: "Telegram", href: "https://t.me/hayhome_bot", icon: "✈️" },
-              { label: "YouTube", href: "https://youtube.com/@hayhome", icon: "▶️" },
             ].map((s) => (
               <a key={s.label} href={s.href}
                 className="flex items-center gap-1.5 text-white/40 hover:text-white/80 transition-colors text-sm font-medium">

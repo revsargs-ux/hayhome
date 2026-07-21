@@ -9,18 +9,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import NavigatorLinks from "@/components/NavigatorLinks";
-import { getCityCoords } from "@/lib/cityCoords";
+import { getCityCoords, getCityCoordsAsync } from "@/lib/cityCoords";
 import getUI from "@/lib/ui";
 import ChatWidget from "@/components/ChatWidget";
 import FavoriteButton from "@/components/FavoriteButton";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false });
+import { isUserInArmenia, findNearestAirport, ZVARTNOTS } from "@/components/RouteMap";
 
-// Route translation labels for dashboard
-const DASH_RT = {
-  route: { ru: "Маршрут", en: "Route", hy: "Երթուղի", fr: "Itinéraire", de: "Route", es: "Ruta", it: "Percorso", ar: "الطريق", zh: "路线", fa: "مسیر" },
-  useGeo: { ru: "Определить местоположение", en: "Use my location", hy: "Իմ գտնվելու վայրը", fr: "Ma position", de: "Mein Standort", es: "Mi ubicación", it: "Mia posizione", ar: "موقعي", zh: "我的位置", fa: "موقعیت من" },
-};
 
 const STATUS_LABELS: Record<string, Record<string, string>> = {
   ru: { pending: "Ожидает", confirmed: "Подтверждено", completed: "Завершено", cancelled: "Отменено" },
@@ -44,15 +40,14 @@ export default function DashboardPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [myProfile, setMyProfile] = useState<Host | null>(null);
   const [loading, setLoading] = useState(true);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [tab, setTab] = useState<"bookings" | "profile" | "calendar" | "messages" | "favorites">("bookings");
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [editForm, setEditForm] = useState({ description: "", phone: "", pricePerNight: 30 });
+  const [editForm, setEditForm] = useState({ description: "", phone: "" });
   const [partnerCode, setPartnerCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
-  const [favHosts, setFavHosts] = useState<Host[]>([]);
-  const [favLoading, setFavLoading] = useState(false);
   const [showChatWidget, setShowChatWidget] = useState(false);
   const [chatWithUser, setChatWithUser] = useState<string | null>(null);
 
@@ -61,6 +56,29 @@ export default function DashboardPage() {
   const [photoError, setPhotoError] = useState("");
 
   const statusLabels = STATUS_LABELS[lang] ?? STATUS_LABELS.en;
+  const cancelLabels: Record<string, string> = { ru: "Отменить", en: "Cancel", hy: "Չեղարկել", fr: "Annuler", de: "Stornieren", es: "Cancelar", it: "Annulla", ar: "إلغاء", zh: "取消", fa: "لغو" };
+
+  const cancelBooking = async (bookingId: string) => {
+    setCancellingId(bookingId);
+    try {
+      const res = await fetch(`/api/bookings/${bookingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelled" }),
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(err.error || "Cancel failed");
+        return;
+      }
+      setBookings((prev) => prev.map((b) => b.id === bookingId ? { ...b, status: "cancelled" as const } : b));
+    } catch {
+      alert("Network error");
+    } finally {
+      setCancellingId(null);
+    }
+  };
 
   useEffect(() => {
     if (!authLoading && !user) { router.push("/login"); return; }
@@ -83,7 +101,7 @@ export default function DashboardPage() {
       const profile = hData.find((h: Host) => h.email === user.email);
       if (profile) {
         setMyProfile(profile);
-        setEditForm({ description: profile.description, phone: profile.phone, pricePerNight: profile.pricePerNight });
+        setEditForm({ description: profile.description, phone: profile.phone });
       }
     }
     // Check partner status
@@ -150,7 +168,7 @@ export default function DashboardPage() {
 
   const handleDashboardPhotoDelete = async (photoUrl: string) => {
     if (!myProfile) return;
-    if (!confirm("Удалить это фото?")) return;
+    if (!confirm(tr.hosts.deletePhoto)) return;
 
     const newPhotos = myProfile.photos.filter((p) => p !== photoUrl);
     const newCover = myProfile.coverPhoto === photoUrl ? (newPhotos[0] || "") : myProfile.coverPhoto;
@@ -326,16 +344,14 @@ export default function DashboardPage() {
                         }`}>{statusLabels[b.status]}</span>
                       </div>
                       <p className="text-sm text-gray-600">
-                        {b.hostName} · {b.checkIn} → {b.checkOut} · {b.guests} {u.guestsLabel} · <strong>${b.totalPrice}</strong>
+                        {b.hostName} · {b.checkIn} → {b.checkOut} · {b.guests} {u.guestsLabel}
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">{b.guestEmail} · {b.guestPhone}</p>
                       {b.message && <p className="text-xs text-gray-500 italic mt-1">"{b.message}"</p>}
                       {/* Service bookings for this booking */}
                       <ServiceBookingsList bookingId={b.id} lang={lang} />
-                      {/* Route for confirmed/completed bookings */}
-                      {(b.status === "confirmed" || b.status === "completed") && (
-                        <DashRouteSection booking={b} lang={lang} />
-                      )}
+                      {/* Route for all bookings */}
+                      <DashRouteSection booking={b} lang={lang} />
                     </div>
                     <div className="flex gap-2 flex-shrink-0">
                       <Link href={`/hosts/${b.hostId}`}
@@ -348,6 +364,15 @@ export default function DashboardPage() {
                           style={{ background: "#D4001A" }}>
                           {u.reviewBtn}
                         </Link>
+                      )}
+                      {(b.status === "pending" || b.status === "confirmed") && (
+                        <button
+                          onClick={() => cancelBooking(b.id)}
+                          disabled={cancellingId === b.id}
+                          className="px-3 py-1.5 rounded-lg border border-red-200 text-xs font-medium text-red-600 hover:bg-red-50 transition disabled:opacity-50"
+                        >
+                          {cancellingId === b.id ? "..." : cancelLabels[lang] || cancelLabels.en}
+                        </button>
                       )}
                     </div>
                   </div>
@@ -431,18 +456,7 @@ export default function DashboardPage() {
                     <p className="text-gray-600 text-sm">{myProfile.phone}</p>
                   )}
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    {u.pricePerNight}
-                  </label>
-                  {editing ? (
-                    <input type="number" min={10} max={500} value={editForm.pricePerNight}
-                      onChange={e => setEditForm(f => ({ ...f, pricePerNight: Number(e.target.value) }))}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
-                  ) : (
-                    <p className="text-gray-600 text-sm">${myProfile.pricePerNight}</p>
-                  )}
-                </div>
+
               </div>
             </div>
           </div>
@@ -467,7 +481,7 @@ export default function DashboardPage() {
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
                 style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}
               >
-                <Camera size={16} /> {photoUploading ? "Загрузка..." : "Добавить фото"}
+                <Camera size={16} /> {photoUploading ? (u.uploading || "Загрузка...") : "Добавить фото"}
               </button>
               {photoError && <p className="text-red-500 text-xs mt-2">{photoError}</p>}
             </div>
@@ -484,13 +498,13 @@ export default function DashboardPage() {
                       <Trash2 size={13} />
                     </button>
                     {photo === myProfile.coverPhoto && (
-                      <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium">Обложка</span>
+                      <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium">{u.cover || "Обложка"}</span>
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-400 text-sm text-center py-6">Фото пока не загружены</p>
+              <p className="text-gray-400 text-sm text-center py-6">{u.noPhotos || "Фото пока не загружены"}</p>
             )}
           </div>
           </div>
@@ -536,9 +550,9 @@ export default function DashboardPage() {
               ) : myBookings.length === 0 ? (
                 <div className="p-10 text-center">
                   <div className="text-4xl mb-3">📭</div>
-                  <p className="text-gray-500 mb-4">У вас пока нет бронирований</p>
+                  <p className="text-gray-500 mb-4">{u.noBookings}</p>
                   <Link href="/hosts" className="inline-block px-5 py-2 rounded-full text-white text-sm font-semibold hover:opacity-90 transition" style={{ background: "#D4001A" }}>
-                    Найти семью
+                    {u.bookService}
                   </Link>
                 </div>
               ) : (
@@ -555,19 +569,19 @@ export default function DashboardPage() {
                             "bg-gray-100 text-gray-500"
                           }`}>{statusLabels[b.status]}</span>
                         </div>
-                        <p className="text-sm text-gray-500">{b.checkIn} → {b.checkOut} · {b.guests} гостей</p>
-                        {b.totalPrice > 0 && <p className="text-sm font-semibold text-gray-700 mt-0.5">${b.totalPrice}</p>}
+                        <p className="text-sm text-gray-500">{b.checkIn} → {b.checkOut} · {b.guests} {lang === "ru" ? "гостей" : lang === "hy" ? "հյուրեր" : "guests"}</p>
+                
                       </div>
                       <div className="flex gap-2 flex-shrink-0">
                         <Link href={`/hosts/${b.hostId}`}
                           className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 transition">
-                          Профиль
+                          {u.profile || "Профиль"}
                         </Link>
                         {b.status === "completed" && (
                           <Link href={`/hosts/${b.hostId}#reviews`}
                             className="px-3 py-1.5 rounded-lg text-xs font-medium text-white transition"
                             style={{ background: "#D4001A" }}>
-                            Оставить отзыв
+                            {u.leaveReview || "Оставить отзыв"}
                           </Link>
                         )}
                       </div>
@@ -592,7 +606,7 @@ export default function DashboardPage() {
 
         {/* Favorites tab */}
         {tab === "favorites" && (
-          <DashboardFavorites lang={lang} />
+          <DashboardFavorites lang={lang} tr={tr} />
         )}
 
         {/* Calendar tab */}
@@ -758,9 +772,11 @@ function DashRouteSection({ booking, lang }: { booking: Booking; lang: string })
   useEffect(() => {
     fetch(`/api/hosts/${booking.hostId}`)
       .then(r => r.json())
-      .then(h => {
+      .then(async h => {
         if (h && h.city) {
-          setDestCoords(getCityCoords(h.city));
+          // Try async geocoding (Nominatim fallback for unknown cities)
+          const coords = await getCityCoordsAsync(h.city);
+          setDestCoords(coords);
         }
       })
       .catch(() => {});
@@ -816,16 +832,28 @@ function DashRouteSection({ booking, lang }: { booking: Booking; lang: string })
             fromLabel={originLabel}
             toLabel={booking.hostName}
             height={200}
+            lang={lang}
           />
           <div className="mt-2">
-            <NavigatorLinks
-              fromLat={origin.lat}
-              fromLng={origin.lng}
-              toLat={destCoords.lat}
-              toLng={destCoords.lng}
-              toName={booking.hostName}
-              lang={lang}
-            />
+            {isUserInArmenia(origin.lat, origin.lng) ? (
+              <NavigatorLinks
+                fromLat={origin.lat}
+                fromLng={origin.lng}
+                toLat={destCoords.lat}
+                toLng={destCoords.lng}
+                toName={booking.hostName}
+                lang={lang}
+              />
+            ) : (
+              <NavigatorLinks
+                fromLat={ZVARTNOTS.lat}
+                fromLng={ZVARTNOTS.lng}
+                toLat={destCoords.lat}
+                toLng={destCoords.lng}
+                toName={booking.hostName}
+                lang={lang}
+              />
+            )}
           </div>
         </>
       )}
@@ -977,9 +1005,9 @@ function GuestServiceHistory({ lang, tr }: { lang: string; tr: any }) {
       ) : svcBookings.length === 0 ? (
         <div className="p-10 text-center">
           <div className="text-4xl mb-3">🎭</div>
-          <p className="text-gray-500 mb-4">У вас пока нет заказанных услуг</p>
-          <Link href="/hosts" className="inline-block px-5 py-2 rounded-full text-white text-sm font-semibold hover:opacity-90 transition" style={{ background: "#D4001A" }}>
-            Найти семью
+          <p className="text-gray-500 mb-4">{u.noSvcBookings || u.noBookings}</p>
+          <Link href="/services" className="inline-block px-5 py-2 rounded-full text-white text-sm font-semibold hover:opacity-90 transition" style={{ background: "#D4001A" }}>
+            {u.bookService}
           </Link>
         </div>
       ) : (
@@ -1010,7 +1038,7 @@ function GuestServiceHistory({ lang, tr }: { lang: string; tr: any }) {
 }
 
 // ── Dashboard Favorites Tab ──
-function DashboardFavorites({ lang }: { lang: string }) {
+function DashboardFavorites({ lang, tr }: { lang: string; tr: any }) {
   const u = getUI(lang as any);
   const [favorites, setFavorites] = useState<any[]>([]);
   const [hosts, setHosts] = useState<Host[]>([]);
@@ -1072,7 +1100,9 @@ function DashboardFavorites({ lang }: { lang: string }) {
                 <h3 className="font-bold text-gray-900 text-sm mb-1">{host.familyName}</h3>
                 <p className="text-xs text-gray-500 mb-2">{host.city}, {host.region}</p>
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-gray-900">${host.pricePerNight}</span>
+                  {host.stayFree && (
+                          <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{tr.hosts.freeBadge}</span>
+                        )}
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <Star size={12} fill="#F2A900" color="#F2A900" />
                     {host.rating > 0 ? host.rating.toFixed(1) : "New"}

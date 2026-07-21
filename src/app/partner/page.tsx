@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import getUI from "@/lib/ui";
-import { Users, Target, MapPin, DollarSign, ChevronRight, Star, Gift, Shield } from "lucide-react";
+import { Users, Target, MapPin, DollarSign, ChevronRight } from "lucide-react";
 
 function PartnerContent() {
   const { tr, lang } = useLang();
@@ -14,7 +14,7 @@ function PartnerContent() {
 
   const T: Record<string, Record<string, string>> = {
     title: { ru: "Станьте партнёром HayHome", en: "Become a HayHome Partner", hy: "Դարձեք HayHome գործընկեր", fr: "Devenez partenaire HayHome", de: "HayHome-Partner werden", es: "Hágase socio de HayHome" },
-    subtitle: { ru: "Зарабатывайте, помогая людям находить настоящее армянское гостеприимство", en: "Earn by helping people find authentic Armenian hospitality", hy: "Աշխատեք օգնելով մարդկանց գտնել իրական հայկական գրավիչ", fr: "Gagnez en aidant à trouver l'hospitalité arménienne", de: "Verdienen Sie, indem Sie echte armenische Gastfreundschaft vermitteln", es: "Gane ayudando a encontrar hospitalidad armenia auténtica" },
+    subtitle: { ru: "Зарабатывайте, помогая людям найти настоящее армянское гостеприимство", en: "Earn by helping people find authentic Armenian homestay", hy: "Աշխատեք օգնելով մարդկանց գտնել իրական հայկական գրավիչ", fr: "Gagnez en aidant à trouver des séjours chez des familles arméniennes", de: "Verdienen Sie, indem Sie echte armenische Gastfreundschaft vermitteln", es: "Gana ayudando a encontrar estancias con familias armenias" },
     how: { ru: "Как это работает", en: "How it works", hy: "Ինչպես է այն աշխատում", fr: "Comment ça marche", de: "So funktioniert's", es: "Cómo funciona" },
     step1Title: { ru: "Зарегистрируйтесь", en: "Sign Up", hy: "Գրանցվել", fr: "Inscrivez-vous", de: "Registrieren", es: "Regístrese" },
     step1Desc: { ru: "Выберите роль партнёра и получите уникальный код", en: "Choose your partner role and get a unique code", hy: "Ընտրեք գործընկերի դեր և ստացեք յուրահատուկ կոդ", fr: "Choisissez votre rôle et obtenez un code unique", de: "Wählen Sie eine Rolle und erhalten Sie einen Code", es: "Elija su rol y obtenga un código" },

@@ -1,6 +1,6 @@
 "use client";
 import { Suspense, useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Star, MapPin, ChevronLeft } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
@@ -16,10 +16,15 @@ const PRICE_UNIT_LABELS: Record<string, Record<string, string>> = {
 
 function ServiceBookContent() {
   const params = useParams();
-  const { lang } = useLang();
+  const searchParams = useSearchParams();
+  const { lang, tr } = useLang();
   const u = getUI(lang);
   const { user } = useAuth();
   const id = params.id as string;
+
+  // Pre-fill date and guests from URL params (e.g. from post-booking)
+  const prefillDate = searchParams.get("date") || "";
+  const prefillGuests = parseInt(searchParams.get("guests") || "1", 10) || 1;
 
   const [service, setService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,11 +35,11 @@ function ServiceBookContent() {
   // Form state
   const [guestName, setGuestName] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(prefillDate);
   const [bookedDates, setBookedDates] = useState<string[]>([]);
   const [timeOfDay, setTimeOfDay] = useState<"morning" | "evening" | "custom">("morning");
   const [customTime, setCustomTime] = useState("");
-  const [guests, setGuests] = useState(1);
+  const [guests, setGuests] = useState(prefillGuests);
   const [message, setMessage] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"onsite" | "transfer">("onsite");
 
@@ -263,7 +268,7 @@ function ServiceBookContent() {
                       required
                       type="tel"
                       value={guestPhone}
-                      onChange={(e) => setGuestPhone(e.target.value)}
+                      onChange={(e) => setGuestPhone(e.target.value.replace(/[^+\d\s()\-]/g, ''))}
                       placeholder="+374 ..."
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-orange-400 text-gray-900"
                     />
@@ -280,7 +285,7 @@ function ServiceBookContent() {
                     {(() => {
                       const today = new Date();
                       today.setHours(0, 0, 0, 0);
-                      const dayNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+                      const dayNames = [tr.hosts.mon, tr.hosts.tue, tr.hosts.wed, tr.hosts.thu, tr.hosts.fri, tr.hosts.sat, tr.hosts.sun];
                       const cells = [];
                       // Header
                       dayNames.forEach((n) => {
@@ -325,9 +330,9 @@ function ServiceBookContent() {
                     })()}
                   </div>
                   <div style={{ marginTop: "8px", display: "flex", gap: "12px", fontSize: "11px" }}>
-                    <span style={{ color: "#16a34a" }}>🟢 Свободно</span>
-                    <span style={{ color: "#ef4444" }}>🔴 Занято</span>
-                    <span style={{ color: "#1d4ed8" }}>🔵 Выбрано</span>
+                    <span style={{ color: "#16a34a" }}>{tr.hosts.calFree}</span>
+                    <span style={{ color: "#ef4444" }}>{tr.hosts.calBusy}</span>
+                    <span style={{ color: "#1d4ed8" }}>{tr.hosts.calSelected}</span>
                   </div>
                 </div>
 

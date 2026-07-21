@@ -18,13 +18,18 @@ export default defineConfig({
     screenshot: "only-on-failure",
     locale: "ru-RU",
     timezoneId: "Asia/Yerevan",
-    extraHTTPHeaders: { "x-test-run": "1" },
+    ignoreHTTPSErrors: true,
   },
 
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        launchOptions: {
+          args: ["--disable-gpu", "--disable-software-rasterizer", "--no-sandbox"],
+        },
+      },
       testIgnore: ["**/mobile.spec.ts", "**/pwa.spec.ts"],
     },
     {

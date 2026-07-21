@@ -11,9 +11,6 @@ const SCRIPT_PATTERNS: Record<string, RegExp> = {
   zh: /[一-鿿㐀-䶿　-〿]/,  // CJK + CJK punctuation
 };
 
-// Which languages have non-Latin scripts
-const NON_LATIN_LANGS = new Set(["ru", "hy", "ar", "fa", "zh"]);
-
 export function isCharAllowed(char: string, lang: string): boolean {
   if (LATIN_AND_UNIVERSAL.test(char)) return true;
   const scriptPattern = SCRIPT_PATTERNS[lang];

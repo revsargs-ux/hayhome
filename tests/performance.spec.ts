@@ -26,7 +26,9 @@ test.describe("⚡ Performance Checks", () => {
             !e.includes("sw.js") &&
             !e.includes("Download the React DevTools") &&
             !e.includes("401") &&
-            !e.includes("Failed to load resource")
+            !e.includes("Failed to load resource") &&
+      !e.includes("www.google.com/g/collect") &&
+      !e.includes("mc.yandex.ru")
     );
     console.log("Console errors:", realErrors);
     expect(realErrors.length).toBe(0);

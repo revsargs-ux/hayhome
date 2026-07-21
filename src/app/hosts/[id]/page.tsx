@@ -26,6 +26,7 @@ export default function HostProfilePage() {
   const [host, setHost] = useState<Host | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [calendarDates, setCalendarDates] = useState<Map<string, string>>(new Map());
   const [canReview, setCanReview] = useState(false);
   const [hasCompletedBooking, setHasCompletedBooking] = useState(false);
   const [hostBookings, setHostBookings] = useState<Booking[]>([]);
@@ -36,7 +37,6 @@ export default function HostProfilePage() {
   const [submitting, setSubmitting] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const [showChat, setShowChat] = useState(false);
-  const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const ui = getUI(lang);
 
   // Review media state
@@ -54,10 +54,26 @@ export default function HostProfilePage() {
   const isHostOwner = user && host && (user.id === host.user_id || user.role === "admin");
 
   useEffect(() => {
+    // Calendar data for availability (auth-less, always up-to-date)
+    const now = new Date();
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+    const nextMonth = new Date(now.getFullYear(), now.getMonth()+1, 1);
+    const nextMonthStr = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth()+1).padStart(2,"0")}`;
+
+    // Fetch this month + next month
+    Promise.all([
+      fetch(`/api/calendar?hostId=${id}&month=${thisMonth}`).then(r => r.ok ? r.json() : []),
+      fetch(`/api/calendar?hostId=${id}&month=${nextMonthStr}`).then(r => r.ok ? r.json() : []),
+    ]).then(([m1, m2]) => {
+      const m = new Map<string, string>();
+      [...(m1||[]), ...(m2||[])].forEach((e: {date: string; status: string}) => m.set(e.date, e.status));
+      setCalendarDates(m);
+    }).catch(() => {});
+
     Promise.all([
       fetch(`/api/hosts/${id}`).then((r) => r.json()),
       fetch(`/api/reviews?hostId=${id}`).then((r) => r.json()),
-      fetch(`/api/bookings?hostId=${id}`).then((r) => r.ok ? r.json() : []),
+      fetch("/api/bookings").then((r) => r.ok ? r.json() : []).catch(() => []),
     ]).then(([hostData, reviewData, bookingData]) => {
       setHost(hostData);
       setReviews(Array.isArray(reviewData) ? reviewData : []);
@@ -86,7 +102,7 @@ export default function HostProfilePage() {
         const hasConfirmed = bookings && bookings.some(
           (b) => b.hostId === id && (b.status === "confirmed" || b.status === "completed")
         );
-        setBookingConfirmed(!!hasConfirmed);
+        // booking confirmed check (state not needed)
       })
       .catch(() => setCanReview(false));
   }, [user, id]);
@@ -163,7 +179,7 @@ export default function HostProfilePage() {
 
   const handleDeletePhoto = async (photoUrl: string) => {
     if (!host || !isHostOwner) return;
-    if (!confirm("Удалить это фото?")) return;
+    if (!confirm(tr.hosts.deletePhoto)) return;
 
     const newPhotos = host.photos.filter((p) => p !== photoUrl);
     const newCover = host.coverPhoto === photoUrl ? (newPhotos[0] || "") : host.coverPhoto;
@@ -278,7 +294,7 @@ export default function HostProfilePage() {
       addressLocality: host.city || "Yerevan",
       addressCountry: "AM",
     },
-    priceRange: host.pricePerNight ? `$${host.pricePerNight}` : "$$",
+    priceRange: "Free",
     telephone: host.phone,
     aggregateRating: reviews.length > 0 ? {
       "@type": "AggregateRating",
@@ -671,9 +687,15 @@ export default function HostProfilePage() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 lg:sticky lg:top-24">
               <div className="text-center mb-6">
-                <div className="text-4xl font-extrabold text-gray-900">
-                  ${host.pricePerNight}
-                  <span className="text-lg font-normal text-gray-500">{h.perNight}</span>
+                <div className="flex justify-center gap-2 mb-1">
+                  <span className="inline-flex items-center gap-2 bg-green-500 text-white text-xl font-bold px-5 py-2 rounded-2xl shadow">
+                    {tr.hosts.freeStay}
+                  </span>
+                  {host.allowsDayVisit && (
+                    <span className="inline-flex items-center gap-1 bg-amber-500 text-white text-xs font-bold px-3 py-2 rounded-2xl shadow">
+                      🥘 {lang === "ru" ? "Дневной визит" : lang === "hy" ? "Օրեկան այց" : "Day Visit"}
+                    </span>
+                  )}
                 </div>
                 {host.rating > 0 && (
                   <div className="flex items-center justify-center gap-1 mt-1 text-sm text-gray-500">
@@ -720,7 +742,7 @@ export default function HostProfilePage() {
                   onClick={(e) => e.stopPropagation()}>
                   <Phone size={16} className="text-gray-400 flex-shrink-0 group-hover:text-red-600 transition" />
                   <span className="font-medium group-hover:text-red-600 transition">{host.phone}</span>
-                  <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-green-50 border border-green-200 text-green-700 font-semibold">📞 {lang === "ru" ? "Позвонить" : "Call"}</span>
+                  <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-green-50 border border-green-200 text-green-700 font-semibold">📞 {lang === "ru" ? "Позвонить" : lang === "fr" ? "Appeler" : lang === "de" ? "Anrufen" : lang === "es" ? "Llamar" : lang === "it" ? "Chiamare" : lang === "ar" ? "اتصال" : lang === "zh" ? "打电话" : lang === "fa" ? "تماس" : "Call"}</span>
                 </a>
                 <a href={`mailto:${host.email}`}
                   className="flex items-center gap-2 group"
@@ -731,33 +753,23 @@ export default function HostProfilePage() {
               </div>
 
               {/* 7-day availability calendar */}
-              {hostBookings.length > 0 && (() => {
+              {calendarDates.size > 0 ? function HostCal(): React.ReactElement {
                 const today = new Date();
-                const bookedDates = new Set<string>();
-                hostBookings.forEach((b: Booking) => {
-                  if (b.status === "confirmed" || b.status === "completed" || b.status === "pending") {
-                    let d = new Date(b.checkIn);
-                    const end = new Date(b.checkOut);
-                    while (d < end) {
-                      bookedDates.add(d.toISOString().split("T")[0]);
-                      d.setDate(d.getDate() + 1);
-                    }
-                  }
-                });
                 const days = Array.from({ length: 7 }, (_, i) => {
                   const d = new Date(today);
                   d.setDate(d.getDate() + i);
                   return d;
                 });
-                const dayNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
-                const monthNames = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+                const dayNames = [tr.hosts.sun, tr.hosts.mon, tr.hosts.tue, tr.hosts.wed, tr.hosts.thu, tr.hosts.fri, tr.hosts.sat];
+                const monthNames = lang === "ru" ? ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"] : lang === "hy" ? ["Հուն","Փետ","Մար","Ապր","Մայ","Հուն","Հուլ","Օգ","Սեպ","Հոկ","Նոյ","Դեկ"] : lang === "fr" ? ["jan","fév","mar","avr","mai","juin","juil","aoû","sep","oct","nov","déc"] : lang === "de" ? ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"] : lang === "es" ? ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"] : lang === "it" ? ["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"] : lang === "ar" ? ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"] : lang === "zh" ? ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"] : lang === "fa" ? ["ژانویه","فوریه","مارس","آوریل","مه","ژئن","ژئیه","اوت","سپتامبر","اکتبر","نوامبر","دسامبر"] : ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
                 return (
                   <div className="mt-4 pt-4 border-t border-gray-100">
-                    <p className="text-xs font-semibold text-gray-600 mb-2">📅 {lang === "ru" ? "Занятость на 7 дней" : "Availability — next 7 days"}</p>
+                    <p className="text-xs font-semibold text-gray-600 mb-2">📅 {tr.hosts.calOccupied}</p>
                     <div className="grid grid-cols-7 gap-1">
                       {days.map((d) => {
                         const dateStr = d.toISOString().split("T")[0];
-                        const isBooked = bookedDates.has(dateStr);
+                        const status = calendarDates.get(dateStr);
+                        const isBooked = status === "booked" || status === "blocked";
                         return (
                           <div key={dateStr} className={`text-center rounded-lg py-1.5 ${isBooked ? "bg-red-50 border border-red-200" : "bg-green-50 border border-green-200"}`}>
                             <div className="text-[10px] text-gray-400">{dayNames[d.getDay()]}</div>
@@ -769,7 +781,7 @@ export default function HostProfilePage() {
                     </div>
                   </div>
                 );
-              })()}
+              }() : null}
 
               <div className="mt-6 pt-5 border-t border-gray-100 space-y-2">
                 {[h.freeCancel, h.directContact, h.noHidden].map((f) => (

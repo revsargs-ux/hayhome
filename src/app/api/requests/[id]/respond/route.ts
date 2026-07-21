@@ -12,6 +12,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!user) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
+  if (user.role !== "host" && user.role !== "provider" && user.role !== "admin") {
+    return NextResponse.json({ error: "Host or provider role required" }, { status: 403 });
+  }
 
   const { id } = await params;
 

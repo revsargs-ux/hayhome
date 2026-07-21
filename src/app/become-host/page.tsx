@@ -7,19 +7,57 @@ import { stripInvalidChars, stripNonPhone, scriptErrorMsg, phoneErrorMsg } from 
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import BankAutocomplete from "@/components/BankAutocomplete";
 
-const AMENITIES = [
-  "Wi-Fi", "Отдельная комната", "Завтрак", "Ужин", "Полное питание",
-  "Горячая вода", "Кондиционер", "Баня", "Огород", "Домашнее вино",
-  "Домашнее молоко и сыр", "Вид на природу", "Трансфер", "Стиральная машина",
-];
-const EXPERIENCES = [
-  "Мастер-класс по долме", "Мастер-класс по гате/кяте", "Дегустация армянских вин",
-  "Виноделие", "Сбор трав в горах", "Посещение монастыря", "Экскурсия по городу",
-  "Рыбалка", "Приготовление хоровац (шашлык)", "Ткачество карпетов",
-  "Гончарное мастерство", "Посещение рынка", "Уход за животными", "Сбор урожая",
-];
-const LANGS_LIST = ["Армянский", "Русский", "Английский", "Французский", "Немецкий", "Персидский", "Арабский"];
-const REGIONS = ["Ереван","Арарат","Арагацотн","Гегаркуник","Лори","Котайк","Ширак","Сюник","Вайоц Дзор","Тавуш"];
+const AMENITIES: Record<string, string[]> = {
+  ru: ["Wi-Fi", "Отдельная комната", "Завтрак", "Ужин", "Полное питание", "Горячая вода", "Кондиционер", "Баня", "Огород", "Домашнее вино", "Домашнее молоко и сыр", "Вид на природу", "Трансфер", "Стиральная машина"],
+  en: ["Wi-Fi", "Separate room", "Breakfast", "Dinner", "Full board", "Hot water", "Air conditioning", "Bathhouse", "Garden", "Homemade wine", "Homemade milk and cheese", "Nature view", "Transfer", "Washing machine"],
+  hy: ["Wi-Fi", "Առանձին սենյակ", "Նախաճաշ", "Ընդերես", "Լրիվ սնունդ", "Տաք ջուր", "Կոնդիցիոներ", "Բաղնիք", "Այգի", "Տնային գինի", "Տնային կաթ և պանիր", "Բնության տեսարժեք", "Տրանսֆեր", "Լվացքի մեքենա"],
+  fr: ["Wi-Fi", "Chambre séparée", "Petit-déjeuner", "Dîner", "Pension complète", "Eau chaude", "Climatisation", "Bain", "Jardin", "Vin maison", "Lait et fromage maison", "Vue sur la nature", "Transfert", "Machine à laver"],
+  de: ["Wi-Fi", "Getrenntes Zimmer", "Frühstück", "Abendessen", "Vollpension", "Warmwasser", "Klimaanlage", "Bad", "Garten", "Hauswein", "Hausmilch und Käse", "Naturblick", "Transfer", "Waschmaschine"],
+  es: ["Wi-Fi", "Habitación separada", "Desayuno", "Cena", "Pensión completa", "Agua caliente", "Aire acondicionado", "Baño", "Jardín", "Vino casero", "Leche y queso caseros", "Vista a la naturaleza", "Traslado", "Lavadora"],
+  it: ["Wi-Fi", "Stanza separata", "Colazione", "Cena", "Pensione completa", "Acqua calda", "Aria condizionata", "Bagno turco", "Giardino", "Vino fatto in casa", "Latte e formaggio fatti in casa", "Vista sulla natura", "Trasferimento", "Lavatrice"],
+  ar: ["Wi-Fi", "غرفة منفصلة", "إفطار", "عشاء", "إقامة كاملة", "ماء ساخن", "تكييف", "حمام", "حديقة", "نبيذ منزلي", "حليب وجبنة منزليين", "إطلالة على الطبيعة", "نقل", "غسالة"],
+  zh: ["Wi-Fi", "独立房间", "早餐", "晚餐", "全膳", "热水", "空调", "浴室", "花园", "自酿酒", "自制牛奶和奶酪", "自然景观", "接送", "洗衣机"],
+  fa: ["Wi-Fi", "اتاق مستقل", "صبحانه", "شام", "پذیرش کامل", "آب گرم", "کولر", "حمام", "باغ", "شراب خانگی", "شیر و پنیر خانگی", "منظره طبیعت", "ترانسفر", "ماشین لباسشویی"],
+};
+
+const EXPERIENCES: Record<string, string[]> = {
+  ru: ["Мастер-класс по долме", "Мастер-класс по гате/кяте", "Дегустация армянских вин", "Виноделие", "Сбор трав в горах", "Посещение монастыря", "Экскурсия по городу", "Рыбалка", "Приготовление хоровац (шашлык)", "Ткачество карпетов", "Гончарное мастерство", "Посещение рынка", "Уход за животными", "Сбор урожая"],
+  en: ["Dolma master class", "Gata/kata master class", "Armenian wine tasting", "Winemaking", "Mountain herb gathering", "Monastery visit", "City tour", "Fishing", "Khorovats (BBQ) cooking", "Carpet weaving", "Pottery workshop", "Market visit", "Animal care", "Harvest gathering"],
+  hy: ["Տոլմայի վարպետություն", "Գաթայի վարպետություն", "Հայկական գինու համտես", "Գինեգործություն", "Լեռնային խոտաբույսերի հավաք", "Վանքի այց", "Քաղաքի զբոսաշրջություն", "Ձկնորսություն", "Խորովածի պատրաստում", "Գորգերի գործվածք", "Կավագործություն", "Շուկայի այց", "Կենդանիների խնամք", "Բերքահավաք"],
+  fr: ["Atelier de dolma", "Atelier de gata/kata", "Dégustation de vins arméniens", "Vinification", "Cueillette d'herbes de montagne", "Visite de monastère", "Visite de la ville", "Pêche", "Préparation de khorovats (barbecue)", "Tissage de tapis", "Atelier de poterie", "Visite du marché", "Soins aux animaux", "Récolte"],
+  de: ["Dolma-Workshop", "Gata/Kata-Workshop", "Armenische Weinverkostung", "Weinherstellung", "Kräutersammeln in den Bergen", "Klosterbesuch", "Stadttour", "Angeln", "Khorovats (Grill) Zubereitung", "Teppichweberei", "Töpferei-Workshop", "Marktbesuch", "Tierpflege", "Ernte"],
+  es: ["Taller de dolma", "Taller de gata/kata", "Cata de vinos armenios", "Elaboración de vino", "Recolección de hierbas de montaña", "Visita al monasterio", "Tour por la ciudad", "Pesca", "Preparación de khorovats (barbacoa)", "Tejido de alfombras", "Taller de cerámica", "Visita al mercado", "Cuidado de animales", "Cosecha"],
+  it: ["Laboratorio sulla dolma", "Laboratorio su gata/kata", "Degustazione di vini armeni", "Vinificazione", "Raccolta di erbe di montagna", "Visita al monastero", "Tour della città", "Pesca", "Preparazione del khorovats (barbecue)", "Tessitura di tappeti", "Laboratorio di ceramica", "Visita al mercato", "Cura degli animali", "Raccolta del raccolto"],
+  ar: ["ورشة طبخ الدولمة", "ورشة الجاتا/كاتا", "تذوق النبيذ الأرمني", "صناعة النبيذ", "جمع الأعشاب الجبلية", "زيارة الدير", "جولة في المدينة", "صيد السمك", "تحضير الخوفاتس (مشوي)", "نسج السجاد", "ورشة الفخار", "زيارة السوق", "رعاية الحيوانات", "الحصاد"],
+  zh: ["朵尔玛制作课", "加塔/卡塔制作课", "亚美尼亚品酒", "酿酒", "采集山地草药", "参观修道院", "城市观光", "钓鱼", "制作烤肉串", "地毯编织", "陶艺工作坊", "参观市场", "动物护理", "采摘收获"],
+  fa: ["کارگاه دلمه", "کارگاه گاتا/کاتا", "چشیدن شراب ارمنی", "تولید شراب", "جمع گیاهان کوهی", "بازدید از صومعه", "بازدید از شهر", "ماهیگیری", "آماده‌سازی خوروواتس (کباب)", "بافتن قالی", "کارگاه سرامیک", "بازدید از بازار", "مراقبت از حیوانات", "برداشت محصول"],
+};
+
+const LANGS_LIST: Record<string, string[]> = {
+  ru: ["Армянский", "Русский", "Английский", "Французский", "Немецкий", "Персидский", "Арабский"],
+  en: ["Armenian", "Russian", "English", "French", "German", "Persian", "Arabic"],
+  hy: ["Հայերեն", "Ռուսերեն", "Անգլերեն", "Ֆրանսերեն", "Գերմաներեն", "Պարսկերեն", "Արաբերեն"],
+  fr: ["Arménien", "Russe", "Anglais", "Français", "Allemand", "Persan", "Arabe"],
+  de: ["Armenisch", "Russisch", "Englisch", "Französisch", "Deutsch", "Persisch", "Arabisch"],
+  es: ["Armenio", "Ruso", "Inglés", "Francés", "Alemán", "Persa", "Árabe"],
+  it: ["Armeno", "Russo", "Inglese", "Francese", "Tedesco", "Persiano", "Arabo"],
+  ar: ["الأرمنية", "الروسية", "الإنجليزية", "الفرنسية", "الألمانية", "الفارسية", "العربية"],
+  zh: ["亚美尼亚语", "俄语", "英语", "法语", "德语", "波斯语", "阿拉伯语"],
+  fa: ["ارمنی", "روسی", "انگلیسی", "فرانسوی", "آلمانی", "فارسی", "عربی"],
+};
+
+const REGIONS: Record<string, string[]> = {
+  ru: ["Ереван", "Арарат", "Арагацотн", "Армавир", "Котайк", "Гегаркуник", "Лори", "Ширак", "Тавуш", "Вайоц Дзор", "Сюник"],
+  en: ["Yerevan", "Ararat", "Aragatsotn", "Armavir", "Kotayk", "Gegharkunik", "Lori", "Shirak", "Tavush", "Vayots Dzor", "Syunik"],
+  hy: ["Երևան", "Արարատ", "Արագածոտն", "Արմավիր", "Կոտայք", "Գեղարքունիք", "Լոռի", "Շիրակ", "Տավուշ", "Վայոց Ձոր", "Սյունիք"],
+  fr: ["Erevan", "Ararat", "Aragatsotn", "Armavir", "Kotayk", "Gegharkunik", "Lori", "Chirak", "Tavush", "Vayots Dzor", "Siunik"],
+  de: ["Eriwan", "Ararat", "Aragatsotn", "Armavir", "Kotayk", "Gegharkunik", "Lori", "Schirak", "Tawusch", "Wajoz Dsor", "Sjunik"],
+  es: ["Ereván", "Ararat", "Aragatsotn", "Armavir", "Kotayk", "Gegharkunik", "Lori", "Shirak", "Tavush", "Vayots Dzor", "Syunik"],
+  it: ["Erevan", "Ararat", "Aragatsotn", "Armavir", "Kotayk", "Gegharkunik", "Lori", "Shirak", "Tavush", "Vayots Dzor", "Syunik"],
+  ar: ["يريفان", "أرارات", "أراغاتسوتن", "أرمافير", "كوتايك", "غيغاركونيك", "لوري", "شيراك", "تافوش", "فايتس دزور", "سيونيك"],
+  zh: ["埃里温", "阿拉拉特", "阿拉加措特恩", "阿尔马维尔", "科泰克", "格加尔库尼克", "洛里", "希拉克", "塔武什", "瓦约茨佐尔", "休尼克"],
+  fa: ["یریوان", "آرارات", "آراقاتسوتن", "آرمافیر", "کوتایک", "گغارکونیک", "لوری", "شیراک", "تاووش", "وایوتس دزور", "سیونیک"],
+};
 
 interface AiState { loading: boolean; original: string | null; }
 
@@ -47,12 +85,14 @@ export default function BecomeHostPage() {
   const [binLoading, setBinLoading] = useState(false);
   const binTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [stayFree, setStayFree] = useState(true);
+  const [allowsDayVisit, setAllowsDayVisit] = useState(false);
   const [form, setForm] = useState({
     familyName: "", name: "", patronymic: "", phone: "", email: "",
     passportSeries: "", passportNumber: "", passportDate: "", passportIssued: "",
     inn: "", bankAccount: "", bankBic: "", bankName: "",
     city: "", region: "", location: "",
-    pricePerNight: 30, maxGuests: 2, availableRooms: 1,
+    maxGuests: 2, availableRooms: 1,
     description: "", longDescription: "",
     amenities: [] as string[], experiences: [] as string[],
     languages: ["Армянский"] as string[],
@@ -176,7 +216,7 @@ export default function BecomeHostPage() {
     try {
       const res = await fetch("/api/hosts", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, stars: 1, photos: [], coverPhoto: "", lang }),
+        body: JSON.stringify({ ...form, stars: 1, photos: [], coverPhoto: "", lang, stayFree, allowsDayVisit }),
       });
       if (!res.ok) throw new Error();
       goToStep(4);
@@ -247,6 +287,28 @@ export default function BecomeHostPage() {
                   {fieldErrors[f.field] && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors[f.field]}</p>}
                 </div>
               ))}
+              {/* Бесплатно vs платно */}
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+                <p className="text-xs font-semibold text-amber-800 uppercase tracking-wider">{b.stayFree}</p>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setStayFree(true)}
+                    className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${stayFree ? "bg-white text-gray-900 shadow-sm ring-2 ring-green-500" : "bg-amber-50 text-gray-500"}`}
+                  >
+                    🆓 {b.stayFree}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStayFree(false)}
+                    className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${!stayFree ? "bg-white text-gray-900 shadow-sm ring-2 ring-red-500" : "bg-amber-50 text-gray-500"}`}
+                  >
+                    💰 {b.paidHost}
+                  </button>
+                </div>
+              </div>
+
+              {!stayFree && <>
               <hr className="my-4 border-gray-200" />
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-3">{b.bankTitle}</p>
               {/* Card / account number — BIN auto-detection */}
@@ -284,6 +346,7 @@ export default function BecomeHostPage() {
                   className={`${inputCls} ${fieldErrors.bankName ? "border-amber-400 bg-amber-50" : ""}`} />
                 {fieldErrors.bankName && <p className="text-xs text-amber-700 mt-1">⚠️ {fieldErrors.bankName}</p>}
               </div>
+              </>} {/* end !stayFree */}
             </div>
           )}
 
@@ -306,7 +369,7 @@ export default function BecomeHostPage() {
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">{b.region} *</label>
                 <select value={form.region} onChange={e => set("region", e.target.value)} className={inputCls}>
                   <option value="">{b.pickRegion}</option>
-                  {REGIONS.map(r => <option key={r}>{r}</option>)}
+                  {(REGIONS[lang] || REGIONS.en).map(r => <option key={r}>{r}</option>)}
                 </select>
               </div>
               <div>
@@ -326,19 +389,24 @@ export default function BecomeHostPage() {
           {step === 2 && (
             <div className="space-y-5">
               <h2 className="text-xl font-bold text-gray-900 mb-6">{b.step2}</h2>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  {b.priceNight}: <strong>${form.pricePerNight}</strong>
-                </label>
-                <input type="range" min={10} max={150} step={5}
-                  value={form.pricePerNight} onChange={e => set("pricePerNight", Number(e.target.value))} className="w-full accent-red-600" />
-                <div className="flex justify-between text-xs text-gray-400 mt-1"><span>$10</span><span>$150</span></div>
-                <div className="mt-2 bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-blue-800 space-y-1">
-                  <p className="font-semibold">💰 Расчёт вашего дохода за ночь:</p>
-                  <p>Гость платит: <strong>${form.pricePerNight}</strong></p>
-                  <p>Комиссия платформы (15%): −${(form.pricePerNight * 0.15).toFixed(2)}</p>
-                  <p>Комиссия за перевод (1%): −${(form.pricePerNight * 0.84 * 0.01).toFixed(2)}</p>
-                  <p className="font-bold text-green-700">Вы получите: <span className="text-base">${(form.pricePerNight * 0.84 * 0.99).toFixed(2)}</span></p>
+              <div className="space-y-3">
+                <div className="bg-green-50 border border-green-100 rounded-xl p-3 text-xs text-green-800 space-y-1">
+                  <p className="font-semibold text-base">🆓 Проживание — БЕСПЛАТНО для гостей</p>
+                  <p>Вы зарабатываете на платных услугах: ужины, экскурсии, мастер-классы</p>
+                  <p>Комиссия платформы: 16% с платных услуг</p>
+                  <p>Вы получаете: <strong>84%</strong> от платных услуг</p>
+                </div>
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" checked={allowsDayVisit}
+                      onChange={e => setAllowsDayVisit(e.target.checked)}
+                      className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                  </label>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-800">🥘 Дневной визит без проживания</p>
+                    <p className="text-xs text-gray-600">Гости могут приехать с утра и уехать вечером того же дня — обеды, экскурсии, мастер-классы. Вы сами решаете, подходит ли вам такой формат.</p>
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -419,7 +487,7 @@ export default function BecomeHostPage() {
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">{b.amenitiesLabel}</label>
                 <div className="grid grid-cols-2 gap-2">
-                  {AMENITIES.map(a => (
+                  {(AMENITIES[lang] || AMENITIES.en).map(a => (
                     <button key={a} type="button" onClick={() => toggle("amenities", a)}
                       className={`text-left px-3 py-2 rounded-lg border text-sm transition-colors ${form.amenities.includes(a) ? "border-red-500 bg-red-50 text-red-700 font-medium" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}>
                       {form.amenities.includes(a) && "✓ "}{a}
@@ -439,7 +507,7 @@ export default function BecomeHostPage() {
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">{b.experiencesLabel}</label>
                 <div className="grid grid-cols-1 gap-2">
-                  {EXPERIENCES.map(e => (
+                  {(EXPERIENCES[lang] || EXPERIENCES.en).map(e => (
                     <button key={e} type="button" onClick={() => toggle("experiences", e)}
                       className={`text-left px-3 py-2 rounded-lg border text-sm transition-colors ${form.experiences.includes(e) ? "border-red-500 bg-red-50 text-red-700 font-medium" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}>
                       {form.experiences.includes(e) && "✓ "}{e}
@@ -459,7 +527,7 @@ export default function BecomeHostPage() {
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">{b.langsLabel}</label>
                 <div className="flex flex-wrap gap-2">
-                  {LANGS_LIST.map(l => (
+                  {(LANGS_LIST[lang] || LANGS_LIST.en).map(l => (
                     <button key={l} type="button" onClick={() => toggle("languages", l)}
                       className={`px-3 py-1.5 rounded-full border text-sm transition-colors ${form.languages.includes(l) ? "border-red-500 bg-red-50 text-red-700 font-medium" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}>
                       {l}
@@ -491,13 +559,13 @@ export default function BecomeHostPage() {
               <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-800 flex items-center gap-2">
                 <Loader2 size={14} className="animate-spin" />
                 <Languages size={14} />
-                {lang === "ru" ? "Перевод текста..." : lang === "hy" ? "Թարգմանություն..." : lang === "ar" ? "جارٍ الترجمة..." : lang === "zh" ? "正在翻译..." : lang === "fa" ? "در حال ترجمه..." : "Translating..."}
+                {lang === "ru" ? "Перевод текста..." : lang === "hy" ? "Թարգմանություն..." : lang === "ar" ? "جارٍ الترجمة..." : lang === "zh" ? "正在翻译..." : lang === "fa" ? "در حال ترجمه..." : lang === "fr" ? "Traduction..." : lang === "de" ? "Übersetzung..." : lang === "es" ? "Traducción..." : lang === "it" ? "Traduzione..." : "Translating..."}
               </div>
             )}
             {translatedBanner && !isTranslating && (
               <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-800 flex items-center gap-2 cursor-pointer" onClick={() => setTranslatedBanner(false)}>
                 <Languages size={14} />
-                {lang === "ru" ? "✓ Текст переведён на выбранный язык" : lang === "hy" ? "✓ Տեքստը թարգմանված է" : lang === "ar" ? "✓ تمت ترجمة النص" : lang === "zh" ? "✓ 文本已翻译" : lang === "fa" ? "✓ متن ترجمه شد" : "✓ Text translated to selected language"}
+                {lang === "ru" ? "✓ Текст переведён на выбранный язык" : lang === "hy" ? "✓ Տեքստը թարգմանված է" : lang === "ar" ? "✓ تمت ترجمة النص" : lang === "zh" ? "✓ 文本已翻译" : lang === "fa" ? "✓ متن ترجمه شد" : lang === "fr" ? "✓ Texte traduit" : lang === "de" ? "✓ Text übersetzt" : lang === "es" ? "✓ Texto traducido" : lang === "it" ? "✓ Testo tradotto" : "✓ Text translated to selected language"}
               </div>
             )}
             {Object.values(fieldErrors).some(Boolean) && (

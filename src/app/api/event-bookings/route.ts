@@ -11,8 +11,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert — try hayhome_event_bookings first, fallback to hayhome_bookings
-    let result: any;
-    let error: any;
+    let result: Record<string, unknown> | null = null;
+    let error: { code?: string; message?: string } | null = null;
     let usedTable = "hayhome_event_bookings";
 
     ({ data: result, error } = await supabase

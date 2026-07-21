@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { Host } from "@/lib/types";
+import { useLang } from "@/contexts/LanguageContext";
 
 // Armenian city → coordinates lookup
 export const CITY_COORDS: Record<string, [number, number]> = {
@@ -86,6 +87,7 @@ function createMarkerIcon(): L.DivIcon {
 // Geolocation button component
 function GeolocationButton() {
   const map = useMap();
+  const { tr, lang } = useLang();
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
 
   const handleLocate = () => {
@@ -108,7 +110,7 @@ function GeolocationButton() {
       <button
         onClick={handleLocate}
         className="absolute right-3 top-3 z-[1000] bg-white rounded-lg shadow-md p-2 hover:bg-gray-50 transition"
-        title="My location"
+        title={lang === "ru" ? "Моё местоположение" : lang === "fr" ? "Ma position" : lang === "de" ? "Mein Standort" : lang === "es" ? "Mi ubicación" : lang === "it" ? "La mia posizione" : lang === "ar" ? "موقعي" : lang === "zh" ? "我的位置" : lang === "fa" ? "موقعیت من" : "My location"}
         style={{ border: "2px solid rgba(0,0,0,0.1)" }}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4001A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -129,7 +131,7 @@ function GeolocationButton() {
             iconAnchor: [8, 8],
           })}
         >
-          <Popup>You are here</Popup>
+          <Popup>{lang === "ru" ? "Вы здесь" : lang === "fr" ? "Vous êtes ici" : lang === "de" ? "Sie sind hier" : lang === "es" ? "Estás aquí" : lang === "it" ? "Sei qui" : lang === "ar" ? "أنت هنا" : lang === "zh" ? "你在这里" : lang === "fa" ? "شما اینجا هستید" : "You are here"}</Popup>
         </Marker>
       )}
     </>
@@ -142,9 +144,9 @@ export interface MapHost {
   city: string;
   region: string;
   coverPhoto: string;
-  pricePerNight: number;
   rating: number;
   stars: number;
+  stayFree?: boolean;
 }
 
 interface MapProps {
@@ -155,6 +157,7 @@ interface MapProps {
 }
 
 export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
+  const { tr } = useLang();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -172,7 +175,6 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
     city: h.city,
     region: h.region,
     coverPhoto: h.coverPhoto,
-    pricePerNight: h.pricePerNight,
     rating: h.rating,
     stars: h.stars,
   }));
@@ -250,9 +252,11 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
                     <span style={{ fontSize: "12px" }}>
                       {host.rating > 0 ? `⭐ ${host.rating}` : ""}
                     </span>
-                    <span style={{ fontWeight: 700, color: "#D4001A", fontSize: "14px" }}>
-                      ${host.pricePerNight}/night
+                    {host.stayFree && (
+                    <span style={{ fontWeight: 700, color: "#16a34a", fontSize: "13px", background: "#dcfce7", padding: "2px 8px", borderRadius: "12px" }}>
+                      {tr.hosts.freeBadge}
                     </span>
+                    )}
                   </div>
                   {/* 7-day availability calendar */}
                   <div style={{ marginBottom: "8px" }}>
@@ -288,7 +292,7 @@ export default function Map({ hosts, onHostClick, center, zoom }: MapProps) {
                       textDecoration: "none",
                     }}
                   >
-                    Забронировать
+                    {tr.hosts?.book || "Book"}
                   </a>
                 </div>
               </Popup>

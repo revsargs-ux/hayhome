@@ -176,9 +176,9 @@ export async function POST(req: NextRequest) {
   if (existingBookings && existingBookings.length > 0) {
     const newStart = startTime;
     const newEnd = endTime;
-    const conflict = existingBookings.find((b: any) => {
+    const conflict = existingBookings.find((b: { start_time?: string; end_time?: string }) => {
       // Check overlap: existing [b.start_time, b.end_time) vs new [newStart, newEnd)
-      return b.start_time < newEnd && b.end_time > newStart;
+      return (b.start_time ?? "") < newEnd && (b.end_time ?? "") > newStart;
     });
     if (conflict) {
       return NextResponse.json(

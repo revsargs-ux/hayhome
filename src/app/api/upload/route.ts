@@ -31,11 +31,8 @@ const VALID_FOLDERS = ["hosts", "providers", "reviews", "avatars", "general"];
 // Server-side Supabase client with service_role for storage writes (lazy init)
 function getSupabaseServer() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) throw new Error("Supabase env vars not configured");
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    console.warn("[upload] WARNING: Using publishable key — uploads may fail due to RLS");
-  }
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) throw new Error("Supabase service role key not configured");
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
@@ -205,20 +202,37 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "URL is required" }, { status: 400 });
   }
 
-  // Only admin can delete files
-  if (user.role !== "admin") {
-    return NextResponse.json(
-      { error: "Only administrators can delete files. Contact support." },
-      { status: 403 }
-    );
-  }
-
   const storagePath = extractStoragePath(url);
   if (!storagePath) {
     return NextResponse.json(
       { error: "Not a Supabase Storage URL" },
       { status: 400 }
     );
+  }
+
+  // Only admin or host owner can delete files
+  if (user.role !== "admin") {
+    // Only hosts/ folder files can be deleted by non-admins
+    const pathMatch = storagePath.match(/^hosts\//);
+    if (!pathMatch) {
+      return NextResponse.json(
+        { error: "Only administrators can delete files in this folder." },
+        { status: 403 }
+      );
+    }
+    // Verify the user owns an active host profile
+    const { data: userHost } = await getSupabaseServer()
+      .from("hayhome_hosts")
+      .select("id")
+      .eq("userId", user.id)
+      .eq("status", "active")
+      .single();
+    if (!userHost) {
+      return NextResponse.json(
+        { error: "Only host owners or administrators can delete files." },
+        { status: 403 }
+      );
+    }
   }
 
   const { error: deleteError } = await getSupabaseServer().storage

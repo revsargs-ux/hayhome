@@ -116,6 +116,7 @@ export interface UI {
   history: string;
   noRecords: string;
   noBookingsAdmin: string;
+  noSvcBookings: string;
   noPayoutRequests: string;
   noUsers: string;
   searchByName: string;
@@ -315,9 +316,17 @@ export interface UI {
   closeMenu: string;
   openMenu: string;
   requisites: string;
+  // Additional i18n keys
+  uploading: string;
+  cover: string;
+  noPhotos: string;
+  profile: string;
+  leaveReview: string;
+  myLocation: string;
+  youAreHere: string;
+  book: string;
 }
 
-type Rec = Record<string, string>;
 
 const translations: Record<LangCode, UI> = {
   ru: {
@@ -334,6 +343,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "Всего бронирований",
     earnedLabel: "Заработано",
     noBookings: "Пока нет заявок",
+    noSvcBookings: "У вас пока нет заказанных услуг",
     bookingsTab: "Бронирования",
     profileTab: "Профиль",
     calendarTab: "Календарь",
@@ -353,7 +363,7 @@ const translations: Record<LangCode, UI> = {
     statusLabel: "Статус",
     descriptionLabel: "Описание",
     phoneLabel: "Телефон",
-    pricePerNight: "Цена за ночь",
+    pricePerNight: "Бесплатное проживание",
     nameLabel: "Имя",
     emailLabel: "Эл. почта",
     roleLabel: "Роль",
@@ -601,6 +611,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Закрыть меню",
     openMenu: "Открыть меню",
     requisites: "Реквизиты",
+    uploading: "Загрузка...",
+    cover: "Обложка",
+    noPhotos: "Фото пока не загружены",
+    profile: "Профиль",
+    leaveReview: "Оставить отзыв",
+    myLocation: "Мое местоположение",
+    youAreHere: "Вы здесь",
+    book: "Забронировать",
   },
 
   en: {
@@ -610,13 +628,14 @@ const translations: Record<LangCode, UI> = {
     provider: "Provider",
     footerTagline: "Armenia is waiting for you — not in a hotel, but at home.",
     madeInArmenia: "Made with ❤️ in Armenia",
-    armenianPlatform: "🇦🇲 Armenian hospitality platform.",
+    armenianPlatform: "🇦🇲 Armenian homestay platform — stay with local families for free.",
     myAccount: "Dashboard",
     newRequests: "New requests",
     confirmedLabel: "Confirmed",
     totalBookings: "Total bookings",
     earnedLabel: "Earned",
     noBookings: "No bookings yet",
+    noSvcBookings: "No services booked yet",
     bookingsTab: "Bookings",
     profileTab: "Profile",
     calendarTab: "Calendar",
@@ -636,7 +655,7 @@ const translations: Record<LangCode, UI> = {
     statusLabel: "Status",
     descriptionLabel: "Description",
     phoneLabel: "Phone",
-    pricePerNight: "Price/night",
+    pricePerNight: "Free stay",
     nameLabel: "Name",
     emailLabel: "Email",
     roleLabel: "Role",
@@ -884,6 +903,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Close menu",
     openMenu: "Open menu",
     requisites: "Legal Details",
+    uploading: "Uploading...",
+    cover: "Cover",
+    noPhotos: "No photos yet",
+    profile: "Profile",
+    leaveReview: "Leave a review",
+    myLocation: "My location",
+    youAreHere: "You are here",
+    book: "Book",
   },
 
   hy: {
@@ -900,6 +927,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "Ընդհանուր ամրագրումներ",
     earnedLabel: "Վաստակված",
     noBookings: "Դեռևս ամրագրումներ չկան",
+    noSvcBookings: "Դեռևս պատասխան չկան պատասխան",
     bookingsTab: "Ամրագրումներ",
     profileTab: "Պրոֆիլ",
     calendarTab: "Օրացույց",
@@ -919,7 +947,7 @@ const translations: Record<LangCode, UI> = {
     statusLabel: "Կարգավիճակ",
     descriptionLabel: "Նկարագրություն",
     phoneLabel: "Հեռախոս",
-    pricePerNight: "Գինը մեկ գիշերվա",
+    pricePerNight: "Անվճար ապրել",
     nameLabel: "Անուն",
     emailLabel: "Էլ. փոստ",
     roleLabel: "Դեր",
@@ -1167,6 +1195,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Փակել մենյուը",
     openMenu: "Բացել մենյուը",
     requisites: "Տվյալներ",
+    uploading: "Բեռնում...",
+    cover: "Քապ",
+    noPhotos: "Սպասի փոչում չկա",
+    profile: "Պրոֆիլ",
+    leaveReview: "Տալի կարից",
+    myLocation: "Մու պատճառը",
+    youAreHere: "Դուք այստես եք",
+    book: "Ամրագրիր",
   },
 
   fr: {
@@ -1176,13 +1212,14 @@ const translations: Record<LangCode, UI> = {
     provider: "Espace pro",
     footerTagline: "L'Arménie vous attend — pas à l'hôtel, mais à la maison.",
     madeInArmenia: "Fait avec ❤️ en Arménie",
-    armenianPlatform: "🇦🇲 Plateforme d'hospitalité arménienne.",
+    armenianPlatform: "🇦🇲 Plateforme de séjours chez les familles arméniennes.",
     myAccount: "Mon espace",
     newRequests: "Nouvelles demandes",
     confirmedLabel: "Confirmés",
     totalBookings: "Total réservations",
     earnedLabel: "Revenus",
     noBookings: "Pas encore de réservations",
+    noSvcBookings: "Aucun service réservé pour le moment",
     bookingsTab: "Réservations",
     profileTab: "Profil",
     calendarTab: "Calendrier",
@@ -1202,7 +1239,7 @@ const translations: Record<LangCode, UI> = {
     statusLabel: "Statut",
     descriptionLabel: "Description",
     phoneLabel: "Téléphone",
-    pricePerNight: "Prix/nuit",
+    pricePerNight: "Séjour gratuit",
     nameLabel: "Nom",
     emailLabel: "Email",
     roleLabel: "Rôle",
@@ -1450,6 +1487,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Fermer le menu",
     openMenu: "Ouvrir le menu",
     requisites: "Coordonnées",
+    uploading: "Téléchargement...",
+    cover: "Couverture",
+    noPhotos: "Pas encore de photos",
+    profile: "Profil",
+    leaveReview: "Laisser un avis",
+    myLocation: "Ma position",
+    youAreHere: "Vous êtes ici",
+    book: "Réserver",
   },
 
   de: {
@@ -1466,6 +1511,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "Buchungen gesamt",
     earnedLabel: "Verdient",
     noBookings: "Noch keine Buchungen",
+    noSvcBookings: "Noch keine Dienstleistungen gebucht",
     bookingsTab: "Buchungen",
     profileTab: "Profil",
     calendarTab: "Kalender",
@@ -1485,7 +1531,7 @@ const translations: Record<LangCode, UI> = {
     statusLabel: "Status",
     descriptionLabel: "Beschreibung",
     phoneLabel: "Telefon",
-    pricePerNight: "Preis/Nacht",
+    pricePerNight: "Kostenloser Aufenthalt",
     nameLabel: "Name",
     emailLabel: "E-Mail",
     roleLabel: "Rolle",
@@ -1733,6 +1779,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Menü schließen",
     openMenu: "Menü öffnen",
     requisites: "Bankdaten",
+    uploading: "Hochladen...",
+    cover: "Cover",
+    noPhotos: "Noch keine Fotos",
+    profile: "Profil",
+    leaveReview: "Bewertung abgeben",
+    myLocation: "Mein Standort",
+    youAreHere: "Sie sind hier",
+    book: "Buchen",
   },
 
   es: {
@@ -1749,6 +1803,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "Reservas totales",
     earnedLabel: "Ganado",
     noBookings: "Aún no hay reservas",
+    noSvcBookings: "Aún no hay servicios reservados",
     bookingsTab: "Reservas",
     profileTab: "Perfil",
     calendarTab: "Calendario",
@@ -1768,7 +1823,7 @@ const translations: Record<LangCode, UI> = {
     statusLabel: "Estado",
     descriptionLabel: "Descripción",
     phoneLabel: "Teléfono",
-    pricePerNight: "Precio/noche",
+    pricePerNight: "Estancia gratuita",
     nameLabel: "Nombre",
     emailLabel: "Correo",
     roleLabel: "Rol",
@@ -2016,6 +2071,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Cerrar menú",
     openMenu: "Abrir menú",
     requisites: "Datos legales",
+    uploading: "Subiendo...",
+    cover: "Portada",
+    noPhotos: "Aún no hay fotos",
+    profile: "Perfil",
+    leaveReview: "Dejar una reseña",
+    myLocation: "Mi ubicación",
+    youAreHere: "Estás aquí",
+    book: "Reservar",
   },
 
   it: {
@@ -2032,6 +2095,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "Prenotazioni totali",
     earnedLabel: "Guadagnato",
     noBookings: "Nessuna prenotazione",
+    noSvcBookings: "Nessun servizio prenotato",
     bookingsTab: "Prenotazioni",
     profileTab: "Profilo",
     calendarTab: "Calendario",
@@ -2051,7 +2115,7 @@ const translations: Record<LangCode, UI> = {
     statusLabel: "Stato",
     descriptionLabel: "Descrizione",
     phoneLabel: "Telefono",
-    pricePerNight: "Prezzo/notte",
+    pricePerNight: "Soggiorno gratuito",
     nameLabel: "Nome",
     emailLabel: "Email",
     roleLabel: "Ruolo",
@@ -2299,6 +2363,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "Chiudi menu",
     openMenu: "Apri menu",
     requisites: "Dati legali",
+    uploading: "Caricamento...",
+    cover: "Copertina",
+    noPhotos: "Nessuna foto ancora",
+    profile: "Profilo",
+    leaveReview: "Lascia una recensione",
+    myLocation: "La mia posizione",
+    youAreHere: "Sei qui",
+    book: "Prenota",
   },
 
   ar: {
@@ -2315,6 +2387,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "إجمالي الحجوزات",
     earnedLabel: "المكتسبة",
     noBookings: "لا حجوزات بعد",
+    noSvcBookings: "لا توجد خدمات محجوزة بعد",
     bookingsTab: "الحجوزات",
     profileTab: "ملفي",
     calendarTab: "التقويم",
@@ -2334,7 +2407,7 @@ const translations: Record<LangCode, UI> = {
     statusLabel: "الحالة",
     descriptionLabel: "الوصف",
     phoneLabel: "الهاتف",
-    pricePerNight: "السعر/ليلة",
+    pricePerNight: "إقامة مجانية",
     nameLabel: "الاسم",
     emailLabel: "البريد الإلكتروني",
     roleLabel: "الدور",
@@ -2582,6 +2655,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "إغلاق القائمة",
     openMenu: "فتح القائمة",
     requisites: "البيانات القانونية",
+    uploading: "جارٍ الرفع...",
+    cover: "غلاف",
+    noPhotos: "لا توجد صور بعد",
+    profile: "الملف الشخصي",
+    leaveReview: "أضف تقييماً",
+    myLocation: "موقعي",
+    youAreHere: "أنت هنا",
+    book: "احجز",
   },
 
   zh: {
@@ -2598,6 +2679,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "总预订",
     earnedLabel: "已赚取",
     noBookings: "暂无预订",
+    noSvcBookings: "暂无预订服务",
     bookingsTab: "预订",
     profileTab: "资料",
     calendarTab: "日历",
@@ -2617,7 +2699,7 @@ const translations: Record<LangCode, UI> = {
     statusLabel: "状态",
     descriptionLabel: "描述",
     phoneLabel: "电话",
-    pricePerNight: "价格/晚",
+    pricePerNight: "免费住宿",
     nameLabel: "姓名",
     emailLabel: "邮箱",
     roleLabel: "角色",
@@ -2865,6 +2947,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "关闭菜单",
     openMenu: "打开菜单",
     requisites: "法律信息",
+    uploading: "上传中...",
+    cover: "封面",
+    noPhotos: "还没有照片",
+    profile: "个人资料",
+    leaveReview: "留下评价",
+    myLocation: "我的位置",
+    youAreHere: "你在这里",
+    book: "预订",
   },
 
   fa: {
@@ -2881,6 +2971,7 @@ const translations: Record<LangCode, UI> = {
     totalBookings: "کل رزروها",
     earnedLabel: "کسب شده",
     noBookings: "هنوز رزروی وجود ندارد",
+    noSvcBookings: "هنوز خدمتی رزرو نشده است",
     bookingsTab: "رزروها",
     profileTab: "پروفایل",
     calendarTab: "تقویم",
@@ -2900,7 +2991,7 @@ const translations: Record<LangCode, UI> = {
     statusLabel: "وضعیت",
     descriptionLabel: "توضیحات",
     phoneLabel: "تلفن",
-    pricePerNight: "قیمت/شب",
+    pricePerNight: "اقامت رایگان",
     nameLabel: "نام",
     emailLabel: "ایمیل",
     roleLabel: "نقش",
@@ -3128,6 +3219,14 @@ const translations: Record<LangCode, UI> = {
     closeMenu: "بستن منو",
     openMenu: "باز کردن منو",
     requisites: "اطلاعات قانونی",
+    uploading: "بارگذاری...",
+    cover: "جلد",
+    noPhotos: "هنوز عکسی نیست",
+    profile: "پروفایل",
+    leaveReview: "برجسبان بگذارید",
+    myLocation: "موقعیت من",
+    youAreHere: "شما اینجا هستید",
+    book: "رزرو",
     free: "در دسترس",
     booked: "اشغال",
     selected: "انتخاب شده",

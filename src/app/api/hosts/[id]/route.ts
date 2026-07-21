@@ -3,7 +3,7 @@ import { getHost, updateHost } from "@/lib/data";
 import { getAuthUser } from "@/lib/auth";
 
 const ALLOWED_FIELDS = [
-  "familyName", "name", "description", "longDescription", "pricePerNight",
+  "familyName", "name", "description", "longDescription",
   "coverPhoto", "photos", "amenities", "experiences", "languages",
   "maxGuests", "availableRooms", "i18n", "location", "city", "region",
   "phone", "email",
@@ -29,7 +29,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   // Ownership check: only admin or host owner can PATCH
   const isAdmin = user.role === "admin";
-  const hostUserId = (host as any).user_id || (host as any).userId;
+  const hostRecord = host as unknown as Record<string, unknown>;
+  const hostUserId = (hostRecord.user_id ?? hostRecord.userId) as string | undefined;
   if (!isAdmin && hostUserId !== user.id) {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }

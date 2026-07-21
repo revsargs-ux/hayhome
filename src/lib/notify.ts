@@ -89,7 +89,7 @@ export function buildBookingEmailHtml(data: {
           ${data.guestPhone ? `<tr><td style="padding:8px 0;color:#666">Телефон:</td><td style="padding:8px 0;color:#111">${data.guestPhone}</td></tr>` : ""}
           <tr><td style="padding:8px 0;color:#666">Даты:</td><td style="padding:8px 0;color:#111">📅 ${data.checkIn} → ${data.checkOut}</td></tr>
           <tr><td style="padding:8px 0;color:#666">Гостей:</td><td style="padding:8px 0;color:#111">👥 ${data.guests}</td></tr>
-          <tr><td style="padding:8px 0;color:#666">Сумма:</td><td style="padding:8px 0;font-weight:bold;color:#D4001A;font-size:18px">💵 $${data.totalPrice}</td></tr>
+          <tr><td style="padding:8px 0;color:#666">Сумма:</td><td style="padding:8px 0;font-weight:bold;color:#D4001A;font-size:18px">🆓 Бесплатно</td></tr>
           ${data.message ? `<tr><td style="padding:8px 0;color:#666;vertical-align:top">Сообщение:</td><td style="padding:8px 0;color:#111;font-style:italic">"${data.message}"</td></tr>` : ""}
         </table>
         <div style="margin-top:20px;padding:16px;background:#fff3cd;border-radius:8px;border-left:4px solid #F2A900">
@@ -123,7 +123,7 @@ export function buildServiceEmailHtml(data: {
           <tr><td style="padding:8px 0;color:#666">Услуга:</td><td style="padding:8px 0;font-weight:bold;color:#111">${data.serviceTitle}</td></tr>
           <tr><td style="padding:8px 0;color:#666">Дата:</td><td style="padding:8px 0;color:#111">📅 ${data.date}</td></tr>
           <tr><td style="padding:8px 0;color:#666">Время:</td><td style="padding:8px 0;color:#111">⏰ ${data.startTime} — ${data.endTime}</td></tr>
-          ${data.totalPrice ? `<tr><td style="padding:8px 0;color:#666">Сумма:</td><td style="padding:8px 0;font-weight:bold;color:#D4001A">💵 $${data.totalPrice}</td></tr>` : ""}
+          ${data.totalPrice ? `<tr><td style="padding:8px 0;color:#666">Сумма:</td><td style="padding:8px 0;font-weight:bold;color:#D4001A">🆓 Бесплатно</td></tr>` : ""}
         </table>
         <div style="margin-top:20px;text-align:center">
           <a href="https://hay-home.com/dashboard" style="background:linear-gradient(135deg,#D4001A,#F2A900);color:#fff;padding:12px 24px;border-radius:20px;text-decoration:none;font-weight:bold">Открыть dashboard</a>

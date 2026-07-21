@@ -1,13 +1,22 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Host, Booking } from "@/lib/types";
+import { useRouter } from "next/navigation";
 import { Check, X, Star, Users, DollarSign, Home, RefreshCw } from "lucide-react";
 import AdminCalendarView from "@/components/AdminCalendarView";
+import AdminContracts from "./contracts/page";
+import AdminFinance from "./AdminFinance";
+import AdminLogs from "./AdminLogs";
+import AdminReviews from "./AdminReviews";
+import AdminSettings from "./AdminSettings";
+import AdminNotifications from "./AdminNotifications";
+import AdminGuestRequests from "./AdminGuestRequests";
 import { useLang } from "@/contexts/LanguageContext";
 import getUI from "@/lib/ui";
 import type { LangCode } from "@/lib/translations";
+import translations from "@/lib/translations";
 
-type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar" | "users" | "services" | "promocodes";
+type Tab = "hosts" | "bookings" | "stats" | "payouts" | "calendar" | "users" | "services" | "promocodes" | "contracts" | "finance" | "logs" | "reviews" | "settings" | "notifications" | "guest-requests";
 
 // Full 10-language status labels
 const STATUS_LABELS: Record<string, Record<string, string>> = {
@@ -63,6 +72,7 @@ const ACTION_LABELS: Record<string, Record<string, string>> = {
 };
 
 export default function AdminPage() {
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>("hosts");
   const [hosts, setHosts] = useState<Host[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -90,25 +100,46 @@ export default function AdminPage() {
   const [promoForm, setPromoForm] = useState({ code: "", discount_type: "percent", discount_value: 10, min_amount: 0, max_uses: 100, expires_at: "" });
   const [promoLoading, setPromoLoading] = useState(false);
 
-  const { lang } = useLang();
+  // New tabs state
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [hostHistory, setHostHistory] = useState<any[]>([]);
+  const [guestRequests, setGuestRequests] = useState<any[]>([]);
+  const [platformSettings, setPlatformSettings] = useState({ commissionPercent: 16, iban: "", bankName: "", legalName: "HayHome LLC", legalAddress: "", supportPhone: "", supportEmail: "info@hay-home.com" });
+
+  const { lang, tr } = useLang();
   const u = getUI(lang);
 
   const a = () => ""; // deprecated — do not use, kept for type compat only
 
   const load = async () => {
     setLoading(true);
-    const [h, b, p, usr, promos] = await Promise.all([
-      fetch("/api/hosts?all=1", { credentials: "include" }).then((r) => r.json()),
+    const [h, b, p, usr, promos, rev, gr] = await Promise.all([
+      fetch("/api/hosts?all=1", { credentials: "include" }).then((r) => {
+        if (r.status === 403) { router.push("/"); throw new Error("Not admin"); }
+        return r.json();
+      }),
       fetch("/api/bookings", { credentials: "include" }).then((r) => r.json()),
       fetch("/api/partners/payout/", { credentials: "include" }).then((r) => r.json()).catch(() => []),
       fetch("/api/auth/users", { credentials: "include" }).then((r) => r.json()).catch(() => []),
       fetch("/api/promocodes", { credentials: "include" }).then((r) => r.json()).catch(() => []),
+      fetch("/api/reviews", { credentials: "include" }).then((r) => r.json()).catch(() => []),
+      fetch("/api/requests", { credentials: "include" }).then((r) => r.json()).catch(() => []),
     ]);
     setHosts(h);
     setBookings(b);
     setPayouts(Array.isArray(p) ? p : []);
     setUsers(Array.isArray(usr) ? usr : []);
     setPromocodes(Array.isArray(promos) ? promos : []);
+    setReviews(Array.isArray(rev) ? rev : []);
+    setGuestRequests(Array.isArray(gr) ? gr : []);
+    // Load host history
+    try {
+      const histPromises = h.filter((host: any) => host.status === "active" || host.status === "pending").map((host: any) =>
+        fetch(`/api/hosts/${host.id}/notes`, { credentials: "include" }).then(r => r.json()).catch(() => [])
+      );
+      const histResults = await Promise.all(histPromises);
+      setHostHistory(histResults.flat());
+    } catch { setHostHistory([]); }
     setLoading(false);
   };
 
@@ -165,6 +196,13 @@ export default function AdminPage() {
     { key: "users", label: u.usersTab, badge: users.length || undefined },
     { key: "services", label: u.servicesTab },
     { key: "promocodes", label: u.promocodesTab },
+    { key: "contracts", label: "📄 Договоры" },
+    { key: "finance", label: "💰 Финансы" },
+    { key: "logs", label: "📋 Логи" },
+    { key: "reviews", label: "⭐ Отзывы" },
+    { key: "settings", label: "⚙️ Настройки" },
+    { key: "notifications", label: "✉️ Уведом." },
+    { key: "guest-requests", label: "📨 Запросы", badge: guestRequests.filter((r: any) => r.status === "pending").length || undefined },
   ];
 
   return (
@@ -270,7 +308,7 @@ export default function AdminPage() {
                         </div>
                         <p className="text-sm text-gray-600">
                           {booking.hostName} · {booking.checkIn} → {booking.checkOut}
-                          · {booking.guests} {u.guestsLabel} · <strong>${booking.totalPrice}</strong>
+                          · {booking.guests} {u.guestsLabel}
                         </p>
                         {booking.message && (
                           <p className="text-xs text-gray-400 mt-1 italic">"{booking.message}"</p>
@@ -452,6 +490,7 @@ export default function AdminPage() {
             )}
 
             {/* Promocodes tab */}
+            {tab === "contracts" && <AdminContracts />}
             {tab === "promocodes" && (
               <div className="space-y-4">
                 {/* Create form */}
@@ -603,6 +642,13 @@ export default function AdminPage() {
                 )}
               </div>
             )}
+            {/* ── Extra tabs ── */}
+            {tab === "finance" && <AdminFinance bookings={bookings} commission={platformSettings.commissionPercent} />}
+            {tab === "logs" && <AdminLogs history={hostHistory} />}
+            {tab === "reviews" && <AdminReviews reviews={reviews} onDelete={async (id) => { await fetch("/api/reviews", { method: "DELETE", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) }); load(); }} />}
+            {tab === "settings" && <AdminSettings settings={platformSettings} onChange={setPlatformSettings} />}
+            {tab === "notifications" && <AdminNotifications hosts={hosts} users={users} />}
+            {tab === "guest-requests" && <AdminGuestRequests requests={guestRequests} />}
           </>
         )}
       </div>
@@ -654,7 +700,7 @@ function HostRow({ host, updating, onUpdate, onLogAction, lang }: {
           </div>
           <p className="text-sm text-gray-600">{host.description}</p>
           <p className="text-xs text-gray-400 mt-1">
-            {host.phone} · {host.email} · {"★".repeat(host.stars)} · ${host.pricePerNight}{"/night"}
+            {host.phone} · {host.email} · {"★".repeat(host.stars)} · {translations[lang]?.hosts?.freeStay ?? "🆓 Free"}
           </p>
           {host.admin_notes && (
             <p className="text-xs text-amber-600 mt-1 bg-amber-50 rounded px-2 py-1">📝 {host.admin_notes}</p>
@@ -754,6 +800,7 @@ function AdminServicesTab({ lang }: { lang: LangCode }) {
   const [services, setServices] = useState<any[]>([]);
   const [svcBookings, setSvcBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -768,18 +815,69 @@ function AdminServicesTab({ lang }: { lang: LangCode }) {
 
   useEffect(() => { load(); }, []);
 
+  const moderateService = async (id: string, approve: boolean) => {
+    setUpdating(id);
+    await fetch("/api/services", {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, available: approve }),
+    });
+    await load();
+    setUpdating(null);
+  };
+
   const catIcons: Record<string, string> = {
     photo: "📸", video: "🎥", music: "🎵", costume: "👗", decor: "🎨", dance: "💃", guide: "🗺️", chef: "👨‍🍳", custom: "✨",
   };
+
+  const pendingSvcs = services.filter((s: any) => s.available === false);
+  const activeSvcs = services.filter((s: any) => s.available === true);
 
   if (loading) return <div className="text-center py-12 text-gray-400">{u.loadingText}</div>;
 
   return (
     <div className="space-y-6">
-      {/* All services */}
+      {/* Pending services */}
+      {pendingSvcs.length > 0 && (
+        <div>
+          <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <span className="w-2 h-2 bg-yellow-400 rounded-full" /> На проверке ({pendingSvcs.length})
+          </h2>
+          <div className="space-y-3">
+            {pendingSvcs.map((svc: any) => (
+              <div key={svc.id} className="bg-white rounded-xl shadow-sm p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-gray-900">{svc.title}</span>
+                      <span className="text-gray-400 text-xs">{catIcons[svc.category] || "✨"} {svc.category}</span>
+                      <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs">Pending</span>
+                    </div>
+                    <p className="text-sm text-gray-600">{svc.description?.slice(0, 100)}</p>
+                    <p className="text-xs text-gray-400">{svc.region} · ${svc.price}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => moderateService(svc.id, true)} disabled={updating === svc.id}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg font-medium hover:bg-green-600 disabled:opacity-50">
+                      <Check size={12} /> Одобрить
+                    </button>
+                    <button onClick={() => moderateService(svc.id, false)} disabled={updating === svc.id}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg font-medium hover:bg-red-600 disabled:opacity-50">
+                      <X size={12} /> Отклонить
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Active services */}
       <div>
-        <h2 className="text-lg font-bold text-gray-900 mb-3">{u.allServices} ({services.length})</h2>
-        {services.length === 0 ? (
+        <h2 className="text-lg font-bold text-gray-900 mb-3">{u.allServices} ({activeSvcs.length})</h2>
+        {activeSvcs.length === 0 ? (
           <p className="text-gray-400 text-sm">{u.noServicesAdmin}</p>
         ) : (
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -791,19 +889,22 @@ function AdminServicesTab({ lang }: { lang: LangCode }) {
                   <th className="text-left px-4 py-3">{u.selectRegion}</th>
                   <th className="text-left px-4 py-3">{u.priceLabel}</th>
                   <th className="text-left px-4 py-3">{u.serviceStatusLabel}</th>
+                  <th className="text-left px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {services.map((svc: any) => (
+                {activeSvcs.map((svc: any) => (
                   <tr key={svc.id}>
                     <td className="px-4 py-3 font-medium text-gray-900">{svc.title}</td>
                     <td className="px-4 py-3">{catIcons[svc.category] || "✨"} {svc.category}</td>
                     <td className="px-4 py-3 text-gray-600">{svc.region}</td>
                     <td className="px-4 py-3 font-semibold">${svc.price}</td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${svc.available ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-                        {svc.available ? u.activeStatus : u.hiddenStatus}
-                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">{u.activeStatus}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button onClick={() => moderateService(svc.id, false)} disabled={updating === svc.id}
+                        className="text-red-500 hover:text-red-700 text-xs">Скрыть</button>
                     </td>
                   </tr>
                 ))}

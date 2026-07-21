@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
 import t, { LangCode, Translations, LANGUAGES } from "@/lib/translations";
 
 interface LanguageContextType {
@@ -18,29 +19,21 @@ const LanguageContext = createContext<LanguageContextType>({
 
 function applyLang(l: LangCode) {
   const isRtl = LANGUAGES.find((x) => x.code === l)?.rtl ?? false;
-  document.documentElement.lang = l;
   document.documentElement.setAttribute("dir", isRtl ? "rtl" : "ltr");
+  document.documentElement.setAttribute("lang", l);
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<LangCode>("hy");
+  const searchParams = useSearchParams();
 
+  // Init: URL param → localStorage → default
   useEffect(() => {
-    // Priority: ?lang= URL param → localStorage → default
-    const urlLang = new URLSearchParams(window.location.search).get("lang") as LangCode | null;
-    const saved   = localStorage.getItem("hayhome_lang") as LangCode | null;
-    const resolved = (urlLang && t[urlLang]) ? urlLang
-                   : (saved   && t[saved])   ? saved
-                   : null;
-
-    if (resolved) {
-      setLangState(resolved);
-      localStorage.setItem("hayhome_lang", resolved);
-      applyLang(resolved);
-    } else {
-      // apply default
-      applyLang("hy");
-    }
+    const urlLang = searchParams.get("lang") as LangCode | null;
+    const saved = localStorage.getItem("hayhome_lang") as LangCode | null;
+    const init = urlLang && t[urlLang] ? urlLang : saved && t[saved] ? saved : "hy";
+    setLangState(init);
+    applyLang(init);
   }, []);
 
   const setLang = (l: LangCode) => {

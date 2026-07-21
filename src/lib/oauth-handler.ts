@@ -138,8 +138,8 @@ export async function oauthCallbackPost(req: NextRequest, provider: OAuthProvide
     res.cookies.set("oauth_verifier", "", { maxAge: 0, path: "/" });
     res.cookies.set("oauth_provider", "", { maxAge: 0, path: "/" });
     return res;
-  } catch (err: any) {
-    console.error(`[OAuth] ${provider} POST callback error:`, err.message);
+  } catch (err) {
+    console.error(`[OAuth] ${provider} POST callback error:`, err instanceof Error ? err.message : err);
     return NextResponse.redirect(`${loginUrl}&provider=${provider}`);
   }
 }

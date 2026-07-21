@@ -106,14 +106,18 @@ export default function HostCard({ host, valueRank }: Props) {
           )}
           <button
             onClick={toggleCompare}
+            aria-label={inCompare ? u.removeFromCompare : u.addToCompare}
             className={`absolute bottom-3 right-3 w-9 h-9 rounded-full flex items-center justify-center shadow-md transition z-10 ${inCompare ? "bg-red-600 text-white" : "bg-white/95 text-gray-700 hover:bg-white"}`}
             title={inCompare ? u.removeFromCompare : u.addToCompare}
           >
             <span className="text-sm">⚖️</span>
           </button>
           <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/65 to-transparent p-3 pointer-events-none">
-            <span className="text-white font-extrabold text-xl">${host.pricePerNight}</span>
-            <span className="text-white/75 text-sm">{h.perNight}</span>
+            {host.stayFree && (
+              <span className="inline-flex items-center gap-1 bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
+                {tr.hosts.freeBadge}
+              </span>
+            )}
           </div>
         </div>
 

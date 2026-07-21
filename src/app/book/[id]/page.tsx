@@ -13,8 +13,113 @@ import AddressAutocomplete from "@/components/AddressAutocomplete";
 import type { NominatimResult } from "@/components/AddressAutocomplete";
 import dynamic from "next/dynamic";
 import NavigatorLinks from "@/components/NavigatorLinks";
-import { getCityCoords } from "@/lib/cityCoords";
+import { getCityCoords, getCityCoordsAsync } from "@/lib/cityCoords";
 import Recommendations from "@/components/Recommendations";
+
+// Category emoji mapping
+const CATEGORY_ICONS: Record<string, string> = {
+  food: "🍴", tour: "🗺️", music: "🎵", events: "🎉",
+  culture: "🎭", craft: "🧵", transport: "🚗", other: "✨",
+};
+const PRICE_UNIT: Record<string, Record<string, string>> = {
+  per_hour: { ru: "/час", en: "/hour", hy: "/ժամ" },
+  per_event: { ru: "/меропр.", en: "/event", hy: "/միջոցառ" },
+  per_person: { ru: "/чел", en: "/person", hy: "/հյուր" },
+};
+
+function PostBookingServices({ hostId, region, checkIn, checkOut, guests }: {
+  hostId: string; region: string; checkIn: string; checkOut: string; guests: number;
+}) {
+  const { lang } = useLang();
+  const [services, setServices] = useState<Record<string, unknown>[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isFallback, setIsFallback] = useState(false);
+
+  useEffect(() => {
+    // First try services from same region
+    fetch("/api/recommendations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "similar-services", hostId, limit: 6 }),
+    })
+      .then(r => r.json())
+      .then(d => {
+        const regional = (d?.services || []) as Record<string, unknown>[];
+        if (regional.length > 0) {
+          setServices(regional);
+          setLoading(false);
+        } else {
+          // No services in this region — show all available services
+          setIsFallback(true);
+          fetch("/api/recommendations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "services", limit: 6 }),
+          })
+          .then(r => r.json())
+          .then(d2 => { setServices((d2?.services || []) as Record<string, unknown>[]); setLoading(false); })
+          .catch(() => setLoading(false));
+        }
+      })
+      .catch(() => setLoading(false));
+  }, [hostId]);
+
+  if (loading || services.length === 0) return null;
+
+  const unitLabel = (u: string) => (PRICE_UNIT[u] || PRICE_UNIT.per_event)[lang] || (PRICE_UNIT.per_event).en;
+  const titles: Record<string, string> = {
+    ru: isFallback ? "✨ Доступные впечатления в Армении" : "✨ Добавьте впечатления к вашему визиту",
+    en: isFallback ? "✨ Available experiences in Armenia" : "✨ Add experiences to your visit",
+    hy: isFallback ? "✨ Հայաստանում հասանելի տպավորություններ" : "✨ Ավելացրեք տպավորություններ",
+    fr: isFallback ? "✨ Expériences disponibles en Arménie" : "✨ Ajoutez des expériences",
+    de: isFallback ? "✨ Verfügbare Erlebnisse in Armenien" : "✨ Erlebnisse hinzufügen",
+    es: isFallback ? "✨ Experiencias disponibles en Armenia" : "✨ Agregue experiencias",
+    it: isFallback ? "✨ Esperienze disponibili in Armenia" : "✨ Aggiungi esperienze",
+    ar: isFallback ? "✨ تجارب متاحة في أرمينيا" : "✨ أضف تجارب",
+    zh: isFallback ? "✨ 亚美尼亚可用体验" : "✨ 添加体验",
+    fa: isFallback ? "✨ تجربه‌های موجود در ارمنستان" : "✨ تجربه اضافه کنید",
+  };
+  const btnLabels: Record<string, string> = {
+    ru: "Забронировать", en: "Book now", hy: "Ամրագրել",
+    fr: "Réserver", de: "Buchen", es: "Reservar",
+    it: "Prenota", ar: "احجز", zh: "立即预订", fa: "رزرو",
+  };
+  const dateHint: Record<string, string> = {
+    ru: "Даты вашего бронирования", en: "Your booking dates", hy: "Ձեր ամրագրման ամսաթվերը",
+    fr: "Dates de votre réservation", de: "Ihre Buchungsdaten",
+    es: "Fechas de su reserva", it: "Date della prenotazione",
+    ar: "تواريخ الحجز", zh: "您的预订日期", fa: "تاریخ رزرو شما",
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto px-4 mt-6 w-full">
+      <h3 className="text-lg font-bold text-gray-900 mb-1 text-center">{titles[lang] || titles.en}</h3>
+      <p className="text-sm text-gray-500 mb-4 text-center">📅 {checkIn} → {checkOut} · {dateHint[lang] || dateHint.en}</p>
+      <div className="space-y-3">
+        {services.map((s) => {
+          const cat = String(s.category || "other");
+          const priceUnit = String(s.price_unit || "per_event");
+          const bookingUrl = `/services/book/${s.id}?date=${checkIn}&guests=${guests}`;
+          return (
+            <Link key={String(s.id)} href={bookingUrl}
+              className="flex items-center gap-4 bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+              <div className="text-3xl flex-shrink-0">{CATEGORY_ICONS[cat] || "✨"}</div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-semibold text-gray-900 text-sm truncate">{String(s.title)}</h4>
+                <p className="text-xs text-gray-500 truncate">{String(s.region)}</p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <p className="font-bold text-gray-900">${Number(s.price)}<span className="text-xs text-gray-400 font-normal">{unitLabel(priceUnit)}</span></p>
+                <span className="text-xs text-orange-600 font-medium">{btnLabels[lang] || btnLabels.en} →</span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 import { reverseGeocode } from "@/lib/geo";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false });
@@ -193,15 +298,18 @@ export default function BookPage() {
     return Math.max(0, Math.round((new Date(form.checkOut).getTime() - new Date(form.checkIn).getTime()) / 86400000));
   })();
 
-  const total = host ? nights * host.pricePerNight : 0;
-  const commission = Math.round((total + extraTotal) * 0.15 * 100) / 100;
-  const finalTotal = total;
+  // Проживание бесплатно
+  const total = 0;
+  const finalTotal = host?.stayFree ? 0 : (host?.pricePerNight || 0) * (nights || 0);
+
+  // Day visit: checkIn == checkOut разрешено если хост позволяет
+  const isDayVisit = host?.allowsDayVisit && form.checkIn && form.checkOut && form.checkIn === form.checkOut;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!host) return;
     if (!user) { setAuthRequired(true); return; }
-    if (nights < 1) { setError(u.bookingDatesError); return; }
+    if (nights < 1 && !isDayVisit) { setError(u.bookingDatesError); return; }
     setLoading(true);
     setError("");
     try {
@@ -223,19 +331,7 @@ export default function BookPage() {
       // Clear draft on successful booking
       try { localStorage.removeItem(`hayhome_booking_draft_${id}`); } catch {}
 
-      if (bookingId) {
-        try {
-          const payRes = await fetch("/api/payments/create", {
-            method: "POST", credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ booking_id: bookingId, method: "yookassa", currency: "RUB" }),
-          });
-          if (payRes.ok) {
-            const payData = await payRes.json();
-            if (payData.url) { window.location.href = payData.url; return; }
-          }
-        } catch (e) {}
-      }
+      // Проживание бесплатно — оплата не требуется, сразу показываем успех
       setSuccess(true);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Unknown error";
@@ -320,7 +416,7 @@ export default function BookPage() {
         </p>
         <div className="bg-orange-50 rounded-xl p-4 mb-6 text-left text-sm">
           <p className="font-semibold text-gray-800 mb-2">{t("details")}:</p>
-          <p>📅 {form.checkIn}{form.checkInTime ? " " + form.checkInTime : ""} → {form.checkOut}{form.checkOutTime ? " " + form.checkOutTime : ""} ({nights} {t("nights")})</p>
+          <p>📅 {form.checkIn}{form.checkInTime ? " " + form.checkInTime : ""} → {form.checkOut}{form.checkOutTime ? " " + form.checkOutTime : ""} {isDayVisit ? `(${lang === "ru" ? "дневной визит" : "day visit"})` : `(${nights} ${t("nights")})`}</p>
           <p>👥 {form.guests} {tr.hosts.guests}</p>
           <p>💵 {t("total")}: ${finalTotal}</p>
         </div>
@@ -335,16 +431,8 @@ export default function BookPage() {
         </div>
       </div>
 
-      {/* Recommendations after booking */}
-      <div className="max-w-4xl mx-auto px-4 mt-8 w-full">
-        <Recommendations
-          type="similar-services"
-          hostId={id}
-          title="✨ Добавьте впечатления"
-          titleEn="✨ Add experiences"
-          limit={4}
-        />
-      </div>
+      {/* Post-booking: suggest services for these dates */}
+      <PostBookingServices hostId={id} region={host.region} checkIn={form.checkIn} checkOut={form.checkOut} guests={form.guests} />
     </div>
   );
 
@@ -386,8 +474,8 @@ export default function BookPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("phone")}</label>
-                    <input value={form.guestPhone} onChange={e => setForm(f => ({ ...f, guestPhone: e.target.value }))}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
+                    <input type="tel" value={form.guestPhone} onChange={e => setForm(f => ({ ...f, guestPhone: e.target.value.replace(/[^+\d\s()\-]/g, '') }))}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" placeholder="+7 999 123-45-67" />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -404,7 +492,7 @@ export default function BookPage() {
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("checkOut")} *</label>
                     <input required type="date" value={form.checkOut}
-                      min={form.checkIn || new Date().toISOString().split("T")[0]}
+                      min={host?.allowsDayVisit ? form.checkIn || new Date().toISOString().split("T")[0] : (form.checkIn || new Date().toISOString().split("T")[0])}
                       onChange={e => setForm(f => ({ ...f, checkOut: e.target.value }))}
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-red-400 text-gray-900" />
                     <input type="time" value={form.checkOutTime}
@@ -472,7 +560,7 @@ export default function BookPage() {
 <button type="submit" disabled={loading}
                   className="w-full py-4 rounded-xl text-white font-bold text-lg hover:opacity-90 transition disabled:opacity-70"
                   style={{ background: "linear-gradient(135deg, #D4001A, #F2A900)" }}>
-                  {loading ? u.sendingText : (nights > 0 ? `${lang === "ru" ? "Оплатить (комиссия 15%)" : "Pay (15% commission)"} · $${commission}` : t("submit"))}
+                  {loading ? u.sendingText : (lang === "ru" ? "Забронировать бесплатно" : lang === "hy" ? "Անվարկագին արից պայմանագրել" : "Book for Free")}
                 </button>
                 <p className="text-center text-xs text-gray-400">{t("cancel")}</p>
               </form>
@@ -494,18 +582,26 @@ export default function BookPage() {
                   </div>
                 </div>
               </div>
-              {nights > 0 ? (
+              {(nights > 0 || isDayVisit) ? (
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between text-gray-700">
-                    <span>${host.pricePerNight} × {nights} {t("nights")}</span>
-                    <span>${total}</span>
-                  </div>
+                  {isDayVisit ? (
+                    <div className="flex justify-between text-amber-700">
+                      <span>{lang === "ru" ? "🥘 Дневной визит" : lang === "hy" ? "🥘 Օրեկան այցելություն" : "🥘 Day Visit"}</span>
+                      <span className="text-green-600 font-semibold">{t("free")}</span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between text-gray-700">
+                      <span>{lang === "ru" ? "Проживание" : lang === "hy" ? "Կացելություն" : "Accommodation"}</span>
+                      <span className="text-green-600 font-semibold">{t("free")}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-gray-500 text-xs">
                     <span>{t("service")}</span>
                     <span className="text-green-600 font-medium">{t("free")}</span>
                   </div>
                   <div className="flex justify-between font-bold text-gray-900 text-base pt-2 border-t border-gray-100">
-                    <span>{t("total")}</span><span>${finalTotal}</span>
+                    <span>{t("total")}</span>
+                    <span className="text-green-600">{t("free")}</span>
                   </div>
                 </div>
               ) : (

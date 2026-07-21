@@ -23,20 +23,12 @@ export async function POST(req: NextRequest) {
   // ── Server-side amount calculation ──
   let amount = 0;
 
-  if (booking_id) {
-    // Verify booking belongs to user
-    const { data: booking } = await supabase
-      .from("hayhome_bookings")
-      .select("totalPrice, guestEmail, status")
-      .eq("id", booking_id)
-      .single();
-    if (!booking) {
-      return NextResponse.json({ error: "Booking not found" }, { status: 404 });
-    }
-    if (booking.guestEmail !== user.email && user.role !== "admin") {
-      return NextResponse.json({ error: "Not your booking" }, { status: 403 });
-    }
-    amount = Math.round(Number(booking.totalPrice) * 0.15 * 100) / 100; // 15% commission
+  if (booking_id && !service_booking_id) {
+    // Проживание бесплатно — оплата не требуется
+    return NextResponse.json(
+      { error: "Бронирование проживания бесплатное, оплата не требуется" },
+      { status: 400 }
+    );
   } else if (service_booking_id) {
     // Verify service booking
     const { data: svcBooking } = await supabase

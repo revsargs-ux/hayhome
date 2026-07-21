@@ -77,12 +77,8 @@ export async function POST(req: NextRequest) {
             .eq("id", paymentId)
             .single();
 
-          if (payment?.booking_id) {
-            await supabase
-              .from("hayhome_bookings")
-              .update({ status: "confirmed" })
-              .eq("id", payment.booking_id);
-          }
+          // Проживание бесплатно — статус уже confirmed при создании бронирования
+          // Webhook обновляет только платные услуги (service_bookings)
           if (payment?.service_booking_id) {
             await supabase
               .from("hayhome_service_bookings")
@@ -106,9 +102,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
     }
 
-    // Verify YooKassa signature (IP whitelist or shared secret header)
+    // Verify YooKassa signature (timing-safe)
     const incomingSecret = req.headers.get("x-yookassa-secret") || "";
-    if (incomingSecret !== yookassaSecret) {
+    let validSecret = false;
+    try {
+      const a = Buffer.from(incomingSecret, "utf-8");
+      const b = Buffer.from(yookassaSecret, "utf-8");
+      validSecret = a.length === b.length && crypto.timingSafeEqual(a, b);
+    } catch {
+      validSecret = false;
+    }
+    if (!validSecret) {
       return NextResponse.json({ error: "Invalid webhook secret" }, { status: 401 });
     }
 
@@ -141,12 +145,8 @@ export async function POST(req: NextRequest) {
             .eq("id", paymentId)
             .single();
 
-          if (payRecord?.booking_id) {
-            await supabase
-              .from("hayhome_bookings")
-              .update({ status: "confirmed" })
-              .eq("id", payRecord.booking_id);
-          }
+          // Проживание бесплатно — статус уже confirmed при создании
+          // Webhook обновляет только платные услуги (service_bookings)
           if (payRecord?.service_booking_id) {
             await supabase
               .from("hayhome_service_bookings")

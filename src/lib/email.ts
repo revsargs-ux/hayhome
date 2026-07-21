@@ -51,7 +51,7 @@ export async function sendBookingNotification(data: {
             <tr><td style="padding: 8px 0; color: #666;">Телефон:</td><td style="padding: 8px 0; color: #111;">${data.guestPhone || "—"}</td></tr>
             <tr><td style="padding: 8px 0; color: #666;">Даты:</td><td style="padding: 8px 0; color: #111;">📅 ${data.checkIn} → ${data.checkOut}</td></tr>
             <tr><td style="padding: 8px 0; color: #666;">Гостей:</td><td style="padding: 8px 0; color: #111;">👥 ${data.guests}</td></tr>
-            <tr><td style="padding: 8px 0; color: #666;">Сумма:</td><td style="padding: 8px 0; font-weight: bold; color: #D4001A; font-size: 18px;">💵 $${data.totalPrice}</td></tr>
+            <tr><td style="padding: 8px 0; color: #666;">Сумма:</td><td style="padding: 8px 0; font-weight: bold; color: #D4001A; font-size: 18px;">🆓 Бесплатно</td></tr>
             ${data.message ? `<tr><td style="padding: 8px 0; color: #666; vertical-align: top;">Сообщение:</td><td style="padding: 8px 0; color: #111; font-style: italic;">"${data.message}"</td></tr>` : ""}
           </table>
           <div style="margin-top: 20px; padding: 16px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #F2A900;">
@@ -81,7 +81,7 @@ export async function sendBookingNotification(data: {
             <p style="margin: 6px 0; color: #555;">🏡 <strong>${data.hostName}</strong></p>
             <p style="margin: 6px 0; color: #555;">📅 ${data.checkIn} → ${data.checkOut}</p>
             <p style="margin: 6px 0; color: #555;">👥 Гостей: ${data.guests}</p>
-            <p style="margin: 6px 0; color: #D4001A; font-weight: bold; font-size: 18px;">💵 Итого: $${data.totalPrice}</p>
+            <p style="margin: 6px 0; color: #D4001A; font-weight: bold; font-size: 18px;">🆓 Проживание бесплатное</p>
           </div>
           <p style="color: #777; font-size: 14px;">Если у вас есть вопросы — напишите нам: <a href="mailto:${ADMIN_EMAIL}" style="color: #D4001A;">${ADMIN_EMAIL}</a></p>
           <div style="text-align: center; margin-top: 32px;">
@@ -133,7 +133,7 @@ export async function sendHostApplicationNotification(data: {
             <tr><td style="padding: 8px 0; color: #666;">Email:</td><td style="padding: 8px 0; color: #111;"><a href="mailto:${data.email}">${data.email}</a></td></tr>
             <tr><td style="padding: 8px 0; color: #666;">Телефон:</td><td style="padding: 8px 0; color: #111;">${data.phone}</td></tr>
             <tr><td style="padding: 8px 0; color: #666;">Город:</td><td style="padding: 8px 0; color: #111;">${data.city}, ${data.region}</td></tr>
-            <tr><td style="padding: 8px 0; color: #666;">Цена за ночь:</td><td style="padding: 8px 0; font-weight: bold; color: #D4001A;">$${data.pricePerNight}</td></tr>
+            <tr><td style="padding: 8px 0; color: #666;">Стоимость:</td><td style="padding:8px 0;font-weight:bold;color:#16a34a;">🆓 Бесплатно</td></tr>
             <tr><td style="padding: 8px 0; color: #666; vertical-align: top;">Описание:</td><td style="padding: 8px 0; color: #111; font-style: italic;">"${data.description}"</td></tr>
           </table>
           <div style="margin-top: 20px; text-align: center;">

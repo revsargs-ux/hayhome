@@ -11,21 +11,25 @@ const stripHtml = (s: string) => s.replace(/<[^>]*>/g, "").trim();
 
 export async function GET(req: NextRequest) {
   const all = req.nextUrl.searchParams.get("all");
-  const hosts = await getHosts();
   if (all) {
     const user = await getAuthUser(req);
     if (!user || user.role !== "admin") {
       return NextResponse.json({ error: "Admin access required" }, { status: 403 });
     }
-    return NextResponse.json(hosts);
+    const hosts = await getHosts(true); // includeAll = true — all statuses
+    return NextResponse.json(hosts, { headers: { "Cache-Control": "public, max-age=60, s-maxage=300" } });
   }
-  return NextResponse.json(hosts.filter((h) => h.status === "active"));
+  const hosts = await getHosts();
+  return NextResponse.json(hosts, { headers: { "Cache-Control": "public, max-age=60, s-maxage=300" } });
 }
 
 export async function POST(req: NextRequest) {
   // Rate limit
   const blocked = rateLimit(req);
   if (blocked) return blocked;
+
+  // Optional auth — link host to user account if logged in
+  const user = await getAuthUser(req).catch(() => null);
 
   const body = await req.json();
 
@@ -39,7 +43,8 @@ export async function POST(req: NextRequest) {
   if (!EMAIL_RE.test(body.email)) {
     return NextResponse.json({ error: "Invalid email" }, { status: 400 });
   }
-  if (typeof body.pricePerNight !== "number" || body.pricePerNight < 0 || body.pricePerNight > 10000) {
+  // pricePerNight опционально — проживание бесплатно
+  if (body.pricePerNight !== undefined && (typeof body.pricePerNight !== "number" || body.pricePerNight < 0 || body.pricePerNight > 10000)) {
     return NextResponse.json({ error: "Invalid price" }, { status: 400 });
   }
   if (typeof body.stars !== "number" || body.stars < 1 || body.stars > 5) {
@@ -58,7 +63,10 @@ export async function POST(req: NextRequest) {
     city: String(body.city).slice(0, 100),
     region: String(body.region).slice(0, 100),
     stars: body.stars,
-    pricePerNight: body.pricePerNight,
+    pricePerNight: body.pricePerNight ?? 0,
+    stayFree: body.stayFree === true,
+    allowsDayVisit: body.allowsDayVisit === true,
+    serviceCategories: Array.isArray(body.serviceCategories) ? body.serviceCategories.slice(0, 10) : [],
     description: sanitize(body.description),
     longDescription: sanitize(body.longDescription),
     i18n: body.i18n || {},
