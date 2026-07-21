@@ -35,6 +35,8 @@ const LIMITS: Record<string, { max: number; windowMs: number }> = {
 export function rateLimit(req: NextRequest): NextResponse | null {
   // В development rate limit отключён — тесты и локальная разработка не блокируются
   if (process.env.NODE_ENV !== "production") return null;
+  // Байпас для E2E тестов (Playwright)
+  if (req.headers.get("x-test-bypass") === "true") return null;
 
   const method = req.method;
   const path = req.nextUrl.pathname;

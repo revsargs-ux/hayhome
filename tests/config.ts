@@ -1,7 +1,8 @@
 // Центральный конфиг для всех тестов HayHome
-// Заполнить реальными данными в .env.test или передать через env
+// BASE_URL единый для Playwright и API-вызовов в fixture'ах
 
-export const BASE_URL = process.env.TEST_BASE_URL || "http://localhost:3000";
+// Playwright прокидывает baseURL через process.env.BASE_URL (из playwright.config.ts)
+export const BASE_URL = process.env.BASE_URL || process.env.TEST_BASE_URL || "http://localhost:3000";
 
 export const TEST_USERS = {
   guest: {
@@ -39,7 +40,6 @@ export const TEST_USERS = {
 
 export const COOKIE_NAME = "hayhome_auth";
 
-// Тестовый хост для создания бронирований в тестах
 export const TEST_HOST_ID = process.env.TEST_HOST_ID || "";
 
 export const TIMEOUTS = {

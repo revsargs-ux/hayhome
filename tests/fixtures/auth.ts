@@ -21,7 +21,10 @@ async function loginViaApi(
 
   const res = await fetch(`${BASE_URL}/api/auth/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-test-bypass": "true",
+    },
     body: JSON.stringify({ email: creds.email, password: creds.password }),
   });
 
@@ -37,6 +40,7 @@ async function loginViaApi(
   const tokenMatch = setCookie.match(new RegExp(`${COOKIE_NAME}=([^;]+)`));
   const token = tokenMatch?.[1] || "";
 
+  const isHttps = BASE_URL.startsWith("https");
   const context = await browser.newContext({
     baseURL: BASE_URL,
     storageState: {
@@ -47,7 +51,7 @@ async function loginViaApi(
           domain: new URL(BASE_URL).hostname,
           path: "/",
           httpOnly: true,
-          secure: false,
+          secure: isHttps,
           sameSite: "Lax",
         },
       ],

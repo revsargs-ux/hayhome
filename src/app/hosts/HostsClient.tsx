@@ -68,11 +68,11 @@ function HostsContent() {
     }
     if (region) result = result.filter((h) => h.region === region || h.city === region);
     if (minStars > 0) result = result.filter((h) => h.stars >= minStars);
-    result = result.filter((h) => h.pricePerNight >= minPrice && h.pricePerNight <= maxPrice);
+    result = result.filter((h) => (h.pricePerNight ?? 0) >= minPrice && (h.pricePerNight ?? 0) <= maxPrice);
     if (experience) result = result.filter((h) => h.experiences?.some(e => e.toLowerCase().includes(experience.toLowerCase())));
     if (sortBy === "rating") result.sort((a, b) => b.rating - a.rating);
-    else if (sortBy === "price_asc") result.sort((a, b) => a.pricePerNight - b.pricePerNight);
-    else if (sortBy === "price_desc") result.sort((a, b) => b.pricePerNight - a.pricePerNight);
+    else if (sortBy === "price_asc") result.sort((a, b) => (a.pricePerNight ?? 0) - (b.pricePerNight ?? 0));
+    else if (sortBy === "price_desc") result.sort((a, b) => (b.pricePerNight ?? 0) - (a.pricePerNight ?? 0));
     else if (sortBy === "value") result.sort((a, b) => (valueRanks[a.id] || 999) - (valueRanks[b.id] || 999));
     setFiltered(result);
   }, [hosts, search, region, minStars, minPrice, maxPrice, sortBy, experience, valueRanks]);
